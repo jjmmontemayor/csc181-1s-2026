@@ -27,7 +27,7 @@ After downloading or copying the template:
 2. Replace all bracketed placeholders, such as `[Write your full name]`, with your own answers.
 3. Complete the AI Use Declaration at the end of the template.
 4. Commit and push the completed file to your personal CSC181 GitHub repository. Submit the repository link through MOLE.
-5. Submit the link to your repository through MOLE before **September 29, 2026 23:59:59**.
+5. Submit the link to your repository through MOLE before **September 30, 2026 23:59:59**.
 
 
 ## Learning goals
@@ -166,7 +166,7 @@ You may include **one screenshot** or reference image only if it does not contai
 - **File location in your personal CSC181 repository:** `activities/diyandi-software-in-the-wild.md`
 - **Length:** 250–400 words, excluding headings and optional references
 - **Submission method:** Commit and push the completed file to your personal CSC181 GitHub repository. Submit the repository link through MOLE.
-- **Deadline:** **September 29, 2026 23:59:59**
+- **Deadline:** **September 30, 2026 23:59:59**
 
 ---
 
