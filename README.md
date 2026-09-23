@@ -28,29 +28,21 @@ The course emphasizes that successful software is not defined only by code that 
 
 ## Course Learning Outcomes
 
-1. Explain software-engineering processes, roles, artifacts, quality concerns, and professional responsibilities.
-2. Analyze a real-world software problem by identifying stakeholders, needs, scope, constraints, risks, and success criteria.
-3. Specify a software solution through clear user stories or use cases, functional requirements, quality requirements, and acceptance criteria.
-4. Design a feasible, usable, modular, maintainable, secure, and accessible software solution using appropriate design artifacts.
-5. Apply collaborative development practices using Git/GitHub, issue tracking, documentation, task planning, peer review, and version control.
-6. Implement, test, evaluate, and improve a software solution using test cases, defect evidence, feedback, and defined quality criteria.
-7. Communicate and defend software-engineering decisions through technical documentation, demonstrations, and evidence-based presentations.
-8. Demonstrate ethical, inclusive, responsible, and collaborative behavior in software-project work.
+1. **Knowledge:** Explain fundamental software-engineering concepts, processes, tools, and quality considerations involved in developing software, including requirements, design, construction, testing, configuration management, project management, security, and professional practice.
+
+2. **Skills:** Analyze a real-world software problem and apply an iterative software-engineering process to specify requirements, design a solution, manage development work using collaborative tools, implement or prototype the solution, test it, document it, and communicate or defend technical decisions.
+
+3. **Attitude:** Demonstrate professional, ethical, inclusive, user-centered, and collaborative behavior by communicating responsibly, honoring commitments, giving and receiving constructive feedback, acknowledging sources and AI assistance, considering privacy, security, accessibility, and cultural context, and taking accountability for individual and team contributions.
 
 ---
 
 ## Integrated Course Outcomes
 
-| CLO | Integrated Outcome | KSA Domain | Suggested Assessment Evidence |
-|---|---|---|---|
-| CLO 1 | Explain software-engineering processes, artifacts, tools, quality concerns, and professional responsibilities. | Knowledge | Quizzes, reflections, discussion posts, oral questioning |
-| CLO 2 | Analyze a real-world problem by identifying stakeholders, needs, scope, constraints, risks, and success criteria. | Knowledge and Skills | Problem statement, stakeholder analysis, scope statement, risk register |
-| CLO 3 | Specify a software solution using clear functional requirements, quality requirements, user stories or use cases, and acceptance criteria. | Knowledge and Skills | Requirements document, backlog, user stories, use cases, acceptance criteria |
-| CLO 4 | Design a feasible, usable, modular, maintainable, secure, and accessible software solution using appropriate design artifacts. | Knowledge and Skills | Wireframes, UML/process diagrams, data model, architecture/design document |
-| CLO 5 | Apply collaborative software-development practices using Git/GitHub, issue tracking, documentation, task planning, peer review, and version-control workflows. | Skills and Attitudes | Commit history, branches, pull requests, issue board, meeting notes, contribution log |
-| CLO 6 | Implement, test, evaluate, and improve a software solution using test cases, defect evidence, feedback, and quality criteria. | Skills | Working prototype or system, test plan, test cases, defect log, revision history |
-| CLO 7 | Communicate and defend software-engineering decisions through clear documentation, demonstrations, and evidence-based presentations. | Skills and Attitudes | README, user guide, technical report, project demonstration, oral defense |
-| CLO 8 | Demonstrate ethical, inclusive, accountable, and collaborative conduct throughout software-project work. | Attitudes and Values | Peer evaluation, AI declaration, individual reflection, consultation records, contribution evidence |
+| CLO | Primary Evidence of Learning |
+|---|---|
+| CLO 1 | Quizzes, short reflections, discussion posts, concept checks, requirements and design exercises |
+| CLO 2 | Problem analysis, requirements artifacts, models or wireframes, GitHub repository, issue board, prototype or implementation, test plan and cases, documentation, project demonstration/defense |
+| CLO 3 | Peer evaluation, GitHub contribution evidence, team meeting records, AI use declarations, individual reflections, consultation records, professional conduct during project work |
 
 ---
 
