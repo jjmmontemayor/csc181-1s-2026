@@ -12,6 +12,24 @@ For this activity, you will imagine a digital system that could improve **one pa
 
 ---
 
+## Student template
+
+Use the provided Markdown template for your submission:
+
+[Open or download the student template](hw1_template.md)
+
+After downloading or copying the template:
+
+1. Save it in your personal CSC181 GitHub repository as:
+   ```text
+   activities/diyandi-software-in-the-wild.md
+   ```
+2. Replace all bracketed placeholders, such as `[Write your full name]`, with your own answers.
+3. Complete the AI Use Declaration at the end of the template.
+4. Commit and push the completed file to your personal CSC181 GitHub repository. Submit the repository link through MOLE.
+5. Submit the link to your repository through MOLE before **September 29, 2026 23:59:59**.
+
+
 ## Learning goals
 
 After completing this activity, you should be able to:
