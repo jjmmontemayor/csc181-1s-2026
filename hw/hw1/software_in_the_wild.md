@@ -207,4 +207,6 @@ You may include **one screenshot** or reference image only if it does not contai
 
 **How to tell whether it helped:** Ask users whether they found events more easily, observe whether users can locate selected venues, and collect feedback about schedule accuracy and ease of use.
 
+---
+
 Focus on thinking carefully about people, local context, and how software can help.
