@@ -1,4 +1,4 @@
-# CSC181 — Software Engineering
+# CSC181 Software Engineering
 
 ## Course Information
 
