@@ -28,43 +28,14 @@ The course emphasizes that successful software is not defined only by code that 
 
 ## Course Learning Outcomes
 
-Upon successful completion of CSC181, students should be able to demonstrate the following knowledge, skills, and attitudes/values.
-
-### Knowledge
-
-By the end of the course, students should be able to:
-
-1. Explain the purpose, scope, and life-cycle activities of software engineering.
-2. Distinguish common software process approaches, including plan-driven, iterative, agile, and DevOps-oriented practices.
-3. Describe the roles of stakeholders, user needs, functional requirements, quality attributes, constraints, risks, and acceptance criteria.
-4. Explain core software-design concepts, including modularity, abstraction, cohesion, coupling, architecture, interfaces, and maintainability.
-5. Explain the roles of version control, issue tracking, code review, testing, configuration management, documentation, and deployment in team software development.
-6. Describe fundamental software-quality concerns, including usability, reliability, performance, accessibility, privacy, security, and maintainability.
-7. Explain ethical, legal, social, cultural, and professional considerations relevant to software development, including responsible use of generative AI.
-
-### Skills
-
-By the end of the course, students should be able to:
-
-1. Analyze a real-world problem by identifying stakeholders, user needs, scope boundaries, assumptions, constraints, and project risks.
-2. Produce clear software-requirements artifacts, such as user stories, use cases, acceptance criteria, a prioritized backlog, and quality requirements.
-3. Create and communicate appropriate software-design artifacts, such as wireframes, process models, UML diagrams, data models, component diagrams, architecture descriptions, or interface specifications.
-4. Apply design principles to create a feasible, modular, usable, maintainable, and context-appropriate software solution.
-5. Use Git/GitHub and collaborative development practices to manage source code, documentation, issues, branches, pull requests, and project contributions.
-6. Plan and perform software testing by developing test cases, executing tests, documenting defects, interpreting results, and revising the software solution.
-7. Prepare clear technical and user-facing documentation, including README files, installation or deployment instructions, user guides, test reports, and project reports.
-8. Present and defend a software solution using evidence from requirements, design, implementation, testing, and feedback.
-
-### Attitudes and Values
-
-By the end of the course, students should be able to:
-
-1. Demonstrate professional responsibility by meeting commitments, documenting work honestly, and communicating risks or blockers early.
-2. Collaborate respectfully and constructively by valuing diverse perspectives, giving evidence-based feedback, and contributing fairly to team work.
-3. Practice integrity by acknowledging sources, tools, libraries, collaborators, and AI assistance; verifying outputs; and avoiding plagiarism, fabrication, and misrepresentation.
-4. Demonstrate empathy and user-centeredness by considering the needs of diverse users, including persons with disabilities, users with limited connectivity, and culturally diverse communities.
-5. Demonstrate ethical awareness by considering privacy, security, accessibility, safety, social impact, and cultural respect when proposing or developing software.
-6. Show initiative and a commitment to continuous learning by seeking feedback, revising work, learning unfamiliar tools, and improving software based on evidence.
+1. Explain software-engineering processes, roles, artifacts, quality concerns, and professional responsibilities.
+2. Analyze a real-world software problem by identifying stakeholders, needs, scope, constraints, risks, and success criteria.
+3. Specify a software solution through clear user stories or use cases, functional requirements, quality requirements, and acceptance criteria.
+4. Design a feasible, usable, modular, maintainable, secure, and accessible software solution using appropriate design artifacts.
+5. Apply collaborative development practices using Git/GitHub, issue tracking, documentation, task planning, peer review, and version control.
+6. Implement, test, evaluate, and improve a software solution using test cases, defect evidence, feedback, and defined quality criteria.
+7. Communicate and defend software-engineering decisions through technical documentation, demonstrations, and evidence-based presentations.
+8. Demonstrate ethical, inclusive, responsible, and collaborative behavior in software-project work.
 
 ---
 
