@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 2: Software Processes, SDLC, and Agile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 2. Last week we looked at software in the wild through the Diyandi activity: users, needs and ideas. This week asks the next question: once we know what to build, how do we organize the work of building it? The running example stays the Diyandi festival app from Week 1." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Software processes,<br>SDLC, and agile</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">What a software process is, the software development life cycle, plan-driven and iterative process models, and agile values, roles, and iterations</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 2</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. The first three are about process in general, the next two are agile and Scrum in practice, and the last one asks students to choose and justify a process. The process we pick this week shapes how teams work for the rest of the semester: proposal in Week 3, backlog in Week 4, sprints from Week 7." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From an idea to an organized way of building it</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Software process</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Activities, artifacts, roles</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">The SDLC</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Phases from idea to retirement</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Process models</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Waterfall, V-Model, incremental, spiral</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Agile values</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The manifesto and its principles</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Scrum &amp; Kanban</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Roles, events, artifacts, iterations</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Choosing a process</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Match the process to the project</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the process-model comparison activity (individual), and team formation with a preliminary project domain (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 1 (knowledge of software-engineering processes) and set up CLO 2 (applying an iterative process to the team project)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Define a software process</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and name its fundamental activities</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Describe the SDLC</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and what happens in each phase</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Compare process models</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">plan-driven versus iterative and incremental</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Explain the Agile Manifesto</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">its four values and key principles</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Describe Scrum</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">roles, events, artifacts, and one iteration</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Choose and justify a process</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">for a given project context</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="SWEBOK v4 covers this in the Software Engineering Process knowledge area: process definition, life cycles, assessment and improvement. There is no process-free software development; a team without a stated process still follows one, usually an unexamined one." aria-label="Slide 4">
+<section id="s4" data-section="Software processes" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software process</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What a software process is</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">A structured set of activities, with their inputs, outputs, roles, and constraints, used to develop and evolve a software system.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Specification</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">What should the system do, and under what constraints?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Design &amp; implementation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">How will we structure and build it?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Validation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Does it do what users actually need?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Evolution</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">How will it change as needs change?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Fundamental activities: I. Sommerville, <i>Software Engineering</i>, 10th ed. (2015), Ch. 2 · SWEBOK v4</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="Ask: think of a group project that went badly. Which of these six was missing? Usually coordination or visibility. Cargo-cult process: copying the rituals of a process without understanding what they are for. The term comes from Feynman&#x27;s 1974 &quot;cargo cult science&quot; talk about islanders who built mock runways hoping cargo planes would return. Examples: daily stand-ups where nobody raises blockers, or a Definition of Done nobody checks." aria-label="Slide 5">
+<section id="s5" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software process</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Why processes matter</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Coordination</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Many people, one product. Who does what, and when?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Predictability</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Stakeholders want to know what they get, and when.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Quality</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Reviews, tests and checkpoints are built into the flow.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Visibility</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Progress can be seen, measured and discussed.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Learning</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A defined process can be inspected and improved.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Accountability</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Work and decisions leave a trail: issues, commits, reviews.</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>A process is a tool, not a ritual.</b> Following steps without knowing why they exist is cargo-cult process.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="Students will see all four in their own repositories. The merge rule is a post-condition on the review activity and a pre-condition on integration." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software process</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A process description has four parts</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Activities</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">What is done: write requirements, review code</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Artifacts</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">What is produced: backlog, design, test report</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Roles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Who is responsible: product owner, developer, tester</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Conditions</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">What must be true before and after an activity</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>Example condition:</b> a pull request is merged only after one approving review and passing tests.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">In your team project: GitHub issues (activities), repository files (artifacts), team roles, and merge rules (conditions).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="Map to the course schedule: Week 3 planning and feasibility, Weeks 4 and 5 requirements and quality, Weeks 6 and 7 design, Week 8 implementation, Week 9 testing, Week 10 deployment and maintenance. The course itself walks the SDLC, but iteratively, with two sprints." aria-label="Slide 7">
+<section id="s7" data-section="The software development life cycle" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software development life cycle</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The SDLC: from idea to retirement</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:22px; font-weight:600; color:#1E1B2E">Planning</h3><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Feasibility, scope</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:22px; font-weight:600; color:#1E1B2E">Requirements</h3><p style="font-size:19px; line-height:1.3; color:#4C4A5E">What it must do</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:22px; font-weight:600; color:#1E1B2E">Design</h3><p style="font-size:19px; line-height:1.3; color:#4C4A5E">How it is structured</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:22px; font-weight:600; color:#1E1B2E">Build</h3><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Code and integrate</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">5</p><h3 style="font-size:22px; font-weight:600; color:#1E1B2E">Testing</h3><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Verify and validate</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">6</p><h3 style="font-size:22px; font-weight:600; color:#1E1B2E">Deploy</h3><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Release to users</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">7</p><h3 style="font-size:22px; font-weight:600; color:#F4F4F8">Maintain</h3><p style="font-size:19px; line-height:1.3; color:#C9C5E0">Fix, adapt, improve</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">Feedback from maintenance and real use loops back into planning.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">The phases are universal</h3><p style="font-size:25px; line-height:1.4">Every project plans, specifies, designs, builds, tests, releases and maintains.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">The process model decides the order</h3><p style="font-size:25px; line-height:1.4">How phases are sequenced, repeated and overlapped.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="Every output in the right column is a deliverable students will produce later this semester." aria-label="Slide 8">
+<section id="s8" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software development life cycle</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">SDLC phases at a glance</h2>
+  </div>
+  <table style="font-size:26px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:26%; color:#F4F4F8">Phase</th><th style="width:34%; color:#F4F4F8">Main question</th><th style="width:40%; color:#F4F4F8">Typical outputs</th></tr>
+    <tr><td><b>Planning &amp; feasibility</b></td><td>Should we build this? Can we?</td><td>Problem statement, scope, feasibility notes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Requirements</b></td><td>What must it do?</td><td>User stories, use cases, acceptance criteria</td></tr>
+    <tr><td><b>Design</b></td><td>How will it be structured?</td><td>Models, wireframes, architecture</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Implementation</b></td><td>How do we build it?</td><td>Source code, commits, pull requests</td></tr>
+    <tr><td><b>Testing</b></td><td>Does it work and meet needs?</td><td>Test plan, test cases, defect log</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Deployment</b></td><td>How do users get it?</td><td>Release, user guide</td></tr>
+    <tr><td><b>Maintenance</b></td><td>How does it keep working?</td><td>Patches, updates, change requests</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="The four maintenance types come from ISO/IEC 14764. Ask: which type is a Diyandi app update that adds this year&#x27;s new event venues? (Adaptive or perfective, depending on framing.)" aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software development life cycle</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Maintenance is most of the life cycle</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Corrective</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Fix defects found after release</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Adaptive</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Adjust to a changed environment: new OS, new API</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Perfective</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Improve features or performance</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Preventive</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Refactor to avoid future problems</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Software is rarely "done". It evolves as users, laws, devices and platforms change.</p>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>Implication:</b> code is read and changed far more often than it is written. Readability, documentation and tests pay off long after launch.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="The plan-driven versus agile distinction follows Ian Sommerville, Software Engineering, 10th ed. (Pearson, 2015), Chapter 2 (Software Processes) and Chapter 3 (Agile Software Development). Neither family is &quot;right&quot;; the next slides show what each model is good and bad at." aria-label="Slide 10">
+<section id="s10" data-section="Process models" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Two broad families</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Plan-driven</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Activities <b>planned in advance</b></li><li style="margin:5px 0">Progress measured <b>against the plan</b></li><li style="margin:5px 0">Heavy upfront requirements and design</li><li style="margin:5px 0">Examples: <b>Waterfall</b>, <b>V-Model</b></li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Iterative / incremental</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Plan, build and review in <b>short cycles</b></li><li style="margin:5px 0">Progress measured by <b>working software</b></li><li style="margin:5px 0">Requirements evolve with feedback</li><li style="margin:5px 0">Examples: <b>Incremental</b>, <b>Spiral</b>, <b>Agile</b></li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Most real projects are <b>hybrids</b> that mix elements of both families.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="Royce&#x27;s 1970 paper is often cited as introducing waterfall, but he actually warned against a single pass and recommended iteration and feedback. Pure waterfall is more a teaching model than common practice." aria-label="Slide 11">
+<section id="s11" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Waterfall</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Requirements</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Design</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Implementation</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Testing</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Operation &amp; maintenance</h3></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Strengths</h3><p style="font-size:25px; line-height:1.4">Simple to understand and manage · Clear milestones and documentation · Works when requirements are <b>stable and well understood</b></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Weaknesses</h3><p style="font-size:25px; line-height:1.4">Problems found late, at testing · Hard to absorb changing requirements · Users see working software <b>very late</b></p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="The same ATM appears on the V-Model example so students can compare the two. Ask: at which stage could the ₱200-bill request have been caught cheaply? (Requirements, by showing users an early prototype or mock-up.)" aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Waterfall in practice: an ATM cash-withdrawal system</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Requirements</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">A signed-off document, frozen before design: withdraw up to ₱20,000 a day, keep the card after 3 wrong PINs, reply within 5 seconds.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Design</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Full specifications: card reader, PIN pad, cash dispenser, transaction service, and the database for accounts and daily totals.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Implementation</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Programmers code every module, such as <b>computeNotes(amount)</b>, which picks the bills. No user sees the system yet.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Testing</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Only after all coding is done does QA test the whole system, end to end, against the requirements document.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Operation &amp; maintenance</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">ATMs are installed in branches; later patches handle new card standards and new regulations.</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>The catch:</b> during testing, the bank asks for ₱200 bills. That change goes back through design and implementation, the most expensive point to find it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="Left side is definition and decomposition; right side is testing and integration. Each horizontal pair links a specification to the test that checks it, which gives traceability." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">V-Model: every design level has a matching test level</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; align-items:center; gap:20px"><div style="width:640px; margin-left:0px; background:#EEEDF8; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#231E3D">Requirements analysis</div><p style="width:220px; text-align:center; font-size:22px; color:#6B6980">⟷ validates</p><div style="width:640px; background:#E1F3EE; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#0A5A4A">Acceptance testing</div></div>
+    <div style="display:flex; flex-direction:row; align-items:center; gap:20px"><div style="width:600px; margin-left:40px; background:#EEEDF8; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#231E3D">System design</div><p style="width:220px; text-align:center; font-size:22px; color:#6B6980">⟷ verifies</p><div style="width:600px; background:#E1F3EE; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#0A5A4A">System testing</div></div>
+    <div style="display:flex; flex-direction:row; align-items:center; gap:20px"><div style="width:560px; margin-left:80px; background:#EEEDF8; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#231E3D">Architecture design</div><p style="width:220px; text-align:center; font-size:22px; color:#6B6980">⟷ verifies</p><div style="width:560px; background:#E1F3EE; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#0A5A4A">Integration testing</div></div>
+    <div style="display:flex; flex-direction:row; align-items:center; gap:20px"><div style="width:520px; margin-left:120px; background:#EEEDF8; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#231E3D">Module design</div><p style="width:220px; text-align:center; font-size:22px; color:#6B6980">⟷ verifies</p><div style="width:520px; background:#E1F3EE; border-radius:10px; padding:14px 22px; font-size:26px; font-weight:600; color:#0A5A4A">Unit testing</div></div>
+    <div style="display:flex; flex-direction:row; justify-content:center; padding-left:0"><p style="background:#231E3D; color:#F4F4F8; font-size:26px; font-weight:600; padding:14px 40px; border-radius:10px; margin-left:-140px">Coding</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Test planning starts early</h3><p style="font-size:25px; line-height:1.4">Each design level defines how it will be tested.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Safety-critical fit</h3><p style="font-size:25px; line-height:1.4">Medical, automotive, aviation and other regulated domains.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Still sequential</h3><p style="font-size:25px; line-height:1.4">It shares waterfall's difficulty with change.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="Walk the table bottom-up the way testing runs: unit, integration, system, acceptance. Then point out that the acceptance tests were drafted while the requirements were written, so an ambiguous requirement like &quot;withdraw cash quickly&quot; gets caught early because nobody can write a test for it." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">V-Model in practice: the same ATM</h2>
+  </div>
+  <table style="font-size:23px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Level</th><th style="width:34%; color:#F4F4F8">Design side (left)</th><th style="width:46%; color:#F4F4F8">Matching test (right)</th></tr>
+    <tr><td><b>Requirements ⟷ Acceptance</b></td><td>Customers can withdraw up to ₱20,000 a day</td><td>Bank staff and pilot customers use a trial ATM in a branch and confirm the daily limit on real accounts</td></tr>
+    <tr style="background:#F6F5FB"><td><b>System design ⟷ System test</b></td><td>ATM talks to the bank server, replies within 5 s, keeps the card after 3 wrong PINs</td><td>Whole ATM and server in a test lab: 3 wrong PINs keeps the card; response time measured under load</td></tr>
+    <tr><td><b>Architecture ⟷ Integration</b></td><td>Card reader, PIN pad, dispenser, transaction service, network link</td><td>Transaction service with the dispenser: ₱2,500 approved means exactly ₱2,500 out; a network drop mid-transaction does not debit the account</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Module design ⟷ Unit test</b></td><td><b>computeNotes(amount)</b> picks which bills to dispense</td><td><b>computeNotes(2500)</b> returns 2 × ₱1,000 + 1 × ₱500; <b>computeNotes(2550)</b> is rejected</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>The difference from waterfall:</b> each test plan is written during its design stage, before any code exists. Coding sits at the bottom of the V.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="Most business systems and web apps are developed incrementally today. Both risks come from Sommerville, Ch. 2. Structure: adding features without restructuring makes each later change harder; agile counters this with regular refactoring. Visibility: plan-driven managers measure progress against deliverable documents, but producing a document for every increment is not cost-effective, so progress becomes harder to see unless the team keeps lightweight artifacts current." aria-label="Slide 15">
+<section id="s15" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Incremental development</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Outline requirements</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#0E7C66">1</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Increment 1</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Core features</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#0E7C66">2</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Increment 2</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">More features</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">3</p><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Increment 3</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">And so on</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">User feedback on each increment shapes the next one.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Benefits</h3><p style="font-size:23px; line-height:1.4">Users get value <b>early</b> and give feedback. Changing requirements costs less than in waterfall.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Risk: the structure degrades</h3><p style="font-size:23px; line-height:1.4">Each increment is built to fit the new feature, not the whole system. Without <b>refactoring</b> (cleaning up the design as you go), shortcuts pile up as technical debt. <i>Diyandi app: the vendor and venue lists copy the event-list code; a time-format bug now needs the same fix in three places.</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Risk: progress is harder to see</h3><p style="font-size:23px; line-height:1.4">There is no complete upfront plan to measure "% done" against, and docs fall behind the code. Managers can't track progress and new members can't see how parts fit. <i>Fix: keep the backlog, release notes and architecture notes current.</i></p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="Jeff Patton&#x27;s Mona Lisa analogy is a good image search to show here if you have time." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Iterative vs. incremental</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Incremental</h3><p style="font-size:28px; line-height:1.4">Build the product <b>piece by piece</b>. Each piece is mostly finished when delivered.</p><p style="font-size:26px; line-height:1.4; color:#4C4A5E"><i>Like painting one section of a mural at a time.</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Iterative</h3><p style="font-size:28px; line-height:1.4">Build a rough version of the <b>whole</b>, then <b>refine</b> it repeatedly.</p><p style="font-size:26px; line-height:1.4; color:#4C4A5E"><i>Like sketching the whole mural, then adding detail over several passes.</i></p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Agile combines both:</b> each iteration delivers an increment, and the product is refined through feedback.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="The spiral is a meta-model: inside a loop you could run waterfall or prototyping. What makes it distinct is that risk analysis decides what happens next." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Spiral model: one loop per major risk</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Objectives</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Goals, alternatives, constraints</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Risks</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Identify and resolve, often by prototyping</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Develop</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Build and verify the next level</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">4</p><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Plan</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">Review and plan the next loop</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">Each loop repeats the four steps, at growing cost and detail.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Good for</h3><p style="font-size:25px; line-height:1.4"><b>Large, high-risk or novel</b> systems.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Makes risk explicit</h3><p style="font-size:25px; line-height:1.4">You will build a <b>risk register</b> in Week 5.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Watch out</h3><p style="font-size:25px; line-height:1.4">Needs risk-assessment expertise; costly for small projects.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Boehm, "A Spiral Model of Software Development and Enhancement" (1988)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Each row is one full loop through the four quadrants: set the objective, find and reduce the biggest risk, build and verify, then plan the next loop with stakeholders. Notice the product changes direction twice (push plus SMS, then SMS opt-in) because of what the risk work revealed. Ask: what would have happened under waterfall if the SMS speed problem was found only during testing?" aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Spiral in practice: a Diyandi emergency-alert system</h2>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Goal:</b> warn up to 100,000 festival attendees within one minute of an emergency, such as a fire, a crowd crush or a storm.</p>
+  <table style="font-size:23px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:8%; color:#F4F4F8">Loop</th><th style="width:28%; color:#F4F4F8">Biggest risk</th><th style="width:32%; color:#F4F4F8">How the loop reduced it</th><th style="width:32%; color:#F4F4F8">Decision</th></tr>
+    <tr><td><b>1</b></td><td>Can we reach everyone within a minute?</td><td>Load test with the telco's SMS gateway</td><td>SMS alone is too slow: use push notifications, with SMS as fallback</td></tr>
+    <tr style="background:#F6F5FB"><td><b>2</b></td><td>Will attendees install an app?</td><td>Mock-up shown to 20 festival-goers</td><td>Most won't: add SMS opt-in by texting a keyword</td></tr>
+    <tr><td><b>3</b></td><td>What about false alarms?</td><td>Approval step designed with organizers; core system built and verified</td><td>Two people must confirm before an alert is sent</td></tr>
+    <tr style="background:#F6F5FB"><td><b>4</b></td><td>Does it work in real crowds?</td><td>Pilot at one event before the full festival</td><td>Fix the issues found, then roll out festival-wide</td></tr>
+  </table>
+  <p style="font-size:25px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>The payoff:</b> the riskiest unknowns are tackled first, while they are still cheap. If loop 1 had shown alerts were impossible, the project could stop before most of the budget was spent.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Link to Week 6 (wireframes) and Week 8 (working prototype)." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Prototyping: build to learn</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Throwaway prototype</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Answers one question, such as "Can users find today's events?"</li><li style="margin:5px 0">Discarded after it teaches you something</li><li style="margin:5px 0">Wireframes are throwaway prototypes</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Evolutionary prototype</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Refined step by step until it becomes the product</li><li style="margin:5px 0">Needs real engineering quality from the start</li></ul></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Useful when</h3><p style="font-size:25px; line-height:1.4">Requirements are unclear, the UI is central, or a technical approach is unproven.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Watch out for</h3><p style="font-size:25px; line-height:1.4">Stakeholders mistaking a prototype for a finished product; "quick and dirty" code becoming permanent.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="Students may reuse the dimensions of this table but must add their own reasoning and a recommendation for their team&#x27;s domain." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Process models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Comparing process models</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:16%; color:#F4F4F8">Model</th><th style="width:24%; color:#F4F4F8">Requirements</th><th style="width:20%; color:#F4F4F8">Feedback</th><th style="width:16%; color:#F4F4F8">Handles change</th><th style="width:24%; color:#F4F4F8">Good fit</th></tr>
+    <tr><td><b>Waterfall</b></td><td>Fixed upfront</td><td>At the end</td><td>Poorly</td><td>Stable, well-known problems</td></tr>
+    <tr style="background:#F6F5FB"><td><b>V-Model</b></td><td>Fixed upfront</td><td>Planned test levels</td><td>Poorly</td><td>Safety-critical, regulated</td></tr>
+    <tr><td><b>Incremental</b></td><td>Outline, then refined</td><td>Each increment</td><td>Moderately</td><td>Business systems, early value</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Spiral</b></td><td>Evolves with risk analysis</td><td>Each loop</td><td>Well</td><td>Large, high-risk, novel</td></tr>
+    <tr><td><b>Prototyping</b></td><td>Discovered by prototypes</td><td>Frequent</td><td>Well</td><td>Unclear needs, UI-heavy</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Agile (Scrum)</b></td><td>Evolving backlog</td><td>Every sprint</td><td>Very well</td><td>Changing needs, small teams</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Use this table as a starting point for the <b>process-model comparison activity</b>.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="The authors came from methods that already existed: Scrum, XP, DSDM, Crystal, FDD and others. The manifesto named what those methods had in common." aria-label="Slide 21">
+<section id="s21" data-section="Agile values and principles" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Agile values</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Why agile?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Slow</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Heavyweight processes responded slowly to changing business and user needs.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Outdated</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Documents were obsolete before the code was written.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Late surprises</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Misunderstandings surfaced late, when fixes were expensive.</p></div>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">February 2001 · Snowbird, Utah</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">Seventeen practitioners met and wrote the <b>Manifesto for Agile Software Development</b>.</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="Stress the last sentence. Agile does not mean no documentation or no plan; it is about relative priority. This course still expects documentation; we keep it useful and current." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Agile values</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The Agile Manifesto: four values</h2>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#4C4A5E"><i>"We are uncovering better ways of developing software by doing it and helping others do it. Through this work we have come to value:"</i></p>
+  <div style="display:flex; flex-direction:column; gap:14px">
+    <div style="display:flex; flex-direction:row; align-items:center; gap:24px"><p style="width:720px; font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; color:#F4F4F8; background:#0E7C66; border-radius:12px; padding:18px 28px">Individuals and interactions</p><p style="flex:1; font-size:32px; color:#6B6980">over processes and tools</p></div>
+    <div style="display:flex; flex-direction:row; align-items:center; gap:24px"><p style="width:720px; font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; color:#F4F4F8; background:#0E7C66; border-radius:12px; padding:18px 28px">Working software</p><p style="flex:1; font-size:32px; color:#6B6980">over comprehensive documentation</p></div>
+    <div style="display:flex; flex-direction:row; align-items:center; gap:24px"><p style="width:720px; font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; color:#F4F4F8; background:#0E7C66; border-radius:12px; padding:18px 28px">Customer collaboration</p><p style="flex:1; font-size:32px; color:#6B6980">over contract negotiation</p></div>
+    <div style="display:flex; flex-direction:row; align-items:center; gap:24px"><p style="width:720px; font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; color:#F4F4F8; background:#0E7C66; border-radius:12px; padding:18px 28px">Responding to change</p><p style="flex:1; font-size:32px; color:#6B6980">over following a plan</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><i>"That is, while there is value in the items on the right, we value the items on the left more."</i></p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Beck et al., <i>Manifesto for Agile Software Development</i> (2001), agilemanifesto.org</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="Ask students which misreading they have heard before. &quot;No documentation&quot; is the most common one in student teams." aria-label="Slide 23">
+<section id="s23" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Agile values</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Common misreadings</h2>
+  </div>
+  <table style="font-size:28px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:42%; color:#F4F4F8">Misreading</th><th style="width:58%; color:#F4F4F8">What the manifesto actually says</th></tr>
+    <tr><td>"Agile means no documentation."</td><td>Documentation has value; <b>working software</b> is valued more.</td></tr>
+    <tr style="background:#F6F5FB"><td>"Agile means no planning."</td><td>Plans exist; they are <b>revised</b> as we learn.</td></tr>
+    <tr><td>"Agile means no process."</td><td>Processes and tools matter; <b>people and interaction</b> matter more.</td></tr>
+    <tr style="background:#F6F5FB"><td>"The customer can change anything at any time."</td><td>Change is welcome, but it is <b>managed</b> through the backlog and iterations.</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="The reflect-and-adjust principle is the basis of the sprint retrospective, which we will see shortly." aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Agile values</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Selected agile principles</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Early and continuous delivery</h3><p style="font-size:23px; line-height:1.38; color:#4C4A5E">Our highest priority is to satisfy the customer through early and continuous delivery of valuable software.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Welcome change</h3><p style="font-size:23px; line-height:1.38; color:#4C4A5E">Welcome changing requirements, even late in development.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Deliver frequently</h3><p style="font-size:23px; line-height:1.38; color:#4C4A5E">From a couple of weeks to a couple of months, preferring the shorter timescale.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Work together daily</h3><p style="font-size:23px; line-height:1.38; color:#4C4A5E">Business people and developers work together daily throughout the project.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Working software</h3><p style="font-size:23px; line-height:1.38; color:#4C4A5E">Working software is the primary measure of progress.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Simplicity</h3><p style="font-size:23px; line-height:1.38; color:#4C4A5E">Maximize the amount of work not done.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>Reflect and adjust:</b> at regular intervals, the team reflects on how to become more effective, then tunes its behavior.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">6 of the 12 principles behind the Agile Manifesto · agilemanifesto.org/principles.html</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="XP&#x27;s engineering practices (code review, tests, continuous integration) appear later in the course even though we organize the work with Scrum." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Agile values</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Agile is a family of methods</h2>
+  </div>
+  <table style="font-size:28px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:32%; color:#F4F4F8">Method</th><th style="width:68%; color:#F4F4F8">Emphasis</th></tr>
+    <tr><td><b>Scrum</b></td><td>Fixed-length iterations (sprints), defined roles and events</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Kanban</b></td><td>Visualize work, <b>limit work in progress</b>, continuous flow</td></tr>
+    <tr><td><b>Extreme Programming (XP)</b></td><td>Pair programming, test-driven development, continuous integration, small releases</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Lean</b></td><td>Eliminate waste, deliver fast, build quality in</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>In this course:</b> Scrum-style iterations with a Kanban-style project board in GitHub Projects.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="Scrum is built on empiricism: knowledge comes from experience, so we make work visible, inspect it and adapt." aria-label="Slide 26">
+<section id="s26" data-section="Agile roles and iterations: Scrum" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Scrum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Scrum in one picture</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Product backlog</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint planning</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint backlog</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Sprint</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">1–4 weeks · Daily Scrum</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Increment</h3></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Review &amp; retro</h3></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">The review updates the product backlog; the retrospective improves the next sprint.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Transparency</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Work and progress are visible to everyone.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Inspection</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Check progress and the product often.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Adaptation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Adjust the plan or the process when something is off.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Schwaber &amp; Sutherland, <i>The Scrum Guide</i> (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="There is no &quot;project manager&quot; or &quot;team lead&quot; role in Scrum. In student teams the Scrum Master often also writes code, which is fine." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Scrum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Three accountabilities, one Scrum team</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Product Owner</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Maximizes the <b>value</b> of the product</li><li style="margin:5px 0">Owns and <b>orders</b> the product backlog</li><li style="margin:5px 0">Represents stakeholders</li><li style="margin:5px 0">One person, not a committee</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Scrum Master</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Coaches the team in Scrum</li><li style="margin:5px 0"><b>Removes impediments</b></li><li style="margin:5px 0">Facilitates events</li><li style="margin:5px 0">A servant-leader, not a boss</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #231E3D; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#231E3D">Developers</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Everyone who builds the increment: code, design, tests, docs</li><li style="margin:5px 0">Plan the sprint backlog</li><li style="margin:5px 0"><b>Self-managing</b>: decide how to do the work</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">The 2020 Scrum Guide calls these <b>accountabilities</b> within one team, typically 10 people or fewer.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Schwaber &amp; Sutherland, <i>The Scrum Guide</i> (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="For our asynchronous and blended course, the Daily Scrum can be a short written update in the team channel or on the board: what I did, what I will do, what is blocking me." aria-label="Slide 28">
+<section id="s28" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Scrum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Scrum events</h2>
+  </div>
+  <table style="font-size:27px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:24%; color:#F4F4F8">Event</th><th style="width:28%; color:#F4F4F8">When / length</th><th style="width:48%; color:#F4F4F8">Purpose</th></tr>
+    <tr><td><b>Sprint</b></td><td>Fixed length, one month or less</td><td>Container for all work; produces a usable increment</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Sprint Planning</b></td><td>Start of the sprint</td><td>Choose a <b>sprint goal</b> and the items to achieve it</td></tr>
+    <tr><td><b>Daily Scrum</b></td><td>Every day, 15 minutes</td><td>Inspect progress toward the goal; adjust the plan</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Sprint Review</b></td><td>End of the sprint</td><td>Show the increment to stakeholders; update the backlog</td></tr>
+    <tr><td><b>Sprint Retrospective</b></td><td>After the review</td><td>Improve how the team works</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>Blended course tip:</b> run the Daily Scrum as an async stand-up: done, next, blocked.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="Teams will write their own Definition of Done before Sprint 1. It is the quality bar every item must meet before it counts as done." aria-label="Slide 29">
+<section id="s29" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Scrum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Scrum artifacts and their commitments</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Product backlog</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">An <b>ordered list</b> of everything the product might need.<br><br><span style="color:#0E7C66; font-weight:600">Commitment: Product Goal</span></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Sprint backlog</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The items chosen for this sprint <b>plus a plan</b> to deliver them.<br><br><span style="color:#0E7C66; font-weight:600">Commitment: Sprint Goal</span></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Increment</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A usable step toward the Product Goal that meets the quality bar.<br><br><span style="color:#0E7C66; font-weight:600">Commitment: Definition of Done</span></p></div>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition of Done · example</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">Code reviewed via pull request · tests pass · acceptance criteria met · docs updated · merged to main</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="Ten working days is a common sprint length for student teams. Our Sprint 1 and Sprint 2 follow this shape." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Scrum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Anatomy of a two-week sprint</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; border-radius:14px; overflow:hidden"><div style="width:12%; background:#EEEDF8; color:#231E3D; padding:22px 16px; text-align:center"><p style="font-size:22px">Day 1</p><p style="font-size:26px; font-weight:600">Planning</p></div><div style="width:64%; background:#E1F3EE; color:#0A5A4A; padding:22px 16px; text-align:center"><p style="font-size:22px">Days 1–9</p><p style="font-size:26px; font-weight:600">Build, test, review · Daily Scrum each day</p></div><div style="width:12%; background:#231E3D; color:#F4F4F8; padding:22px 16px; text-align:center"><p style="font-size:22px">Day 10</p><p style="font-size:26px; font-weight:600">Review</p></div><div style="width:12%; background:#ECE9FB; color:#3F3391; padding:22px 16px; text-align:center"><p style="font-size:22px">Day 10</p><p style="font-size:26px; font-weight:600">Retro</p></div></div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Each day</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Short stand-up, pick items from the sprint backlog, move cards on the board.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Work flows</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">To do → In progress → In review → Done</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">At the end</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A <b>working increment</b>, not just "progress".</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="This connects the Week 1 Diyandi activity to the process. The new map-view request shows change being welcomed but managed through the backlog." aria-label="Slide 31">
+<section id="s31" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Scrum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">One backlog item through one sprint</h2>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Diyandi event-schedule app:</b> "As a visitor, I want to see today's events near me so that I can plan my day."</p>
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:16px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:700; color:#5B4BC4; width:48px">1</p><p style="flex:1; font-size:26px; line-height:1.35"><b>Sprint planning:</b> chosen for Sprint 1 and split into tasks (events API, list view, location filter)</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:16px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:700; color:#5B4BC4; width:48px">2</p><p style="flex:1; font-size:26px; line-height:1.35"><b>During the sprint:</b> each task becomes a GitHub <b>issue</b>, a <b>branch</b> and a <b>pull request</b></p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:16px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:700; color:#5B4BC4; width:48px">3</p><p style="flex:1; font-size:26px; line-height:1.35"><b>Done?</b> Checked against the Definition of Done: reviewed, tested, criteria met</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:16px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:700; color:#5B4BC4; width:48px">4</p><p style="flex:1; font-size:26px; line-height:1.35"><b>Sprint review:</b> a visitor asks for a map view, which goes into the product backlog</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:16px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:700; color:#5B4BC4; width:48px">5</p><p style="flex:1; font-size:26px; line-height:1.35"><b>Retrospective:</b> "PRs waited two days for review. Next sprint: review within 24 hours."</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">31</p>
+</section>
+</div>
+<div class="frame" data-notes="GitHub Projects boards work exactly like this. A WIP limit of 2 per column for a team of four keeps items moving to Done." aria-label="Slide 32">
+<section id="s32" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Kanban</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Kanban: visualize the flow, limit work in progress</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:10px; background:#ECECF2; border-radius:14px; padding:20px; min-height:240px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">To do</h3><p style="background:#FFFFFF; border:1px solid #E0DFEA; border-radius:8px; padding:10px 14px; font-size:24px; color:#1E1B2E">Map view</p><p style="background:#FFFFFF; border:1px solid #E0DFEA; border-radius:8px; padding:10px 14px; font-size:24px; color:#1E1B2E">Vendor list</p></div>
+    <div style="display:flex; flex-direction:column; gap:10px; background:#EEEDF8; border-radius:14px; padding:20px; min-height:240px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">In progress · WIP ≤ 2</h3><p style="background:#FFFFFF; border:1px solid #E0DFEA; border-radius:8px; padding:10px 14px; font-size:24px; color:#1E1B2E">Events API</p><p style="background:#FFFFFF; border:1px solid #E0DFEA; border-radius:8px; padding:10px 14px; font-size:24px; color:#1E1B2E">List view</p></div>
+    <div style="display:flex; flex-direction:column; gap:10px; background:#ECE9FB; border-radius:14px; padding:20px; min-height:240px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">In review</h3><p style="background:#FFFFFF; border:1px solid #E0DFEA; border-radius:8px; padding:10px 14px; font-size:24px; color:#1E1B2E">Location filter</p></div>
+    <div style="display:flex; flex-direction:column; gap:10px; background:#E1F3EE; border-radius:14px; padding:20px; min-height:240px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Done</h3><p style="background:#FFFFFF; border:1px solid #E0DFEA; border-radius:8px; padding:10px 14px; font-size:24px; color:#1E1B2E">Repo setup</p></div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Visualize</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Every item is a card on the board</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Limit WIP</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Finish items, don't just start them</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Manage flow</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Spot bottlenecks like a full "In review"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">No fixed sprints</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Often mixed with Scrum: "Scrumban"</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">32</p>
+</section>
+</div>
+<div class="frame" data-notes="Rule of thumb: Scrum when you build toward planned reviews, Kanban when work arrives unpredictably. Ask: a campus IT help desk that receives requests all day, Scrum or Kanban? (Kanban.) A team building a new enrollment feature to demo every two weeks? (Scrum.)" aria-label="Slide 33">
+<section id="s33" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#0E7C66">Kanban</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Scrum vs. Kanban</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:22%; color:#F4F4F8"></th><th style="width:39%; color:#F4F4F8">Scrum</th><th style="width:39%; color:#F4F4F8">Kanban</th></tr>
+    <tr><td><b>Rhythm</b></td><td>Fixed sprints, 1–4 weeks</td><td>Continuous flow, no sprints</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Roles</b></td><td>Product Owner, Scrum Master, Developers</td><td>None required; existing roles stay</td></tr>
+    <tr><td><b>Planning</b></td><td>Commit to a sprint goal at sprint planning</td><td>Pull the next item when there is capacity</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Limits work by</b></td><td>What fits in the sprint</td><td>WIP limits per board column</td></tr>
+    <tr><td><b>Change mid-cycle</b></td><td>Avoided; new work waits for the next sprint</td><td>Allowed anytime; reorder the To-do column</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Meetings</b></td><td>Planning, Daily Scrum, Review, Retro</td><td>None required; many teams still hold stand-ups</td></tr>
+    <tr><td><b>Progress measure</b></td><td>Velocity: work finished per sprint</td><td>Cycle time: start-to-done time per item</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Best for</b></td><td>Feature development with regular demos</td><td>Unpredictable incoming work: support, maintenance</td></tr>
+  </table>
+  <p style="font-size:25px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>In this course:</b> Scrum sets the sprint reviews in Weeks 8 and 10; the GitHub Projects board is Kanban-style. Combining both is often called "Scrumban".</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">33</p>
+</section>
+</div>
+<div class="frame" data-notes="Most organizations land on a hybrid: agile delivery inside a plan-driven governance frame." aria-label="Slide 34">
+<section id="s34" data-section="Choosing a process" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Choosing a process</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Plan-driven or agile? Ask these questions</h2>
+  </div>
+  <table style="font-size:26px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:40%; color:#F4F4F8">Question</th><th style="width:30%; color:#F4F4F8">Leans plan-driven</th><th style="width:30%; color:#F4F4F8">Leans agile</th></tr>
+    <tr><td><b>How stable are the requirements?</b></td><td>Stable, well known</td><td>Unclear or changing</td></tr>
+    <tr style="background:#F6F5FB"><td><b>How critical is failure?</b></td><td>Safety-critical, regulated</td><td>Lower consequence, recoverable</td></tr>
+    <tr><td><b>Is the customer available?</b></td><td>Rarely</td><td>Frequently</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Team size and location?</b></td><td>Large, distributed</td><td>Small, collaborative</td></tr>
+    <tr><td><b>Contract type?</b></td><td>Fixed scope and price</td><td>Flexible scope</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Need for formal documentation?</b></td><td>High: audits, certification</td><td>Lighter</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Adapted from Boehm &amp; Turner, <i>Balancing Agility and Discipline</i> (2003)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">34</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: plan-driven or V-Model; regulation and safety demand traceable verification. Q2: agile (Scrum); needs shift and early feedback from visitors matters. Q3: mostly plan-driven; requirements are fixed and well understood. Q4: prototyping plus agile; learn quickly whether users want it. Accept well-argued alternatives; the justification matters more than the label." aria-label="Slide 35">
+<section id="s35" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Which process would you pick?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35"><b>Pacemaker firmware</b> for a medical-device company</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">A <b>Diyandi festival-schedule app</b> with changing event lineups</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">A <b>payroll update</b> to apply a new, fully specified tax table</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">A <b>startup's first mobile app</b> with an untested idea</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">35</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the course schedule from the syllabus, read as a process. Weeks 3 to 7 are front-loaded planning; Weeks 8 to 10 are two sprints." aria-label="Slide 36">
+<section id="s36" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Our course process</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A lightweight, Scrum-inspired semester</h2>
+  </div>
+  <table style="font-size:27px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:16%; color:#F4F4F8">Week</th><th style="width:84%; color:#F4F4F8">Process element</th></tr>
+    <tr><td><b>2</b></td><td>Form teams; agree on roles and a working agreement</td></tr>
+    <tr style="background:#F6F5FB"><td><b>3–4</b></td><td>Proposal, scope, and a <b>prioritized product backlog</b></td></tr>
+    <tr><td><b>5–7</b></td><td>Quality requirements, risk, design, and the <b>Sprint 1 plan</b></td></tr>
+    <tr style="background:#F6F5FB"><td><b>8</b></td><td><b>Sprint 1 review</b>; working prototype; project-board update</td></tr>
+    <tr><td><b>9–10</b></td><td><b>Sprint 2</b>; testing; <b>Sprint 2 review</b></td></tr>
+    <tr style="background:#F6F5FB"><td><b>11–12</b></td><td>Final testing, documentation, demonstration, and defense</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Tools:</b> GitHub Issues (backlog) · GitHub Projects (board) · pull requests (review) · MOLE (submissions)</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">36</p>
+</section>
+</div>
+<div class="frame" data-notes="Teams should record their roles and working agreement in their repository. These records later count as contribution and professional-conduct evidence (CLO 3)." aria-label="Slide 37">
+<section id="s37" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Form your team and pick a preliminary domain</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Suggested roles</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0"><b>Product Owner:</b> keeps the backlog ordered; speaks for users</li><li style="margin:5px 0"><b>Scrum Master / Facilitator:</b> runs meetings, tracks blockers, keeps records</li><li style="margin:5px 0"><b>Developers:</b> everyone, including the two roles above</li><li style="margin:5px 0">Rotate roles if your team agrees</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Working agreement</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Where you communicate, and the expected response time</li><li style="margin:5px 0">How work is assigned and tracked: issues, board</li><li style="margin:5px 0">How you review each other’s work: pull requests</li><li style="margin:5px 0">How you handle missed commitments and conflicts</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">37</p>
+</section>
+</div>
+<div class="frame" data-notes="Run a visible timer for each step. Expected answers (accept well-argued alternatives). A: plan-driven (Waterfall or V-Model): requirements are fixed by DOH rules, and privacy and correctness must be verified before release. B: Scrum: requirements keep changing and organizers can review a working increment every sprint. C: Spiral or prototyping with agile: the biggest risk is whether anyone will use it, so test that cheaply first. For the share-out, pick one student who chose differently from the majority and ask them to defend it." aria-label="Slide 38">
+<section id="s38" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 20 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Pick the right process</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+  <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">2 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Choose</b> one scenario on the right.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">8 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Fill the grid</b> on the next slide for Waterfall, Spiral and Scrum.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">3 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Recommend</b> one model, using the sentence frame.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Share:</b> two students per scenario read their answers; the class votes.</p></div>
+  </div>
+  <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay vaccination records</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Replace paper logbooks at a health center. Rules are set by the DOH and must protect patient data.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Diyandi festival guide</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Schedules, venues and vendors for visitors. Organizers keep changing the lineup until the last week.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Campus ride-sharing app</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">A new idea: students share rides to and from campus. Nobody knows yet whether students will use it.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 2 · Software processes, SDLC, and agile</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">38</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Short answers in each cell are enough; the reasoning matters more than the model they pick. Use the comparison table from earlier in the deck as a reference." aria-label="Slide 39">
+<section id="s39" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · answer grid</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Copy this grid on paper or in a document</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:34%; color:#F4F4F8"></th><th style="width:22%; color:#F4F4F8">Waterfall</th><th style="width:22%; color:#F4F4F8">Spiral</th><th style="width:22%; color:#F4F4F8">Scrum</th></tr>
+    <tr><td><b>How are requirements handled for <i>this</i> project?</b></td><td><div style="height:62px"></div></td><td></td><td></td></tr>
+    <tr style="background:#F6F5FB"><td><b>When would users give feedback?</b></td><td><div style="height:62px"></div></td><td></td><td></td></tr>
+    <tr><td><b>How well does it handle change and risk here?</b></td><td><div style="height:62px"></div></td><td></td><td></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Fit for this scenario (✓ / ✗) and one reason</b></td><td><div style="height:62px"></div></td><td></td><td></td></tr>
+  </table>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Sentence frame for your recommendation</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">For Scenario ___, I recommend ___ because ___. It fits better than ___ because ___.</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: barangay vaccination records · B: Diyandi festival guide · C: campus ride-sharing app</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">39</p>
+</section>
+</div>
+<div class="frame" data-notes="A process organizes specification, design and implementation, validation and evolution. The SDLC names the phases; a process model decides how they are ordered and repeated. Plan-driven models suit stable and regulated contexts; iterative models suit uncertainty and change. The Agile Manifesto prioritizes people, working software, collaboration and responding to change without discarding the alternatives. Scrum gives roles, events and artifacts. Choose a process from context and be ready to justify it." aria-label="Slide 40">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From process to practice</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">A process organizes the work</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">The SDLC names the phases</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Models order and repeat them</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Agile values change and feedback</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Scrum: roles, events, artifacts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Choose from context, then justify</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">There is no best process, only the best fit for your users, risks and team.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>
