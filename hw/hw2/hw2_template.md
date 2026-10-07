@@ -2,9 +2,7 @@
 
 ## Team Information
 
-- Team name: [Team name]
-- Section: [Section]
-- Activity date: [YYYY-MM-DD]
+- Team name: [Team name] (coz why not? ^_^)
 - Working arrangement: [Laboratory, personal computers, or mixed]
 - Coordination method: [In-person discussion, group call, shared document, etc.]
 
