@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 3: Stakeholders, Problem Framing, Scope, and Feasibility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 3. Last week teams formed and picked a preliminary domain, and chose how they will work. This week asks the questions that come before requirements: who is this for, what problem are we actually solving, what will we build and not build, and can we pull it off in one semester? The running example stays the Diyandi festival guide from Weeks 1 and 2." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Stakeholders, problem<br>framing, scope,<br>and feasibility</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Who the software is for, what problem it really solves, where the project stops, and whether it can be built with what you have</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 3</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. The first two are about people, the third is about the problem, the fourth and fifth fence the project in, and the last one turns everything into the team proposal. The proposal is the first graded team artifact and everything after it (backlog in Week 4, risk register in Week 5, design in Week 6) traces back to it." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Before we write requirements, we decide what problem is worth solving</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Stakeholders</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Who affects or is affected</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Stakeholder analysis</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Power, interest, needs, conflicts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Problem framing</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Root causes and problem statements</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Scope</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">In, out, later, and the MVP</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Feasibility</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Technical, economic, legal, operational, schedule</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Project proposal</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Put it all on one page</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the stakeholder and scope exercise (individual), and the project proposal with a problem statement, stakeholder list, and initial scope (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 2 (identify stakeholders, analyze user needs, define project scope) and prepare CLO 3 (producing software-engineering artifacts) and CLO 9 (defending a solution with evidence from requirements)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Identify stakeholders</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">including the easy-to-miss ones</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Analyze stakeholders</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">by power, interest, needs, and conflicts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Frame a problem</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">separating the problem from a solution</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write a problem statement</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">that is specific, evidenced, and measurable</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Define an initial scope</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">what is in, out, and deferred</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Assess feasibility</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">and draft a project proposal</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Boehm&#x27;s framing: verification asks &quot;are we building the product right?&quot;, validation asks &quot;are we building the right product?&quot; Boehm&#x27;s cost-of-change data (Software Engineering Economics, 1981) showed requirements errors cost far more to fix the later they are found. The exact multipliers vary by study, so stress the direction rather than a number. Ask: has anyone used an app that worked perfectly but was useless to you?" aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Why start here</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Building the right thing comes before building it right</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Building it right</h3><p style="font-size:28px; line-height:1.4"><b>Verification:</b> does the software match its specification?</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Code quality, tests, reviews. We cover these from Week 7 onward.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Building the right thing</h3><p style="font-size:28px; line-height:1.4"><b>Validation:</b> does the software meet the real need?</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Stakeholders, problem, scope. If this is wrong, perfect code still fails.</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Errors in understanding the problem are the most expensive to fix.</b> They are found late, usually when users finally see the product, and every phase built on them must be redone.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Remember the Week 2 ATM: the ₱200-bill request surfaced during testing. One early conversation with the bank would have caught it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">B. W. Boehm, <i>Software Engineering Economics</i> (1981) · Sommerville, <i>Software Engineering</i>, 10th ed., Ch. 4</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="Point at the Week 3 box. The domain the team chose last week is a topic, like &quot;festivals&quot; or &quot;barangay services&quot;. This week turns that topic into a concrete problem for concrete people, with a fence around it. Each card on the bottom row shows where the artifact is reused." aria-label="Slide 5">
+<section id="s5" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The planning phase of the SDLC</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Week 1</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Software in the wild: local needs</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Week 2</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Process, team, preliminary domain</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Week 3</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Stakeholders, problem, scope, feasibility</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Week 4</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Requirements and backlog</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Week 5</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Quality, risk, ethics</p></div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Problem statement</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">becomes the "why" behind every requirement</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Stakeholder list</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">becomes the roles in your user stories</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Initial scope</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">becomes the first cut of your backlog</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Feasibility notes</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">become the first entries in your risk register</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">This week's artifacts are <b>not paperwork</b>. Each one feeds a later milestone.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="A stakeholder does not have to touch the software. A resident whose street is closed for a festival parade never opens the festival app, but is still affected by the decisions it encodes. The development team is a stakeholder too: their capacity is a constraint on scope." aria-label="Slide 6">
+<section id="s6" data-section="Stakeholders" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholders</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Who is a stakeholder?</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">Any person, group, or organization that <b>affects</b>, is <b>affected by</b>, or has an <b>interest</b> in the system or the project.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Users</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">People who operate the software directly</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Customers &amp; sponsors</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">People who pay for it, approve it, or own the goal</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Operators &amp; maintainers</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">People who run, support, and change it after launch</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Regulators</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Bodies whose rules it must follow</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Affected non-users</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">People whose lives change because it exists</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">The development team</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">You: your time, skills, and grades are on the line</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="Ian Alexander&#x27;s onion model places stakeholders in rings by how close they are to the product. Walking outward from the centre is a reliable way to find people you would otherwise forget. Most student teams list only the inner two rings. The outer ring is where legal, social and safety requirements come from." aria-label="Slide 7">
+<section id="s7" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholders</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The onion model: rings of influence</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:36px; height:600px">
+    <div style="flex:1; display:flex"><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#DCDBE8; border-radius:28px; padding:18px 24px 24px"><p style="font-size:21px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Wider environment</p><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#E1F3EE; border-radius:28px; padding:18px 24px 24px"><p style="font-size:21px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#0E7C66">Containing system</p><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#ECE9FB; border-radius:28px; padding:18px 24px 24px"><p style="font-size:21px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#5B4BC4">The system</p><div style="flex:1; display:flex; justify-content:center; align-items:center; background:#231E3D; border-radius:20px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:700; color:#F5C451">The product</p></div></div></div></div></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #231E3D; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">The product</h3><p style="font-size:23px; line-height:1.4">The software itself.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">The system</h3><p style="font-size:23px; line-height:1.4">The product plus the people who use and run it: <b>visitors, festival staff updating schedules</b>.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Containing system</h3><p style="font-size:23px; line-height:1.4">People who benefit or connect to it without operating it: <b>organizers, vendors, the map service</b>.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #6B6980; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#6B6980">Wider environment</h3><p style="font-size:23px; line-height:1.4">People and rules around it: <b>regulators, residents on closed streets, the press</b>.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">I. Alexander, "A Taxonomy of Stakeholders," <i>Int. J. Technology and Human Interaction</i> (2005)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the kind of list the proposal asks for. Note the last two columns: a name alone is not analysis. &quot;Affects the project&quot; is about power: who can block, fund, or change the work. Ask: which row would you talk to first, and why? (Organizers: they own the data and can stop the project.)" aria-label="Slide 8">
+<section id="s8" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholders · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Stakeholders of the Diyandi festival guide</h2>
+  </div>
+  <table style="font-size:22px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Stakeholder</th><th style="width:17%; color:#F4F4F8">Type</th><th style="width:33%; color:#F4F4F8">What they need or care about</th><th style="width:30%; color:#F4F4F8">How they affect the project</th></tr>
+    <tr><td><b>Visitors</b>, local and out-of-town</td><td>Primary user</td><td>Know what is on, where, and when; get around</td><td>Their adoption decides whether the app matters</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Festival organizers</b></td><td>Sponsor / operator</td><td>Publicize events; push last-minute changes</td><td>Own the schedule data; approve the app</td></tr>
+    <tr><td><b>Vendors</b> and food stalls</td><td>Secondary user</td><td>Be found by visitors</td><td>Supply listings; may pay for visibility</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Performers</b> and cultural groups</td><td>Secondary</td><td>Accurate times and fair representation</td><td>Can object to how they are shown</td></tr>
+    <tr><td><b>Residents</b> near venues</td><td>Affected non-user</td><td>Road closures, noise, parking</td><td>Complaints can shape what is published</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Police and disaster office</b></td><td>Regulator / partner</td><td>Crowd safety and advisories</td><td>May require safety notices in the app</td></tr>
+    <tr><td><b>Your team</b></td><td>Developer</td><td>A working, gradable project in 12 weeks</td><td>Time and skills limit the scope</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="Each of these generates requirements that are expensive to add late: accessibility, offline support, privacy consent, documentation for handover. Week 5 covers ethics, privacy, accessibility and security in depth; this week, just make sure they are on the list. The Data Privacy Act of 2012 (RA 10173) makes data subjects legally relevant stakeholders in the Philippines." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholders</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The stakeholders teams forget</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Negative stakeholders</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">People who lose something if the system succeeds: the printer who made the paper programs</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Users with disabilities</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Low vision, hearing loss, limited mobility. Accessibility is a requirement, not a polish step</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Low-connectivity users</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Prepaid data, weak signal in crowded venues, older phones</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Data subjects</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Anyone whose personal data you collect, even if they never log in</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Future maintainers</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Whoever runs and fixes it after your team graduates</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Older and first-time users</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Lolo and Lola looking for the parade route</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Ask every time:</b> who is <i>not</i> in the room, and what happens to them if we get this wrong?</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="These techniques overlap on purpose; using two or three of them catches most of the list. Snowballing is especially useful for students because it turns one contact into several. Listing roles before people keeps the list from depending on who the team happens to know." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholders</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">How to find your stakeholders</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Walk the process</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Trace the current way the task gets done, step by step. Who touches it at each step?</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Follow the data</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Where does information come from, who changes it, who reads it?</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Follow the money</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Who pays, who earns, who saves or loses money because of this?</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Walk the onion</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Go ring by ring, from users out to regulators and the public</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Ask "who else?"</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">End every conversation with: who else should we talk to? (snowballing)</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Check the rules</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Laws, ordinances, school or office policies: who enforces them?</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">List <b>roles</b> first ("barangay secretary"), then name the real people you can reach.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="Mendelow&#x27;s grid, later popularized by Eden and Ackermann. Power is the ability to change or stop the project; interest is how much they care about the outcome. Visitors sit in &quot;keep informed&quot; here, which surprises students: individually they have little power over the project, but collectively they decide whether it succeeds, so user research is how we give them a voice. Positions change over time; a regulator moves to &quot;manage closely&quot; the moment you collect personal data." aria-label="Slide 11">
+<section id="s11" data-section="Stakeholder analysis" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholder analysis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The power–interest grid</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:56px 1fr 1fr; grid-template-rows:1fr 1fr 44px; gap:14px; height:600px">
+    <div style="grid-row:1 / span 2; display:flex; align-items:center; justify-content:center"><p style="writing-mode:vertical-rl; transform:rotate(180deg); font-size:22px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Power: low → high</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#5B4BC4">Keep satisfied</h3><p style="font-size:22px; line-height:1.35; color:#4C4A5E">High power, low interest. Consult on key decisions; do not overload.</p><p style="font-size:21px; line-height:1.35; color:#4C4A5E"><i>e.g. police and disaster office</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#F5C451">Manage closely</h3><p style="font-size:22px; line-height:1.35; color:#C9C5E0">High power, high interest. Involve them early and often.</p><p style="font-size:21px; line-height:1.35; color:#C9C5E0"><i>e.g. festival organizers</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#ECECF2; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#231E3D">Monitor</h3><p style="font-size:22px; line-height:1.35; color:#4C4A5E">Low power, low interest. Check in occasionally.</p><p style="font-size:21px; line-height:1.35; color:#4C4A5E"><i>e.g. the press</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#E1F3EE; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#0E7C66">Keep informed</h3><p style="font-size:22px; line-height:1.35; color:#4C4A5E">Low power, high interest. Share progress; ask for feedback.</p><p style="font-size:21px; line-height:1.35; color:#4C4A5E"><i>e.g. visitors, vendors</i></p></div>
+    <div></div><div style="grid-column:2 / span 2; display:flex; align-items:center; justify-content:center"><p style="font-size:22px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Interest: low → high</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">A. Mendelow (1991) · C. Eden &amp; F. Ackermann, <i>Making Strategy</i> (1998)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="Conflicts are normal, not a sign the analysis failed. The engineer&#x27;s job is to surface them and help the people with authority decide, using the project goals as the tie-breaker. The needs-versus-wants distinction is the same idea as problem-versus-solution, which comes next." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholder analysis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Stakeholders want different things</h2>
+  </div>
+  <table style="font-size:23px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:19%; color:#F4F4F8">Conflict</th><th style="width:25%; color:#F4F4F8">Side A wants</th><th style="width:25%; color:#F4F4F8">Side B wants</th><th style="width:31%; color:#F4F4F8">A possible resolution</th></tr>
+    <tr><td><b>Visibility</b></td><td>Vendors: top placement in listings</td><td>Visitors: nearest or best-rated first</td><td>Sort by distance; label paid placement clearly</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Data</b></td><td>Organizers: attendance and location data</td><td>Visitors: privacy, no tracking</td><td>Anonymous counts only, with opt-in consent</td></tr>
+    <tr><td><b>Change</b></td><td>Organizers: edit the schedule any time</td><td>Visitors: a schedule they can trust</td><td>Show "updated 5 min ago" and notify changes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Effort</b></td><td>Organizers: rich features by festival day</td><td>Your team: something finished in 12 weeks</td><td>Agree on an MVP; put the rest on a "later" list</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Needs vs. wants</h3><p style="font-size:24px; line-height:1.4">A <b>want</b> is a stated request ("an AR map"). A <b>need</b> is the underlying goal ("find the stage quickly"). Design for the need.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Make conflicts visible</h3><p style="font-size:24px; line-height:1.4">Write them down and decide on purpose. Hidden conflicts come back as late change requests.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a preview; Week 4 covers elicitation techniques properly. The &quot;ask about the past&quot; advice comes from customer-interview practice (Rob Fitzpatrick, The Mom Test, 2013). Fabricating interview results is an academic-integrity violation under the syllabus, same as fabricated test results." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholder analysis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Talk to real people, early</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Interviews</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">15 minutes, open questions: "Walk me through the last time you…"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Observation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Watch the task happen where it happens: the canteen line, the barangay hall</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Short surveys</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Good for "how many" questions once you know what to ask</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Existing evidence</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Complaints, Facebook comments, logbooks, forms in use today</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Ask about the past, not the future</h3><p style="font-size:24px; line-height:1.4">"What did you do last time?" beats "Would you use an app that…?" People are poor at predicting their own behaviour.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Respect the people you ask</h3><p style="font-size:24px; line-height:1.4">Explain why you are asking, get consent, collect no personal data you do not need, and never invent responses.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Classmates can stand in for users during practice, but your proposal should cite <b>at least a few conversations with real stakeholders</b>.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="Personas come from Alan Cooper&#x27;s interaction-design work (The Inmates Are Running the Asylum, 1999). One or two personas for the primary user group is enough for the proposal. Every detail on the card should trace to something the team heard or observed; the prepaid data and weak signal details will matter again in Week 5 when we discuss quality attributes." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Stakeholder analysis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Personas make users concrete</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.1; display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><p style="font-size:22px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#5B4BC4">Persona</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#231E3D">Marites, 34, visiting from Cagayan de Oro</h3><p style="font-size:24px; line-height:1.4"><b>Context:</b> day trip with two kids; Android phone on prepaid data; signal drops near the plaza.</p><p style="font-size:24px; line-height:1.4"><b>Goals:</b> catch the street-dance showdown; find food and a restroom fast.</p><p style="font-size:24px; line-height:1.4"><b>Frustrations:</b> schedules spread across many Facebook posts; times change without notice.</p><p style="font-size:24px; line-height:1.4; color:#4C4A5E"><i>"I just want to know what is happening near me in the next hour."</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">What a persona is</h3><p style="font-size:24px; line-height:1.4">A short, specific portrait of a typical user, <b>built from research</b>, used to keep decisions focused on real needs.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Use it to decide</h3><p style="font-size:24px; line-height:1.4">Would Marites need this feature? Would it work on her phone, in that crowd?</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Do not invent it</h3><p style="font-size:24px; line-height:1.4">A persona with no research behind it is a guess wearing a name tag.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">A. Cooper, <i>The Inmates Are Running the Asylum</i> (1999)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="The drill line is attributed to marketing professor Theodore Levitt. The second callout is a good self-test for teams. Sometimes the best solution is a printed map, a pinned Facebook post, or a better spreadsheet; it is fine for a team to discover that, and then pick a part of the problem where software really helps." aria-label="Slide 15">
+<section id="s15" data-section="Problem framing" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Problem framing</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Start with the problem, not the solution</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Solution-first</h3><p style="font-size:28px; line-height:1.4">"We'll build a Diyandi app with an AR map, chat, and ticketing."</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Starts from a feature list. Nobody has checked who needs it, or why.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Problem-first</h3><p style="font-size:28px; line-height:1.4">"Out-of-town visitors miss events because schedules are scattered and change without notice."</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Starts from a person and a pain. Many solutions are possible, and some are not apps.</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>"People don't want a quarter-inch drill. They want a quarter-inch hole."</b> Users care about the outcome, not your technology.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">If the only possible answer to your problem statement is your app, you have written a solution, not a problem.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="The 5 Whys technique comes from Toyota (Taiichi Ohno). Notice how the solution space narrows: &quot;visitors miss events&quot; invites anything, while &quot;no single updatable source&quot; points toward an organizer-facing editor plus a visitor-facing view. A different chain might reach a different cause, such as visitors not trusting posted times; that is why evidence matters on the next slides." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Problem framing</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Dig for the root cause: the 5 Whys</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px; margin-left:0px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:700; color:#5B4BC4; width:260px">Symptom</p><p style="flex:1; font-size:26px; line-height:1.35; color:#1E1B2E">Visitors miss events.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px; margin-left:48px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:700; color:#5B4BC4; width:260px">Why?</p><p style="flex:1; font-size:26px; line-height:1.35; color:#1E1B2E">They do not know when or where events are.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px; margin-left:96px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:700; color:#5B4BC4; width:260px">Why?</p><p style="flex:1; font-size:26px; line-height:1.35; color:#1E1B2E">Schedules are posted across many Facebook pages and posters.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px; margin-left:144px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:700; color:#5B4BC4; width:260px">Why?</p><p style="flex:1; font-size:26px; line-height:1.35; color:#1E1B2E">Each organizing group publishes its own updates separately.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#231E3D; border-radius:12px; padding:14px 26px; margin-left:192px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:700; color:#F5C451; width:260px">Why?</p><p style="flex:1; font-size:26px; line-height:1.35; color:#F4F4F8">There is no single, updatable source of the official schedule.</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Root cause found</h3><p style="font-size:24px; line-height:1.4">A single source of truth the organizers can update. That is a problem software can address.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Stop when it is actionable</h3><p style="font-size:24px; line-height:1.4">Five is a guide, not a rule. Stop when the answer is something you can change.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">T. Ohno, <i>Toyota Production System</i> (1988)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="The template comes from the Vision document in the Rational Unified Process. It forces four things: a concrete problem, named people, a consequence, and a measurable outcome. The success line is the seed of acceptance criteria in Week 4; &quot;in under 30 seconds&quot; can be tested with real users." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Problem framing</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A problem statement template</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Template</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">The problem of <span style="color:#F5C451">[what]</span> affects <span style="color:#F5C451">[whom]</span>, the impact of which is <span style="color:#F5C451">[what happens]</span>. A successful solution would <span style="color:#F5C451">[measurable benefit]</span>.</p>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:22%; color:#F4F4F8">Part</th><th style="width:78%; color:#F4F4F8">Diyandi festival guide</th></tr>
+    <tr><td><b>The problem of</b></td><td>festival schedules being scattered across many pages and changing without notice</td></tr>
+    <tr style="background:#F6F5FB"><td><b>affects</b></td><td>out-of-town and local visitors, and the organizers who field their questions</td></tr>
+    <tr><td><b>the impact of which is</b></td><td>missed events, crowding at the wrong venue, and repeated questions to organizers</td></tr>
+    <tr style="background:#F6F5FB"><td><b>a successful solution would</b></td><td>let a visitor find what is on near them in the next hour in under 30 seconds, with times no older than 15 minutes</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Problem-statement format from the Rational Unified Process (RUP) Vision document</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Walk through each row and ask students to say what is wrong before revealing the middle column. The barangay and canteen numbers are illustrative; in a real proposal the team must measure or cite them, which is the next slide." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Problem framing</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Weak and strong problem statements</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Weak</th><th style="width:25%; color:#F4F4F8">What is wrong</th><th style="width:45%; color:#F4F4F8">Stronger</th></tr>
+    <tr><td>"There is no app for the festival."</td><td>A missing solution, not a problem</td><td>"Visitors miss events because schedules are scattered and change without notice."</td></tr>
+    <tr style="background:#F6F5FB"><td>"People have a hard time."</td><td>Who? Doing what?</td><td>"Out-of-town visitors cannot tell which events are near them right now."</td></tr>
+    <tr><td>"Barangay services are slow."</td><td>Vague, no evidence</td><td>"Residents wait 2–3 hours for a barangay clearance; we observed this on two weekday mornings."</td></tr>
+    <tr style="background:#F6F5FB"><td>"Students want a better canteen."</td><td>A want, not a measurable need</td><td>"Students lose 25 minutes of a 60-minute lunch break queuing; success means under 10."</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Test:</b> could someone outside your team read it and know <b>who</b> suffers, <b>what</b> goes wrong, and <b>how you will know</b> it is fixed?</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Assumptions are not bad; every project has them. The danger is not knowing which beliefs are untested. &quot;Organizers will keep the data updated&quot; is the riskiest assumption in the Diyandi example: if it fails, the app shows wrong times, which is worse than no app. A cheap test is to ask organizers to update a shared spreadsheet for one week." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Problem framing</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Separate evidence from assumptions</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Evidence</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">We <b>observed</b> it: watched the line, timed the wait</li><li style="margin:5px 0">They <b>told us</b>: interview notes, survey answers</li><li style="margin:5px 0">It is <b>recorded</b>: complaints, logbooks, posts</li><li style="margin:5px 0">It is <b>published</b>: reports, news, statistics with a source</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Assumption</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">"Everyone has a smartphone."</li><li style="margin:5px 0">"Organizers will keep the data updated."</li><li style="margin:5px 0">"Visitors will install another app."</li><li style="margin:5px 0">"The barangay will let us use their records."</li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Keep an assumption log.</b> Write each assumption down, mark how risky it is, and plan how you will check it. Untested assumptions become Week 5 risks.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="These are project-level success criteria; Week 4 breaks them down into acceptance criteria for individual user stories. The last row may not be measurable within the semester; it is fine to include it as a goal and mark it &quot;beyond course scope&quot;. Students often write goals like &quot;user-friendly&quot;; push them to say how they would check it." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Problem framing</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Turn the problem into goals you can check</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Goal</th><th style="width:38%; color:#F4F4F8">Success measure</th><th style="width:32%; color:#F4F4F8">How we will check</th></tr>
+    <tr><td>Visitors find relevant events fast</td><td>Find "what is on near me in the next hour" in under 30 s</td><td>Timed task with 5 test users</td></tr>
+    <tr style="background:#F6F5FB"><td>Schedule stays trustworthy</td><td>Changes appear within 15 minutes of an organizer edit</td><td>Log edit and display times during a trial</td></tr>
+    <tr><td>Works in crowded venues</td><td>Last-loaded schedule readable with no signal</td><td>Test in airplane mode</td></tr>
+    <tr style="background:#F6F5FB"><td>Organizers spend less time on questions</td><td>Fewer repeated schedule questions on their page</td><td>Compare counts before and after a pilot</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Specific and measurable</h3><p style="font-size:24px; line-height:1.4">A number, a time, a count, or a yes/no check.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Realistic for 12 weeks</h3><p style="font-size:24px; line-height:1.4">Measurable by your team, with access you actually have.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Tied to the problem</h3><p style="font-size:24px; line-height:1.4">Each goal answers part of the problem statement.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="The product-versus-project scope distinction is from the PMBOK Guide. Students tend to list features only; remind them that testing, documentation and the final demo are also work that competes for the same hours. Writing down what is out of scope turns later &quot;can we also add…&quot; debates into a quick check against an agreed list." aria-label="Slide 21">
+<section id="s21" data-section="Scope" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Scope is a fence around the project</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">Scope is the boundary between what the project <b>will</b> deliver and what it <b>will not</b>.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Product scope</h3><p style="font-size:28px; line-height:1.4">The features and functions of the software.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>"Visitors can browse today's events by venue and time."</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Project scope</h3><p style="font-size:28px; line-height:1.4">The work needed to deliver it: documents, testing, training, deployment.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>"We will write a user guide and test with 5 users."</i></p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">An "out of scope" list is as important as the "in scope" list. It is what stops arguments in Week 9.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Product vs. project scope: PMI, <i>PMBOK Guide</i></p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="Three columns, not two. &quot;Later&quot; is a pressure valve: it lets the team acknowledge good ideas without committing to them, and it becomes the bottom of the Week 4 backlog. Ask: why is official PNP alerts out of scope even though it would be valuable? (The team has no authority to issue them, and a false alarm has serious consequences; recall the spiral example from Week 2.)" aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">In, out, and later: the Diyandi festival guide</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">In scope</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Browse events by day, venue, and time</li><li style="margin:5px 0">See what is on near me in the next hour</li><li style="margin:5px 0">Organizer page to add and edit events</li><li style="margin:5px 0">Show when each event was last updated</li><li style="margin:5px 0">Last-loaded schedule works offline</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Out of scope</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Ticket sales and payments</li><li style="margin:5px 0">Live GPS tracking of floats</li><li style="margin:5px 0">Chat between visitors</li><li style="margin:5px 0">Native iOS and Android apps</li><li style="margin:5px 0">Official PNP alerts</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">Later, if time allows</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Vendor listings and map pins</li><li style="margin:5px 0">Favourites and reminders</li><li style="margin:5px 0">Filipino and Cebuano language options</li><li style="margin:5px 0">Simple attendance counts with consent</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Every "out" item has a reason: payments need legal and banking work, GPS needs hardware, alerts need official authority.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="A context diagram (the level-0 data-flow diagram) shows one box for the system, the external entities around it, and the information flowing between them. It makes scope visible at a glance: the map service is outside, so the team uses an existing one rather than building maps. The disaster office arrow says &quot;link only&quot;, which records the scope decision from the previous slide." aria-label="Slide 23">
+<section id="s23" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A context diagram draws the boundary</h2>
+  </div>
+  <svg width="1664" height="560" viewBox="0 0 1664 560" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Arial, sans-serif">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B6980"/></marker></defs>
+    <rect x="602" y="190" width="460" height="180" rx="24" fill="#231E3D"/>
+    <text x="832" y="268" text-anchor="middle" font-family="Space Grotesk, Arial, sans-serif" font-size="34" font-weight="700" fill="#F5C451">Diyandi festival guide</text>
+    <text x="832" y="312" text-anchor="middle" font-size="22" fill="#C9C5E0">the system we build</text>
+    <g font-size="26" font-weight="600" fill="#231E3D">
+      <rect x="0" y="40" width="330" height="96" rx="14" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="165" y="98" text-anchor="middle">Visitor</text>
+      <rect x="0" y="424" width="330" height="96" rx="14" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="165" y="482" text-anchor="middle">Festival organizer</text>
+      <rect x="1334" y="40" width="330" height="96" rx="14" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="1499" y="98" text-anchor="middle">Map service</text>
+      <rect x="1334" y="424" width="330" height="96" rx="14" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="1499" y="482" text-anchor="middle">Disaster office</text>
+    </g>
+    <line x1="330" y1="56" x2="600" y2="196" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="473" y="110" text-anchor="middle" font-size="21" fill="#4C4A5E" transform="rotate(27.4 473 110)">search, filters</text>
+    <line x1="600" y1="280" x2="332" y2="124" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="475" y="186" text-anchor="middle" font-size="21" fill="#4C4A5E" transform="rotate(30.2 475 186)">events near me</text>
+    <line x1="330" y1="472" x2="600" y2="342" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="457" y="391" text-anchor="middle" font-size="21" fill="#4C4A5E" transform="rotate(-25.7 457 391)">new and edited events</text>
+    <line x1="1064" y1="196" x2="1332" y2="56" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="1190" y="110" text-anchor="middle" font-size="21" fill="#4C4A5E" transform="rotate(-27.6 1190 110)">location to show</text>
+    <line x1="1334" y1="124" x2="1066" y2="280" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="1191" y="186" text-anchor="middle" font-size="21" fill="#4C4A5E" transform="rotate(-30.2 1191 186)">map tiles</text>
+    <line x1="1334" y1="472" x2="1064" y2="342" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="1191" y="429" text-anchor="middle" font-size="21" fill="#4C4A5E" transform="rotate(25.7 1191 429)">advisories (link only)</text>
+  </svg>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Inside the box</b> is what you build. <b>Outside</b> are people and systems you exchange information with but do not build.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Context diagram (level-0 DFD): T. DeMarco, <i>Structured Analysis and System Specification</i> (1978)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="The term MVP comes from Eric Ries, The Lean Startup (2011). Henrik Kniberg&#x27;s skateboard drawing (2016) shows the idea: every release lets the user get somewhere, even if slowly. For the course, Release 1 maps to Sprint 1 (Week 8) and Release 2 to Sprint 2 (Week 10). The MVP here tests the riskiest assumption from earlier: will organizers keep the schedule updated?" aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Start with a minimum viable product</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Minimum viable product (MVP)</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">The smallest version that delivers real value to real users <b>and</b> tests your riskiest assumption.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:28px; font-weight:600; color:#1E1B2E">Release 1 · MVP</h3><p style="font-size:23px; line-height:1.3; color:#4C4A5E">Today's events by venue and time; organizer edit page</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:28px; font-weight:600; color:#1E1B2E">Release 2</h3><p style="font-size:23px; line-height:1.3; color:#4C4A5E">Near-me filter; last-updated label; offline cache</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Release 3</h3><p style="font-size:23px; line-height:1.3; color:#C9C5E0">Vendor listings; favourites; languages</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Each release is usable</h3><p style="font-size:24px; line-height:1.4">Like Kniberg's skateboard → bicycle → car, not wheel → axle → chassis.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Not a half-built product</h3><p style="font-size:24px; line-height:1.4">A login screen and a database with no useful feature is not an MVP.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">E. Ries, <i>The Lean Startup</i> (2011) · H. Kniberg, "Making sense of MVP" (2016)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="Scope creep usually comes from stakeholders, gold-plating from the team itself. Both eat the time needed for testing and documentation, which is why so many student projects arrive at Week 11 with features and no tests. A scope change is not forbidden; it just has to be a decision with a trade-off, recorded in the decision log." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Scope creep and gold-plating</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Scope creep</h3><p style="font-size:28px; line-height:1.4">Requirements keep growing after scope is agreed, without adjusting time or resources.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>"While you're at it, can it also sell tickets?"</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Gold-plating</h3><p style="font-size:28px; line-height:1.4">The team adds features nobody asked for, because they are fun or impressive.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>"Let's add dark mode and animations before the schedule works."</i></p></div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write scope down</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">In, out, and later, agreed by the team and the instructor</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Use a change rule</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Something new comes in only if something of similar size goes out or moves to "later"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Check against the problem</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Does this request help solve the problem statement?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="A constraint is a fixed limit the team cannot negotiate away; an assumption is something believed true but unchecked. Constraints belong in the proposal because they explain scope choices. The Data Privacy Act of 2012 (Republic Act 10173) applies to any system that processes personal information in the Philippines, including student projects that collect names or phone numbers from real people." aria-label="Slide 26">
+<section id="s26" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Constraints shape scope</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Constraint</th><th style="width:40%; color:#F4F4F8">Your project</th><th style="width:40%; color:#F4F4F8">Effect on scope</th></tr>
+    <tr><td><b>Time</b></td><td>12 weeks, two short sprints, other courses</td><td>Three to five core features, not fifteen</td></tr>
+    <tr style="background:#F6F5FB"><td><b>People and skills</b></td><td>3–5 students with mixed experience</td><td>Choose a stack the team can learn quickly</td></tr>
+    <tr><td><b>Budget</b></td><td>Usually ₱0</td><td>Free tiers and open-source tools only</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Data access</b></td><td>Real data may belong to someone else</td><td>Get permission early, or use realistic sample data</td></tr>
+    <tr><td><b>Law and policy</b></td><td>Data Privacy Act (RA 10173), school rules</td><td>Collect only the personal data you need</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Technology</b></td><td>Users' phones and connections</td><td>Light pages; tolerate weak signal</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="This slide is the practical heart of the week. The warning signs are not banned, but each adds a large risk; a team that wants one should justify it in the feasibility section and have a fallback. Point to the final-project rubric: requirements traceability, testing evidence and documentation together outweigh raw feature count." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scope</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Right-sizing a semester project</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Good signs</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">One primary user group</li><li style="margin:5px 0">One core workflow done well</li><li style="margin:5px 0">Stakeholders you can actually reach</li><li style="margin:5px 0">Data you can get or safely simulate</li><li style="margin:5px 0">A demo you can run in 10 minutes</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Warning signs</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">"Facebook / Grab / Shopee for X"</li><li style="margin:5px 0">Real payments or real money</li><li style="margin:5px 0">Hardware, sensors, or live GPS</li><li style="margin:5px 0">Machine learning from scratch</li><li style="margin:5px 0">Needs data or approval you cannot get</li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Small and finished beats big and broken.</b> A well-tested MVP with clear documentation scores better than an ambitious prototype that crashes in the demo.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="TELOS is a common mnemonic for feasibility dimensions. Sommerville places the feasibility study at the start of requirements engineering: a short, cheap check of whether the system is worth building with current technology and within budget. For a student project, economic feasibility is mostly about tool costs and the team&#x27;s time, not market profit." aria-label="Slide 28">
+<section id="s28" data-section="Feasibility" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Feasibility</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Can we build it? Five feasibility questions</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">T</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Technical</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Do we have, or can we learn, the technology and skills?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">E</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Economic</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Do the benefits justify the cost? Can we afford the tools?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">L</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Legal</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Does it comply with laws, licenses, and policies?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">O</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Operational</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Will people actually use it and keep it running?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">S</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Schedule</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Can it be done by the deadline?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">✓</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Verdict</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Go, go with changes, or no-go</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">A feasibility study answers one question: <b>is this project worth starting, as scoped?</b></p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">TELOS feasibility dimensions · Sommerville, <i>Software Engineering</i>, 10th ed., Ch. 4</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="Ratings are qualitative: how confident are we that this dimension is fine? Low ratings are not failures; they are where the team should spend effort first. A spike is a short, time-boxed experiment to answer a technical question, a term from Extreme Programming. The operational risk here is the same untested assumption from the evidence slide, and it will be the top entry in the Week 5 risk register." aria-label="Slide 29">
+<section id="s29" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Feasibility · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Assessing the Diyandi festival guide</h2>
+  </div>
+  <table style="font-size:23px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:15%; color:#F4F4F8">Dimension</th><th style="width:31%; color:#F4F4F8">Question we asked</th><th style="width:40%; color:#F4F4F8">Finding</th><th style="width:14%; color:#F4F4F8">Rating</th></tr>
+    <tr><td><b>Technical</b></td><td>Can we build an offline-capable web app?</td><td>Two members know JavaScript; offline caching is new to all of us</td><td>Medium</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Economic</b></td><td>What will hosting cost?</td><td>Free static hosting and a free database tier cover festival traffic</td><td>High</td></tr>
+    <tr><td><b>Legal</b></td><td>Can we publish the schedule and photos?</td><td>Need organizer permission; use our own or licensed photos only</td><td>Medium</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Operational</b></td><td>Will organizers keep it updated?</td><td>Organizer contact agreed to try; not yet confirmed</td><td>Low</td></tr>
+    <tr><td><b>Schedule</b></td><td>Can the MVP be ready for Sprint 1?</td><td>Yes, if vendors and languages stay in "later"</td><td>High</td></tr>
+  </table>
+  <p style="font-size:27px; line-height:1.4; color:#1E1B2E; background:#E1F3EE; padding:22px 30px; border-radius:12px"><b>Verdict: go, with changes.</b> Prototype offline caching first (a spike) and confirm the organizer partnership before Week 5.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="Feasibility is not pass or fail; most findings lead to scope changes. Students sometimes hide feasibility problems to protect their idea. Encourage the opposite: a proposal that names a risk and a plan for it is stronger than one that claims everything is easy. This links back to the spiral model from Week 2, where loop 1 tests the riskiest unknown first." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Feasibility</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What to do with a “no”</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Cut the feature</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Live GPS of floats is not feasible: drop it, keep the static route map</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Shrink the scope</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Serve one festival day or one district first</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Simulate the hard part</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">No real data yet? Use clearly labelled sample data</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Run a spike</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Unsure if a library works? Spend two days finding out</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Change the users</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Organizers too busy? Start with one cultural group</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Pivot the problem</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">If no version is feasible, pick another problem in the same domain</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Finding a no-go in Week 3 costs a few hours. Finding it in Week 9 costs the project.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the team milestone. Numbers 2, 3 and 5 are explicitly named in the syllabus (problem statement, stakeholder list, initial scope); the others make the proposal defensible. &quot;Open questions&quot; is not a weakness: it tells the instructor what the team plans to learn next and makes the Week 4 elicitation work purposeful." aria-label="Slide 31">
+<section id="s31" data-section="Project proposal" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Project proposal</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What goes in your project proposal</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Title and team</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Members, roles, and chosen process</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Problem statement</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Using the template, with evidence</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Stakeholders</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">List, types, needs, power–interest notes</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Goals and success criteria</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Specific and checkable</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Initial scope</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">In, out, later; MVP; context diagram</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">6</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Constraints and assumptions</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Including the assumption log</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">7</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Feasibility</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Five dimensions, ratings, verdict</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">8</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Open questions</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">What you still need to find out</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Aim for two to four pages.</b> Clear and specific beats long. Every claim about users should point to evidence.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">31</p>
+</section>
+</div>
+<div class="frame" data-notes="These come up every semester. Use this slide as a checklist when teams self-review their draft. The fifth row is an academic-integrity issue as well as a quality one: the syllabus prohibits fabricated user feedback and project evidence, including anything generated by AI tools and not verified." aria-label="Slide 32">
+<section id="s32" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Project proposal</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Common proposal mistakes</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Mistake</th><th style="width:34%; color:#F4F4F8">Why it hurts</th><th style="width:36%; color:#F4F4F8">Fix</th></tr>
+    <tr><td>Problem statement describes the app</td><td>No way to judge whether the app helps</td><td>Rewrite around a person and a pain</td></tr>
+    <tr style="background:#F6F5FB"><td>Stakeholders = "users" and "admin"</td><td>Misses sponsors, regulators, affected non-users</td><td>Walk the onion; add types and needs</td></tr>
+    <tr><td>No out-of-scope list</td><td>Scope creep has nothing to push against</td><td>List at least five exclusions with reasons</td></tr>
+    <tr style="background:#F6F5FB"><td>Feasibility says "all feasible"</td><td>Signals no real analysis</td><td>Rate each dimension; name the weakest</td></tr>
+    <tr><td>Evidence is invented or assumed</td><td>Undermines everything after it</td><td>Cite who, when, how; log assumptions</td></tr>
+    <tr style="background:#F6F5FB"><td>Fifteen "core" features</td><td>Cannot be built and tested in 12 weeks</td><td>Pick an MVP of three to five</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">32</p>
+</section>
+</div>
+<div class="frame" data-notes="The final-project rubric gives 20% to problem relevance, users, scope and requirements traceability. That traceability starts here. Teams that write a vague proposal struggle to explain in Week 12 why their features matter." aria-label="Slide 33">
+<section id="s33" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Our course process</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">How this week's work flows forward</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:28%; color:#F4F4F8">Week 3 artifact</th><th style="width:22%; color:#F4F4F8">Reused in</th><th style="width:50%; color:#F4F4F8">As</th></tr>
+    <tr><td><b>Problem statement</b></td><td>Week 4</td><td>The "so that…" in user stories; the reason each requirement exists</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Stakeholder list and personas</b></td><td>Weeks 4, 6</td><td>User-story roles; who you test wireframes with</td></tr>
+    <tr><td><b>Success criteria</b></td><td>Weeks 4, 9</td><td>Acceptance criteria; test cases</td></tr>
+    <tr style="background:#F6F5FB"><td><b>In / out / later scope</b></td><td>Weeks 4, 7</td><td>The first cut and order of the product backlog; the Sprint 1 plan</td></tr>
+    <tr><td><b>Constraints, assumptions, feasibility</b></td><td>Week 5</td><td>Non-functional requirements and the risk register</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Everything above</b></td><td>Week 12</td><td>The "why" in your final defense</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Traceability:</b> in the final defense, you should be able to point from any feature back to a stakeholder need and this problem statement.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">33</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers; accept well-argued alternatives. Q1: barkers or dispatchers at terminals who direct passengers today, or drivers on routes the app shows as slow; also tricycle drivers. Q2: the Data Privacy Act and the National Privacy Commission, because health information is sensitive personal information; also the university clinic&#x27;s own policies and the DOH. Q3: the captain is high power and medium-to-high interest (manage closely); residents are high interest, low individual power (keep informed). Q4: for example, &quot;Students who lose IDs and devices on campus rarely recover them because found items are held in several offices with no shared record; success means a student can check all offices in one place.&quot;" aria-label="Slide 34">
+<section id="s34" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Who did we forget?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">A <b>jeepney route finder</b> for Iligan. Name one <b>negative stakeholder</b>.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">A <b>clinic queue app</b> at the university. Who is the <b>regulator</b>, and why do they care?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">A <b>barangay document request</b> system. Place the barangay captain and residents on the <b>power–interest grid</b>.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">"Students need a lost-and-found app." Rewrite it as a <b>problem</b>, not a solution.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">34</p>
+</section>
+</div>
+<div class="frame" data-notes="Teams should record who they spoke to and when, without storing personal details beyond what they need. The proposal goes in the team repository as Markdown, following the syllabus submission standards; meeting notes from the drafting session count as contribution evidence." aria-label="Slide 35">
+<section id="s35" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Draft and submit your project proposal</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Before you write</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Agree on the problem as a team, using the 5 Whys</li><li style="margin:5px 0">Talk to at least two or three real stakeholders</li><li style="margin:5px 0">Fill in the problem-statement template together</li><li style="margin:5px 0">Decide in, out, and later before choosing a stack</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Before you submit</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Every stakeholder has a type and a need</li><li style="margin:5px 0">At least one success measure has a number</li><li style="margin:5px 0">Out of scope lists reasons</li><li style="margin:5px 0">Feasibility names the weakest dimension and a plan</li><li style="margin:5px 0">Assumptions and open questions are written down</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">35</p>
+</section>
+</div>
+<div class="frame" data-notes="Run a visible timer for each step. What to look for. A: stakeholders include students, cashier, cooks, concessionaire, university administration and food-safety rules; a good out-of-scope item is online payment. B: residents, barangay secretary and captain, seniors and PWDs, and national rules on barangay clearances; feasibility concern: access to records and the Data Privacy Act. C: commuters, drivers, operators, dispatchers, the LTFRB and the city traffic office; feasibility concern: there may be no reliable route data, so the team may have to map routes themselves. For the share-out, pick a statement that sneaks a solution in and fix it together." aria-label="Slide 36">
+<section id="s36" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Frame it and fence it</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">2 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Choose</b> one scenario on the right.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>List stakeholders</b> by onion ring; mark one negative stakeholder.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write the problem statement</b> using the template.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Fence the scope:</b> three in, three out, one feasibility concern.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Share:</b> two students per scenario read their problem statement; the class checks it against the test.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Long queues at lunch; students lose much of their break. The canteen has a cashier, cooks, and a concessionaire.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay document requests</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Residents queue for clearances and certificates. The secretary handles paper forms and a logbook.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Jeepney route finder</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">New students and visitors in Iligan cannot tell which jeepney to take. Routes are known by word of mouth.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 3 · Stakeholders, problem framing, scope, and feasibility</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">36</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Short answers are enough; the problem statement is the part to share aloud. Check each one against the test from earlier: who suffers, what goes wrong, and how you will know it is fixed." aria-label="Slide 37">
+<section id="s37" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Copy this worksheet on paper or in a document</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8"></th><th style="width:70%; color:#F4F4F8">Your answer</th></tr>
+    <tr><td><b>Stakeholders by ring</b><br>product · system · containing · wider</td><td><div style="height:96px"></div></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Negative stakeholder</b> and why</td><td><div style="height:64px"></div></td></tr>
+    <tr><td><b>In scope</b> (3) · <b>Out of scope</b> (3)</td><td><div style="height:96px"></div></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Biggest feasibility concern</b> (T, E, L, O, or S)</td><td><div style="height:64px"></div></td></tr>
+  </table>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Problem statement</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">The problem of ___ affects ___, the impact of which is ___. A successful solution would ___.</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: canteen pre-ordering · B: barangay document requests · C: jeepney route finder</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">37</p>
+</section>
+</div>
+<div class="frame" data-notes="Stakeholders are anyone who affects or is affected by the system, including non-users and the team itself. Analyze them by power, interest and needs, and surface conflicts. Frame the problem before choosing a solution, dig for root causes, and write a problem statement with a measurable outcome. Scope is a fence: in, out and later, starting from an MVP. Feasibility across technical, economic, legal, operational and schedule dimensions turns into a go, go-with-changes, or no-go decision. Next week: turning all of this into requirements, user stories and acceptance criteria." aria-label="Slide 38">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From a topic to a defensible project</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Stakeholders include non-users</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Analyze power, interest, and needs</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Frame the problem, not the app</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Make success measurable</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Scope: in, out, later, MVP</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Check feasibility, then propose</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">Know who it is for, what it fixes, and where it stops, before you build.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>
