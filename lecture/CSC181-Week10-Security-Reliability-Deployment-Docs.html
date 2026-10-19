@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 10: Security, Reliability, Deployment Readiness, Documentation, and Maintenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 10. Sprint 2 ends this week with a review of the revised prototype. With the features mostly in place, this week turns to what makes software safe to put in front of real people: security and privacy in the code, reliability when things go wrong, a deployment that can be repeated, documentation for users and the next team, and maintenance. Week 5 covered these as requirements; this week covers them as implementation." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Security, reliability,<br>deployment, and<br>documentation</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Secure coding and privacy in practice, building for failure, getting ready to deploy, writing documentation people use, and keeping software maintainable</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 10</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. The individual checklist can be either the security and privacy one or the deployment-readiness one; both are built up in this session. The documentation drafts are reviewed again in Week 11 before the final submission." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Getting from “it works” to “it is ready”</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Secure coding</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The OWASP Top 10, in your own code</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Privacy in practice</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The Data Privacy Act, applied to your data</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Reliability</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Failures, errors, logs, and backups</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Deployment readiness</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Environments, pipelines, configuration, releases</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Documentation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">README, user guide, technical docs</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Maintenance</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Types of change and technical debt</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> a security and privacy, or deployment-readiness, checklist (individual), and the Sprint 2 review, a revised prototype, and drafts of the user guide and technical documentation (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 4 (security, reliability and maintainability), CLO 5 (deployment practices), CLO 6 (documentation) and CLO 9 (professional and ethical responsibility)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Prevent common vulnerabilities</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">injection, broken access, exposed secrets</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Apply privacy principles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">to the personal data your system holds</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Design for failure</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with clear errors, logs, and backups</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Prepare a repeatable deployment</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with environments and configuration</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write user and technical docs</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">for the right reader</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Plan for maintenance</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">and manage technical debt</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Most security and reliability problems in student projects are not exotic attacks; they are missing checks, committed secrets, and error pages that leak details. All of these are cheap to fix now and embarrassing to discover during the defense." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Sprint 2 ends: make it safe to hand over</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Test plan</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 9: tests and defects</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Harden</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 10: security and reliability</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Deploy and document</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 10: ready for real users</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Sprint 2 review</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Week 10: revised prototype</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Final testing</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 11: polish and defend</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">From Week 5</h3><p style="font-size:25px; line-height:1.4">The security, privacy, and reliability requirements you wrote are now checked in code.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">From Week 9</h3><p style="font-size:25px; line-height:1.4">Security defects such as #34 are Critical; fix them before new features.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">For Week 12</h3><p style="font-size:25px; line-height:1.4">A stranger should be able to run, use, and change your system from the docs.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="The CIA triad is the standard frame (it appears in ISO/IEC 27000 definitions). The three principles under it come from Saltzer and Schroeder&#x27;s &quot;The Protection of Information in Computer Systems&quot; (1975), which is still the clearest statement of secure design principles." aria-label="Slide 5">
+<section id="s5" data-section="Secure coding" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Secure coding</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Security is a property of the whole system</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">C</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Confidentiality</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Only the right people see the data: organizer phone numbers stay private</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">I</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Integrity</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Only the right people change the data: visitors cannot edit the schedule</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">A</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Availability</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">It works when needed: the schedule loads on festival night</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Least privilege</h3><p style="font-size:25px; line-height:1.4">Every user, service, and key gets only the access it needs.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Defence in depth</h3><p style="font-size:25px; line-height:1.4">Hiding a button is not security. Check again on the server.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Secure by default</h3><p style="font-size:25px; line-height:1.4">New accounts, settings, and endpoints start locked, not open.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">J. Saltzer &amp; M. Schroeder, "The Protection of Information in Computer Systems" (1975)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="Six of the ten categories in the OWASP Top 10:2025, chosen because they are the ones student web projects actually hit. Broken access control has been number one since 2021. The others in the list are insecure design, software and data integrity failures, logging and alerting failures, and mishandling of exceptional conditions; the reliability part of this session touches the last two." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Secure coding</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The OWASP Top 10, in student projects</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:26%; color:#F4F4F8">Risk (OWASP 2025)</th><th style="width:38%; color:#F4F4F8">How it shows up</th><th style="width:36%; color:#F4F4F8">Prevention</th></tr>
+    <tr><td><b>Broken access control</b></td><td>Visitor calls PUT /events/12 directly and it works</td><td>Check role and ownership on the server, every request</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Security misconfiguration</b></td><td>Debug mode on in production; stack traces shown to users</td><td>Production settings; generic error pages</td></tr>
+    <tr><td><b>Software supply chain failures</b></td><td>An outdated package with a known vulnerability</td><td>Lockfile, npm audit, Dependabot alerts</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Cryptographic failures</b></td><td>Passwords stored in plain text or with MD5</td><td>bcrypt or Argon2; HTTPS everywhere</td></tr>
+    <tr><td><b>Injection</b></td><td>Search box text pasted into an SQL string</td><td>Parameterized queries; escape output</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Authentication failures</b></td><td>Unlimited login attempts; "admin123" never changed</td><td>Rate limits, strong defaults, framework auth</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Broken access control is number one</b>, and the most common finding in student projects. Week 9's defect #34 is an example.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">OWASP Foundation, <i>OWASP Top 10:2025</i> (owasp.org/Top10)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the Week 7 discussion question made concrete. ORMs and query builders parameterize by default; the danger is raw queries assembled by hand. The same principle, keeping data separate from code, prevents cross-site scripting in HTML output." aria-label="Slide 7">
+<section id="s7" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Secure coding · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Injection: never build queries from strings</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Before: string concatenation</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">const</span> rows = <span style="color:#7FD4BE">await</span> db.query(
+  &quot;SELECT * FROM events WHERE title LIKE &#x27;%&quot;
+  + q + &quot;%&#x27;&quot;
+);
+
+<span style="color:#9592B0">// q = &quot;x&#x27; OR &#x27;1&#x27;=&#x27;1&quot;</span>
+<span style="color:#F5C451">// every row comes back, or worse</span></pre></div>
+    <div style="flex:1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">After: a parameterized query</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">const</span> rows = <span style="color:#7FD4BE">await</span> db.query(
+  &#x27;SELECT * FROM events WHERE title LIKE $1&#x27;,
+  [&#x27;%&#x27; + q + &#x27;%&#x27;]
+);
+
+<span style="color:#9592B0">// the database treats q as data,</span>
+<span style="color:#9592B0">// never as part of the command</span></pre></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Same idea for HTML</h3><p style="font-size:24px; line-height:1.4">Let the framework escape output. Avoid innerHTML with user text (cross-site scripting).</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Validate input too</h3><p style="font-size:24px; line-height:1.4">Length, type, and format on the server. But validation does not replace parameters.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="The ownership check is the one most often missed: a role check alone lets any organizer edit any event by changing the ID in the URL (an insecure direct object reference). Put checks in middleware so new endpoints cannot forget them, and deny by default." aria-label="Slide 8">
+<section id="s8" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Secure coding · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Access control belongs on the server</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.3; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">src/api/auth.js · src/api/events.js</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:21px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">export function</span> requireOrganizer(req, res, next) {
+  <span style="color:#7FD4BE">if</span> (!req.user) <span style="color:#7FD4BE">return</span> res.status(401).end();
+  <span style="color:#7FD4BE">if</span> (req.user.role !== &#x27;organizer&#x27;)
+    <span style="color:#7FD4BE">return</span> res.status(403).end();
+  next();
+}
+
+router.put(&#x27;/events/:id&#x27;, <span style="color:#F5C451">requireOrganizer</span>, <span style="color:#7FD4BE">async</span> (req, res) =&gt; {
+  <span style="color:#7FD4BE">const</span> event = <span style="color:#7FD4BE">await</span> Events.find(req.params.id);
+  <span style="color:#7FD4BE">if</span> (<span style="color:#F5C451">event.ownerId !== req.user.id</span>)
+    <span style="color:#7FD4BE">return</span> res.status(403).end();
+  <span style="color:#9592B0">// ...validate and save</span>
+});</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Who are you?</h3><p style="font-size:24px; line-height:1.4">Authentication: 401 if not signed in.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">What may you do?</h3><p style="font-size:24px; line-height:1.4">Authorization by role: 403 for visitors.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Is it yours?</h3><p style="font-size:24px; line-height:1.4">Ownership check: organizers edit only their own events.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Test it</h3><p style="font-size:24px; line-height:1.4">Integration tests for 401 and 403, as in Week 9 (defect #34).</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="GitHub reports large numbers of leaked secrets every year in public repositories, and automated scanners find them quickly. The password guidance follows the OWASP Password Storage Cheat Sheet and NIST SP 800-63B (length over complexity rules, check against breached passwords)." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Secure coding</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Secrets, passwords, and dependencies</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:22px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #B4423A; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#B4423A">Secrets</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Never commit keys or passwords; use .env</li><li style="margin:5px 0">.env in .gitignore; .env.example lists names</li><li style="margin:5px 0">Leaked once? Rotate it. Deleting the commit is not enough</li><li style="margin:5px 0">Turn on GitHub secret scanning</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Passwords</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Use the framework's auth if you can</li><li style="margin:5px 0">Otherwise hash with bcrypt or Argon2</li><li style="margin:5px 0">Never plain text, MD5, or SHA-1</li><li style="margin:5px 0">Rate-limit login; allow long passphrases</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Dependencies</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Commit the lockfile</li><li style="margin:5px 0">Run npm audit or pip-audit in CI</li><li style="margin:5px 0">Enable Dependabot alerts</li><li style="margin:5px 0">Fewer packages, from known maintainers</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Git remembers everything.</b> A key committed in Week 7 and deleted in Week 8 is still in the history, and bots scan public repositories within minutes.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">OWASP Cheat Sheet Series: Password Storage · NIST SP 800-63B</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="The Data Privacy Act of 2012 (Republic Act 10173) applies to any processing of personal information in the Philippines, including student projects that real people use. Proportionality is the most useful design rule: data you never collect cannot leak. Revisit the privacy requirements from Week 5 and check each one against the code." aria-label="Slide 10">
+<section id="s10" data-section="Privacy in practice" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Privacy in practice</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The Data Privacy Act, applied to your project</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:24%; color:#F4F4F8">Principle (RA 10173)</th><th style="width:40%; color:#F4F4F8">What it means in code</th><th style="width:36%; color:#F4F4F8">Diyandi guide</th></tr>
+    <tr><td><b>Transparency</b></td><td>A privacy notice says what you collect, why, and for how long</td><td>Shown on the organizer sign-up page</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Legitimate purpose</b></td><td>Use data only for the purpose you stated</td><td>Organizer phone used only for festival updates</td></tr>
+    <tr><td><b>Proportionality</b></td><td>Collect the minimum; no "nice to have" fields</td><td>Visitors need no account; saved events stay on the phone</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Security</b></td><td>Access control, encryption in transit, no personal data in logs</td><td>HTTPS; logs use user IDs, not emails</td></tr>
+    <tr><td><b>Data subject rights</b></td><td>People can see, correct, and delete their data</td><td>"Delete my account" removes the organizer's data</td></tr>
+  </table>
+  <p style="font-size:25px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Breaches must be reported</b> to the National Privacy Commission within 72 hours of knowledge, under NPC Circular 16-03.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Republic Act No. 10173, Data Privacy Act of 2012 · NPC Circular 16-03 (2016)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="The definition follows ISO/IEC 25010, which lists availability, fault tolerance and recoverability as sub-characteristics of reliability. For a festival guide, the critical window is a few evenings; a planned outage the week before is fine, ten minutes down during the parade is not." aria-label="Slide 11">
+<section id="s11" data-section="Reliability" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Reliability</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Reliability: what happens when things go wrong</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">The ability of a system to <b>perform its functions</b> under stated conditions <b>for a specified time</b>, including when parts of it fail.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Availability</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The share of time it is up. 99% still means about 7 hours down a month.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Fault tolerance</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One part fails; the rest keeps working, perhaps with less.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">3</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Recoverability</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">How fast you are back, and how much data you lose.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Assume the network, the server, and the user will all fail sometimes.</b> Decide in advance what the user sees.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISO/IEC 25010:2023, <i>Product quality model</i></p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="This maps to &quot;mishandling of exceptional conditions&quot;, new in the OWASP Top 10:2025: failing open, swallowing errors, or leaking internals. The error-message guidance repeats Nielsen&#x27;s heuristic 9 from Week 6. Every row should appear as a test case in the Week 9 plan." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Reliability</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Fail gracefully</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:26%; color:#F4F4F8">When this fails</th><th style="width:38%; color:#F4F4F8">The user sees</th><th style="width:36%; color:#F4F4F8">The system does</th></tr>
+    <tr><td>Network drops</td><td>"Showing schedule from 7:42 PM. Reconnecting…"</td><td>Serves the cached schedule; retries in the background</td></tr>
+    <tr style="background:#F6F5FB"><td>API is slow</td><td>A loading state, then a clear message after 10 s</td><td>Times out; does not hang forever</td></tr>
+    <tr><td>Invalid input</td><td>"Start time must be before end time" next to the field</td><td>Validates on the server, not only the form</td></tr>
+    <tr style="background:#F6F5FB"><td>Server error</td><td>"Something went wrong. Your changes were not saved."</td><td>Logs the details with a request ID; no stack trace to the user</td></tr>
+    <tr><td>Save conflict</td><td>"Ben edited this event a minute ago. Review his change?"</td><td>Checks a version number before saving</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>An error message should say what happened and what to do next</b>, in the user's language, without blaming them.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="Most hosting platforms keep logs and offer basic alerts; free uptime monitors ping a URL every few minutes. The request ID connects the user&#x27;s error message to the log line, which turns &quot;it broke&quot; into a five-minute investigation. &quot;Logging and alerting failures&quot; is another OWASP Top 10 category." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Reliability</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Logs and monitoring: know before your users tell you</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.15; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">One structured log line</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0">{
+  &quot;time&quot;: &quot;2026-11-02T19:04:11+08:00&quot;,
+  &quot;level&quot;: &quot;error&quot;,
+  &quot;msg&quot;: &quot;event update failed&quot;,
+  &quot;eventId&quot;: 12,
+  &quot;userId&quot;: &quot;u_83&quot;,
+  &quot;requestId&quot;: &quot;r-7f3a&quot;,
+  &quot;error&quot;: &quot;timeout after 5000 ms&quot;
+}
+
+<span style="color:#F5C451">// no email, password, phone, or token</span></pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Structured</h3><p style="font-size:24px; line-height:1.4">JSON fields you can search and filter, not free text.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Useful</h3><p style="font-size:24px; line-height:1.4">Enough to find the cause: what, where, which request.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #B4423A; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#B4423A">Safe</h3><p style="font-size:24px; line-height:1.4">No passwords, tokens, or personal data. Logs leak too.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Watched</h3><p style="font-size:24px; line-height:1.4">A free uptime check and error alerts to the team chat.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="The two questions are the recovery point objective (RPO) and recovery time objective (RTO). For a student project, a daily automatic database backup and one practised restore are enough to answer them honestly in the defense. Many managed databases include daily backups; check that yours does." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Reliability</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Backups you have actually restored</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Back up</h3><p style="font-size:25px; line-height:1.4">The database, uploaded files, and configuration.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Automatically, on a schedule, to a different place than the server.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Restore</h3><p style="font-size:25px; line-height:1.4">A backup you have never restored is a hope, not a backup.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Practise once: restore into a test database and check the data.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Migrate safely</h3><p style="font-size:25px; line-height:1.4">Schema changes as migrations in the repository.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Back up before running them in production.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Two questions for your plan:</b> how much data can we lose (an hour? a day?), and how long can we be down?</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="Free tiers of common hosting platforms support preview or staging deployments per branch or pull request, which gives student teams a staging environment at no cost. The rule &quot;never edit code on the server&quot; is the deployment equivalent of &quot;never commit to main&quot;." aria-label="Slide 15">
+<section id="s15" data-section="Deployment readiness" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Deployment readiness</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Environments: never test on the real thing</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Local</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Your laptop; sample data</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">CI</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Fresh machine; runs the tests</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Staging</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Same setup as production; test data</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#F4F4F8">Production</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">Real users and real data</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Same code everywhere</h3><p style="font-size:25px; line-height:1.4">Only configuration changes between environments. Never edit code on the server.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Staging catches surprises</h3><p style="font-size:25px; line-height:1.4">Missing variables, slow queries, mobile layout, HTTPS issues.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Production is protected</h3><p style="font-size:25px; line-height:1.4">Deployed only from main, by the pipeline, after tests pass.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the &quot;Config&quot; factor of the Twelve-Factor App (Wiggins, 2011): strict separation of configuration from code. Failing fast at start-up on a missing variable turns a confusing runtime error into an obvious deployment error." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Deployment readiness</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Configuration lives in the environment</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:28%; color:#F4F4F8">Variable</th><th style="width:22%; color:#F4F4F8">Local</th><th style="width:25%; color:#F4F4F8">Staging</th><th style="width:25%; color:#F4F4F8">Production</th></tr>
+    <tr><td>DATABASE_URL</td><td>local test database</td><td>staging database</td><td>production database</td></tr>
+    <tr style="background:#F6F5FB"><td>APP_URL</td><td>http://localhost:3000</td><td>staging URL</td><td>public URL</td></tr>
+    <tr><td>DEBUG</td><td>true</td><td>true</td><td><b>false</b></td></tr>
+    <tr style="background:#F6F5FB"><td>MAPS_API_KEY</td><td>dev key (limited)</td><td>dev key</td><td>production key, restricted to the domain</td></tr>
+    <tr><td>SESSION_SECRET</td><td>any value</td><td>random, secret</td><td>random, secret, different</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">One codebase, many deploys</h3><p style="font-size:24px; line-height:1.4">The code reads settings from environment variables.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Listed, not committed</h3><p style="font-size:24px; line-height:1.4">.env.example names every variable with a comment.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Checked at start-up</h3><p style="font-size:24px; line-height:1.4">The app refuses to start if a required variable is missing.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">A. Wiggins, <i>The Twelve-Factor App</i> (12factor.net, 2011)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="Continuous delivery was described by Humble and Farley (2010). For the course, continuous delivery with a manual production step is the safer default, especially around the festival-style deadline of the defense. A smoke test is a handful of quick checks, not the full suite: the home page loads, today&#x27;s events appear, an organizer can sign in." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Deployment readiness</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A deployment pipeline</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Merge to main</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Reviewed pull request</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">CI</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Lint, tests, build</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Deploy to staging</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Automatic</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Smoke test</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Key journeys still work</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Deploy to production</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">One click or automatic</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:22px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Continuous delivery</h3><p style="font-size:25px; line-height:1.4">Every change on main <b>could</b> be released; a person decides when.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Continuous deployment</h3><p style="font-size:25px; line-height:1.4">Every change on main that passes <b>is</b> released automatically.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #B4423A; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#B4423A">Rollback plan</h3><p style="font-size:25px; line-height:1.4">Redeploy the previous version in one step. Know how before you need it.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">J. Humble &amp; D. Farley, <i>Continuous Delivery</i> (2010)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Semantic Versioning 2.0.0 (semver.org) gives version numbers a meaning. GitHub Releases attach notes to a tag, which is also what the final submission in Week 12 asks for. The &quot;Known issues&quot; section is honest and professional; it shows the team knows its product." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Deployment readiness</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Releases and versions</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px">
+    <div style="gap:12px; background:#231E3D; border-radius:14px; padding:28px 32px"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Semantic versioning</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; color:#F4F4F8">1.4.2</p><p style="font-size:23px; line-height:1.45; color:#C9C5E0"><b style="color:#F4F4F8">Major</b> breaks something existing · <b style="color:#F4F4F8">Minor</b> adds a feature · <b style="color:#F4F4F8">Patch</b> fixes a bug</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Tag every release</h3><p style="font-size:24px; line-height:1.4">git tag v1.0.0 marks exactly what was deployed and demoed.</p></div>
+  </div>
+    <div style="flex:1.1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Release notes · v1.1.0</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#F5C451">Added</span>
+- Organizers can cancel an event (#41)
+- Schedule works offline (#44)
+<span style="color:#F5C451">Fixed</span>
+- Noon shows as 12:00 PM (#27)
+- Visitors can no longer call edit API (#34)
+<span style="color:#F5C451">Known issues</span>
+- List takes 4 s on slow 3G (#38)</pre></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">T. Preston-Werner, <i>Semantic Versioning 2.0.0</i> (semver.org)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the basis for the individual checklist option. The value is in the evidence column: a link to the CI run, the branch protection setting, the backup schedule, or the pull request that removed a secret. &quot;Not applicable&quot; needs a one-line reason." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Deployment readiness</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A deployment-readiness checklist</h2>
+  </div>
+  <div style="flex-direction:row; gap:22px"><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Build and deploy</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Deploys from main by the pipeline</li><li style="margin:5px 0">CI green; tests cover key journeys</li><li style="margin:5px 0">Staging tested before production</li><li style="margin:5px 0">Rollback tried once</li><li style="margin:5px 0">Release tagged with notes</li></ul></div><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #B4423A; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#B4423A">Security and privacy</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">No secrets in the repository or history</li><li style="margin:5px 0">DEBUG off; generic error pages</li><li style="margin:5px 0">Access checked on every endpoint</li><li style="margin:5px 0">npm audit clean or explained</li><li style="margin:5px 0">Privacy notice and delete option live</li></ul></div><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Operate and support</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">HTTPS on the public URL</li><li style="margin:5px 0">Logs without personal data</li><li style="margin:5px 0">Uptime check and error alerts</li><li style="margin:5px 0">Daily backup; one restore practised</li><li style="margin:5px 0">README and user guide current</li></ul></div></div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Individual work:</b> adapt this or the security and privacy list to your project; mark each item done, not done, or not applicable, with evidence.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="Keeping documentation in the repository (&quot;docs as code&quot;) means it is reviewed, versioned and tagged with releases like everything else. The common failure is documentation written once in Week 11 that no longer matches the system by Week 12." aria-label="Slide 20">
+<section id="s20" data-section="Documentation" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Documentation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Write for a specific reader</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:24%; color:#F4F4F8">Document</th><th style="width:26%; color:#F4F4F8">Reader</th><th style="width:50%; color:#F4F4F8">Answers</th></tr>
+    <tr><td><b>README</b></td><td>A new developer, a grader</td><td>What is it, how do I run it, where is everything?</td></tr>
+    <tr style="background:#F6F5FB"><td><b>User guide</b></td><td>Visitors and organizers</td><td>How do I get my task done?</td></tr>
+    <tr><td><b>Technical documentation</b></td><td>Next year's team</td><td>How is it built, deployed, and changed safely?</td></tr>
+    <tr style="background:#F6F5FB"><td><b>API reference</b></td><td>Front-end developers, integrators</td><td>What endpoints exist, with what inputs and outputs?</td></tr>
+    <tr><td><b>ADRs</b></td><td>Anyone asking "why?"</td><td>Why it was built this way (Week 7)</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Release notes</b></td><td>Users and the team</td><td>What changed in this version?</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Docs live in the repository</b> and change in the same pull request as the code they describe.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the Diátaxis framework by Daniele Procida (diataxis.fr). Its main insight is that mixing the four kinds in one page serves no reader well; a how-to guide that stops to explain architecture loses the user who just wants to finish a task." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Documentation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Four kinds of documentation</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px"><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">Learn</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Tutorials</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Learning by doing. "Your first event in 5 minutes" for a new organizer.</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">Do</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">How-to guides</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Steps for one task. "How to cancel an event and notify visitors."</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">Look up</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Reference</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Facts to look up. Every field on the event form; every API endpoint.</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">Understand</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Explanation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Understanding. Why the schedule is cached, and what "last updated" means.</p></div></div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Your user guide is mostly how-to guides</b>, one per key task, with a short tutorial at the start. Technical docs mix reference and explanation.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">D. Procida, <i>Diátaxis: a systematic approach to technical documentation</i> (diataxis.fr)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="The best README test: a classmate from another team clones the repository and gets it running using only the README, while the authors stay silent. Every question they ask is a missing line. The license line matters for handover; without one, the next team has no right to reuse the code." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Documentation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A README that gets someone running</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.35; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">README.md</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:21px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#F5C451"># Diyandi Festival Guide</span>
+Today&#x27;s festival events on your phone, for visitors
+and organizers in Iligan.
+
+<span style="color:#F5C451">## Live</span>        https://diyandi-guide.example.org
+<span style="color:#F5C451">## Features</span>    today&#x27;s list · details · offline · editing
+<span style="color:#F5C451">## Setup</span>
+    git clone … &amp;&amp; cd diyandi-guide
+    cp .env.example .env    <span style="color:#9592B0"># fill in values</span>
+    npm ci &amp;&amp; npm run db:migrate &amp;&amp; npm run dev
+<span style="color:#F5C451">## Tests</span>       npm test
+<span style="color:#F5C451">## Docs</span>        docs/user-guide.md · docs/technical.md
+<span style="color:#F5C451">## Team</span>        names, roles, GitHub handles
+<span style="color:#F5C451">## License</span>     MIT</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">The first screen matters</h3><p style="font-size:24px; line-height:1.4">What it is and who it is for, in one line.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Copy-paste setup</h3><p style="font-size:24px; line-height:1.4">Commands that work on a fresh clone. Test this with a teammate.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Links, not walls</h3><p style="font-size:24px; line-height:1.4">Point to the guide and technical docs.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Screenshot or GIF</h3><p style="font-size:24px; line-height:1.4">One image of the main screen near the top.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="Both drafts are part of this week&#x27;s milestone and are finalised in Week 11. Teams can reuse much of the architecture document, test plan and API example. Screenshots should come from the deployed prototype so they match what users will see." aria-label="Slide 23">
+<section id="s23" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Documentation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">User guide and technical documentation: outlines</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">User guide</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Getting started: what you need, how to open it</li><li style="margin:5px 0">Tutorial: your first task, with screenshots</li><li style="margin:5px 0">How-to: one short page per key task</li><li style="margin:5px 0">Troubleshooting: common errors and what to do</li><li style="margin:5px 0">Privacy: what is collected, how to delete it</li><li style="margin:5px 0">Contact and help</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Technical documentation</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Overview and architecture (from Week 7)</li><li style="margin:5px 0">Setup and configuration: every variable</li><li style="margin:5px 0">Data model and API reference</li><li style="margin:5px 0">Testing: how to run, what is covered</li><li style="margin:5px 0">Deployment, backup, restore, rollback</li><li style="margin:5px 0">Known issues and suggested next steps</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Write the user guide in the users' words</b>: "save an event", not "POST to /saved". Test it by watching someone follow it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="The four categories are from ISO/IEC/IEEE 14764 (Software maintenance), building on Lientz and Swanson (1980). Estimates of the maintenance share vary widely by study and system, so present it as &quot;most&quot;, not as a precise figure. Lehman&#x27;s laws of software evolution (1980) explain why: a system in use must keep changing or become less useful." aria-label="Slide 24">
+<section id="s24" data-section="Maintenance" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Maintenance</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Most of a system’s life is maintenance</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Corrective</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Fix defects found in use. "Noon shows as 0:00 PM."</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Adaptive</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Keep up with a changing world: new phone OS, new map API terms.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Perfective</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Improve or add: a vendor directory next year, faster loading.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">4</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Preventive</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Reduce future problems: update packages, refactor, add tests.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Studies commonly put maintenance at well over half of lifetime cost.</b> Every decision this semester is also a decision for the people who maintain it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISO/IEC/IEEE 14764:2022, <i>Software maintenance</i> · B. Lientz &amp; E. B. Swanson (1980)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="Ward Cunningham coined the metaphor in 1992. Martin Fowler&#x27;s technical debt quadrant (2009) separates deliberate from inadvertent and prudent from reckless; the middle and right panels simplify it. Inadvertent debt is normal: teams learn a better design after building the first one." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Maintenance</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Technical debt: borrow on purpose, and pay it back</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:22px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">What it is</h3><p style="font-size:25px; line-height:1.4">Shortcuts that save time now and cost time later, like interest on a loan.</p><p style="font-size:24px; line-height:1.4; color:#4C4A5E">Duplicated code, missing tests, hard-coded values, outdated packages.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Deliberate and prudent</h3><p style="font-size:25px; line-height:1.4">"We ship the demo with a hard-coded venue list and replace it in Sprint 3."</p><p style="font-size:24px; line-height:1.4; color:#4C4A5E">Fine, if it is written down.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #B4423A; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#B4423A">Reckless</h3><p style="font-size:25px; line-height:1.4">"No time for tests." "We will fix it later" with no issue.</p><p style="font-size:24px; line-height:1.4; color:#4C4A5E">The interest grows until no one dares change anything.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Make debt visible:</b> a "tech-debt" label on issues, a line in the release notes, and some time in every sprint to pay it down.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">W. Cunningham, OOPSLA experience report (1992) · M. Fowler, "TechnicalDebtQuadrant" (2009)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="Account ownership is the most commonly forgotten handover item: when a student&#x27;s personal hosting account lapses after graduation, the system disappears. Agree with the client or adviser who owns the domain, hosting and API keys before the final release in Week 12." aria-label="Slide 26">
+<section id="s26" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Maintenance</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Hand over a system someone else can keep alive</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">No single point of knowledge</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Every part known by at least two people (the bus factor)</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Readable code</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Names, structure, and comments for the "why", reviewed all semester</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">A safety net of tests</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The next team can change code without fear</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Accounts and access</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Hosting, domain, and keys owned by the client or adviser, not a student</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Docs that match reality</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">README, technical docs, and ADRs current at the final release</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">A list of next steps</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Known issues and ideas, as labelled issues</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Imagine handing this to next year's CSC181 class.</b> What would they need from you on day one?</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="The Sprint 2 review follows the same shape as Sprint 1 but adds evidence of quality and readiness. After it, the remaining work in Week 11 is polish, final testing and documentation, not new features. Encourage teams to freeze features after this review." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint 2 review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What the Sprint 2 review adds</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Sprint goal</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Met, partly, or not, in one sentence. Compare with Sprint 1.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Live demo</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">The revised prototype on the deployed URL, from main.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Feedback acted on</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Show two or three changes made because of the Sprint 1 review.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Quality evidence</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Test results, the defect log, and what is still open.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Readiness</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Your security, privacy, and deployment checklist status.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Docs drafts</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Walk through the user guide for one task.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: not safe; the password is still in the Git history and may have been scraped; rotate the password immediately, then move it to environment variables and consider rewriting history only after rotation. Q2: security misconfiguration and information leakage (paths, versions, queries help attackers); poor user experience (no clear message or next step); details belong in logs. Q3: proportionality (data minimisation) under the Data Privacy Act; collect only what the purpose needs, explain why in the privacy notice. Q4: unreproducible deploys, untested code in production, missing files or settings, no rollback, only one person can deploy (bus factor), possible secrets on a laptop." aria-label="Slide 28">
+<section id="s28" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What would you check?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">A teammate committed the database password in Week 7 and deleted it in Week 8. Is the team safe? What now?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">The app shows a full stack trace when the API fails. Name <b>two</b> problems.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">Your sign-up form asks for birthday, address, and school. Which principle applies, and what would you change?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">A student deploys by copying files to the server from their laptop. What could go wrong?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="Three parts, matching the syllabus milestone. Individually, each student submits a security and privacy checklist or a deployment-readiness checklist with evidence. The documentation drafts get feedback this week and are finalised in Week 11." aria-label="Slide 29">
+<section id="s29" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Sprint 2 review, revised prototype, docs drafts</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Sprint 2 review</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Goal met, partly, or not</li><li style="margin:5px 0">Live demo from main</li><li style="margin:5px 0">Feedback from Sprint 1 acted on</li><li style="margin:5px 0">Test results and defect log</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Revised prototype</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Deployed with HTTPS</li><li style="margin:5px 0">Critical and P1 defects fixed</li><li style="margin:5px 0">Security and privacy checks done</li><li style="margin:5px 0">Release tagged with notes</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Documentation drafts</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">README that works on a fresh clone</li><li style="margin:5px 0">User guide: tutorial and how-tos</li><li style="margin:5px 0">Technical docs: setup to rollback</li><li style="margin:5px 0">Known issues listed</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected findings. A: weak default credentials, personal and payment references needing protection and a privacy notice, unrepeatable manual deployment with no rollback. B: uploaded IDs publicly reachable (critical privacy breach, reportable under the Data Privacy Act), no backup or restore plan, broken access control and excessive data exposure. C: leaked key (rotate and restrict it, move to environment variables), no graceful offline behaviour, no documentation for setup or handover. Ask teams to justify their top-three ranking with severity reasoning from Week 9." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Ready to ship?</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">3 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Teams of 3 or 4.</b> Pick a system on the right. Each has hidden problems.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Audit it</b> against the readiness checklist. List every problem you find.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Rank the top three</b> by severity. Which would stop the launch?</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write the fix</b> for each in one or two sentences, and how you would test it.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Share:</b> one team per system reads its top problem; others add what they missed.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Stores student IDs and GCash reference numbers. The admin password is "admin123". Deployed by copying files from a laptop.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay document requests</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Uploaded valid IDs are saved in a public folder. No backups. The API returns full resident records to any signed-in user.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Jeepney route finder</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">The maps API key is in the repository. Offline, it shows a blank screen. There is no README.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 10 · Security, reliability, deployment readiness, documentation, and maintenance</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Push for fixes that are specific and testable, not &quot;improve security&quot;." aria-label="Slide 31">
+<section id="s31" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Fill these in on paper or in a document</h2>
+  </div>
+  <div style="flex-direction:row; gap:20px; height:600px"><div style="flex:1; gap:20px"><div style="flex:1.6; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Problems found: item · checklist area</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Top three, ranked: severity · why it stops launch</p></div></div><div style="flex:1; gap:20px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Fix 1: change · how to test it</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Fix 2: change · how to test it</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Fix 3: change · how to test it</p></div></div></div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: canteen pre-ordering · B: barangay document requests · C: jeepney route finder</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">31</p>
+</section>
+</div>
+<div class="frame" data-notes="Security is confidentiality, integrity and availability, built with least privilege, defence in depth and secure defaults. The OWASP Top 10 names the common failures: check access on the server, parameterize queries, keep secrets out of Git, hash passwords and audit dependencies. Apply the Data Privacy Act&#x27;s transparency, legitimate purpose and proportionality. Design for failure with clear errors, structured logs without personal data, monitoring and tested backups. Deploy through environments and a pipeline with configuration in environment variables, tagged releases and a rollback plan. Write documentation for specific readers, and plan for maintenance, technical debt and handover. Next week: project management, estimation, monitoring, and preparing the presentation and demonstration." aria-label="Slide 32">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Ready means safe, repeatable, and documented</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Check access on the server, always</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Parameterize queries; guard secrets</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Collect less; protect what you keep</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Fail gracefully; log safely; back up</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Deploy by pipeline, configure by env</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Docs for each reader; plan for upkeep</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">Build it as if someone else will have to run it, because someone will.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>

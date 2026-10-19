@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 8: Iterative Development, Task Planning, Issue Tracking, and Integration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 8. Teams have been building Sprint 1 since last week. This session covers the habits that keep a sprint on track: thin vertical slices, small owned tasks, honest issue tracking, continuous integration, and a review that shows working software. The Sprint 1 review happens this week, so the last part prepares teams for it." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Iterative development,<br>task planning,<br>and integration</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Building in small increments, breaking stories into tasks, tracking work with issues and a project board, integrating continuously, and running the Sprint 1 review</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 8</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. The first four are the mechanics of a sprint; the last two are what the Sprint 1 review and the individual submission look like. Everything here connects to the Git workflow from last week: issues, branches and pull requests together make the work traceable." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Keeping a sprint moving, visible, and integrated</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Iterative development</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Increments, slices, and the walking skeleton</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Task planning</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">From stories to small, owned tasks</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Issue tracking</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Good issues, labels, and the project board</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Integration</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Continuous integration and API contracts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Sprint review</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Demo working software, then reflect</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Your evidence</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Contribution log and sprint reflection</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the contribution log and sprint reflection (individual), and the Sprint 1 review, a working prototype, and an updated project board (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 5 (Git, task planning, issue tracking, integration), CLO 6 (communicating progress), CLO 7 (working in a team) and CLO 8 (verifiable individual contributions)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Explain iterative and incremental</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">development, and why thin slices win</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Break a user story into tasks</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">that are small, owned, and testable</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write clear issues</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and keep a project board truthful</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Integrate continuously</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with CI and agreed API contracts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Run a sprint review</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and a short retrospective</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Document your contribution</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">with links to verifiable evidence</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Recall the course process: two sprints after the planning weeks. Sprint 1 ends this week; Sprint 2 runs to Week 10. The review is not a grade on perfection; it is a check that the team can deliver something real and learn from it." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Sprint 1: from plan to working software</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 1 plan</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 7: goal, stories, owners</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Build</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Small tasks, small pull requests</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Integrate</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Merge to main daily; CI stays green</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Sprint 1 review</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Week 8: demo the prototype</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 2 plan</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Adjust using what you learned</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Show, don't tell</h3><p style="font-size:25px; line-height:1.4">The review judges what runs, not what is "almost done".</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Make work visible</h3><p style="font-size:25px; line-height:1.4">If it is not on the board or in the repository, it did not happen.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Learn and adjust</h3><p style="font-size:25px; line-height:1.4">The retrospective turns this sprint's problems into next sprint's rules.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="Jeff Patton&#x27;s &quot;Mona Lisa&quot; illustration is a good aid here: incremental alone paints one finished patch at a time; iterative alone sketches the whole picture and refines it; agile teams combine both. Larman and Basili&#x27;s &quot;Iterative and Incremental Development: A Brief History&quot; (IEEE Computer, 2003) shows the idea is decades older than Scrum." aria-label="Slide 5">
+<section id="s5" data-section="Iterative development" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Iterative development</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Iterative and incremental</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">Build the system in <b>small, working increments</b>, and <b>revisit</b> each part as you learn, instead of building every part once, in order.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Incremental</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Add a new working piece each cycle: one more story done end to end</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Iterative</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Improve what exists: rework, refine, and fix based on feedback</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">3</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Together</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Every sprint ends with software someone can use and react to</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>A half-built feature is worth nothing to a user.</b> Three finished stories beat eight that are 80% done.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">C. Larman &amp; V. Basili, "Iterative and Incremental Development: A Brief History", <i>IEEE Computer</i> (2003)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="The walking skeleton is Alistair Cockburn&#x27;s term (Crystal Clear, 2004). It proves the architecture from Week 7 works before the team invests in features. For the Diyandi guide, the skeleton is one hard-coded event coming from the database, through the API, to a deployed page." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Iterative development</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Build vertical slices, not horizontal layers</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">Horizontal: layer by layer</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Week 1: the whole database</li><li style="margin:5px 0">Week 2: the whole API</li><li style="margin:5px 0">Week 3: all the screens</li><li style="margin:5px 0">Nothing works until the end</li><li style="margin:5px 0">Integration problems arrive last, all at once</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Vertical: story by story</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Slice 1: today's events, list only</li><li style="margin:5px 0">Through every layer: screen, API, database</li><li style="margin:5px 0">Deployed and usable after a few days</li><li style="margin:5px 0">Each slice adds one story</li><li style="margin:5px 0">Integration problems arrive early, one at a time</li></ul></div>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Walking skeleton:</b> the thinnest slice that runs end to end and is deployed. Build it first, then add flesh to it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">A. Cockburn, <i>Crystal Clear: A Human-Powered Methodology for Small Teams</i> (2004)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="These are the Scrum events from Week 2, scaled for a team that meets around classes. The Scrum Guide timeboxes assume a full-time team; students should keep the purpose and shrink the time. A chat stand-up works if everyone posts the three answers by an agreed time." aria-label="Slide 7">
+<section id="s7" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Iterative development</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A sprint, day by day, for a student team</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Event</th><th style="width:42%; color:#F4F4F8">Purpose</th><th style="width:38%; color:#F4F4F8">For a student team</th></tr>
+    <tr><td><b>Sprint planning</b></td><td>Choose the goal and stories; break them into tasks</td><td>Week 7, about one hour</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Stand-up</b></td><td>Done since last time, next, blocked</td><td>Three times a week, 10 minutes, in person or chat</td></tr>
+    <tr><td><b>Building</b></td><td>Small tasks, small pull requests, reviews</td><td>Every day something moves on the board</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Backlog refinement</b></td><td>Clarify and split upcoming stories</td><td>Once, mid-sprint, 30 minutes</td></tr>
+    <tr><td><b>Sprint review</b></td><td>Demo working software; gather feedback</td><td>This week, 15 to 20 minutes per team</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Retrospective</b></td><td>Inspect how the team worked; pick improvements</td><td>Right after the review, 20 minutes</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">K. Schwaber &amp; J. Sutherland, <i>The Scrum Guide</i> (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="Tasks are the steps a developer takes; the story is the value a user gets. Notice that every acceptance criterion maps to at least one task, including the test task. Reviewing is a task too: if it is not planned, it becomes the bottleneck at the end of the sprint." aria-label="Slide 8">
+<section id="s8" data-section="Task planning" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Task planning</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From a user story to tasks</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px">
+    <div style="gap:10px; background:#231E3D; border-radius:14px; padding:24px 28px"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Story #10 · size M</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:28px; font-weight:500; line-height:1.35; color:#F4F4F8">As a visitor, I want to see today's events ordered by start time, so that I can plan my evening.</p></div>
+    <div style="gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:22px 28px"><p style="font-size:24px; font-weight:600; color:#0E7C66">Acceptance criteria (Week 4)</p><ul style="font-size:23px; line-height:1.45"><li>Only events on today's date appear</li><li>Ordered by start time; ties by name</li><li>An empty day shows a friendly message</li></ul></div>
+  </div>
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+      <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:66%; color:#F4F4F8">Task</th><th style="width:18%; color:#F4F4F8">Owner</th><th style="width:16%; color:#F4F4F8">Est.</th></tr>
+    <tr><td>Seed 15 sample events in the database</td><td>Ana</td><td>2 h</td></tr>
+    <tr style="background:#F6F5FB"><td>GET /events?date= endpoint with sorting</td><td>Ana</td><td>4 h</td></tr>
+    <tr><td>Unit tests: today only, order, ties</td><td>Ana</td><td>2 h</td></tr>
+    <tr style="background:#F6F5FB"><td>Event list screen using formatTime</td><td>Ben</td><td>4 h</td></tr>
+    <tr><td>Empty-day message and loading state</td><td>Ben</td><td>2 h</td></tr>
+    <tr style="background:#F6F5FB"><td>Review both pull requests</td><td>Cara</td><td>1 h</td></tr>
+  </table>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="A one-day ceiling keeps progress visible and makes blockers obvious. Students commonly create one task per story (&quot;do the event list&quot;), which hides everything; push for steps a teammate could pick up." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Task planning</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What makes a good task</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Small</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Done in a day or less. Bigger means it hides unknowns.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Owned</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One name on it. "The team" owns nothing.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Clear finish</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Anyone can tell when it is done.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Testable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Includes or pairs with its tests.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Linked</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Belongs to a story; the story belongs to the goal.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Visible</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">On the board from the start, not added after the fact.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>If a task has sat in "In progress" for three days, it is too big or it is blocked.</b> Split it or ask for help at the next stand-up.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="Planning poker was described by James Grenning (2002) and popularised by Mike Cohn&#x27;s Agile Estimating and Planning (2005). Estimation is covered in more depth in Week 11; here the aim is just enough to plan Sprint 2 from what Sprint 1 actually delivered." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Task planning</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Sizing work without false precision</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Relative sizing</h3><p style="font-size:25px; line-height:1.4">Compare stories with each other, not with the clock: "Is this bigger than the event list?"</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">T-shirt sizes (S, M, L) or story points (1, 2, 3, 5, 8) both work.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Planning poker</h3><p style="font-size:25px; line-height:1.4">Everyone shows a size at the same time. The highest and lowest explain why, then vote again.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">The discussion finds hidden work; the number matters less.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Hours for tasks</h3><p style="font-size:25px; line-height:1.4">Tasks are small enough to guess in hours: 1, 2, 4, or 8.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Compare the guess with reality in your log. That is how estimates improve.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Velocity</b> is what the team actually finished last sprint. Use it to plan Sprint 2, not to compare teams.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">M. Cohn, <i>Agile Estimating and Planning</i> (2005)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="GitHub Issues and the Projects board are enough for this course; Jira and Trello work the same way. A bug report with steps, expected and actual results is the minimum; Week 9 expands this into a full defect log with severity and priority." aria-label="Slide 11">
+<section id="s11" data-section="Issue tracking" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Issue tracking</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Anatomy of a useful issue</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.15; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:26px 30px"><p style="font-size:28px; font-weight:600; color:#231E3D">Event times show 0:00 PM at noon <span style="color:#6B6980; font-weight:400">#27</span></p><p><span style="display:inline-block; font-size:18px; font-weight:600; color:#FFFFFF; background:#0E7C66; border-radius:999px; padding:2px 12px; margin-right:6px">open</span><span style="display:inline-block; font-size:18px; font-weight:600; color:#FFFFFF; background:#B4423A; border-radius:999px; padding:2px 12px; margin-right:6px">bug</span><span style="display:inline-block; font-size:18px; font-weight:600; color:#FFFFFF; background:#5B4BC4; border-radius:999px; padding:2px 12px; margin-right:6px">sprint-1</span><span style="font-size:19px; color:#6B6980">assigned to Ben</span></p><p style="font-size:22px; line-height:1.45"><b>Steps:</b> open the event list on Oct 20; look at "Opening parade" (12:00).</p><p style="font-size:22px; line-height:1.45"><b>Expected:</b> 12:00 PM. <b>Actual:</b> 0:00 PM.</p><p style="font-size:22px; line-height:1.45"><b>Where:</b> Chrome on Android, main at commit 4f2a9c1.</p><p style="font-size:22px; line-height:1.45"><b>Notes:</b> likely in formatTime; see screenshot.</p><div style="margin-top:auto; gap:4px; background:#ECECF2; border-radius:10px; padding:14px 18px"><p style="font-size:19px; color:#4C4A5E">Linked: branch 27-fix-noon-time · pull request #31 · Closes #27</p></div></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">A title that says what</h3><p style="font-size:24px; line-height:1.4">Someone scanning the board knows the problem without opening it.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Reproducible</h3><p style="font-size:24px; line-height:1.4">Steps, expected, actual, where. A bug no one can reproduce cannot be fixed.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Labelled and assigned</h3><p style="font-size:24px; line-height:1.4">Type (story, task, bug), sprint, and one owner.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Linked to the code</h3><p style="font-size:24px; line-height:1.4">Branch and pull request mention the number, so it closes itself.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="The WIP limits come from Kanban (David Anderson, 2010). The most common student board failure is that everything moves to Done in the last hour, which tells the instructor nothing and makes the burndown useless. GitHub Projects can move cards automatically when a pull request opens or merges." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Issue tracking</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A project board that tells the truth</h2>
+  </div>
+  <div style="flex-direction:row; gap:16px"><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">To do</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#19 · Dan</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Deploy to a public URL</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#20 · unassigned</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Venue map link</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#22 · Cara</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Event edit validation</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">In progress <span style="color:#6B6980; font-weight:400">· limit 4</span></p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#15 · Cara</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Organizer edits an event</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #B4423A; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#27 · Ben</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Fix noon time bug</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">In review <span style="color:#6B6980; font-weight:400">· limit 3</span></p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#11 · Ben</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Event details page</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">Done</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #0E7C66; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#10 · Ana</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Today's list by time</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #0E7C66; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#18 · Ana</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Seed sample data</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #0E7C66; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#9 · Dan</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">CI: lint and tests</p></div></div></div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Move cards as you work</h3><p style="font-size:24px; line-height:1.4">Not on Friday night. The board is the stand-up's agenda.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Limit work in progress</h3><p style="font-size:24px; line-height:1.4">Finish before starting. A full "In review" column means: go review.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Done means Done</h3><p style="font-size:24px; line-height:1.4">Merged, tested, meets the Definition of Done. Not "works on my laptop".</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">D. J. Anderson, <i>Kanban: Successful Evolutionary Change for Your Technology Business</i> (2010)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="A burndown plots work remaining against time. GitHub Projects can chart this from the board, which only works if cards move as work happens. Here days 0 to 4 barely move, which in student teams usually means work was happening off the board or a task was too big. The team cut nothing and finished with 3 points left, which carry into Sprint 2." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Issue tracking</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Is the sprint on track? Read the burndown</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:stretch; gap:28px">
+    <svg width="1100" height="540" viewBox="0 0 1100 540" style="flex:none; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px"><line x1="90" y1="470.0" x2="900" y2="470.0" stroke="#E0DFEA" stroke-width="2"/><text x="74" y="477.0" text-anchor="end" font-size="20" fill="#6B6980">0</text><line x1="90" y1="370.0" x2="900" y2="370.0" stroke="#E0DFEA" stroke-width="2"/><text x="74" y="377.0" text-anchor="end" font-size="20" fill="#6B6980">6</text><line x1="90" y1="270.0" x2="900" y2="270.0" stroke="#E0DFEA" stroke-width="2"/><text x="74" y="277.0" text-anchor="end" font-size="20" fill="#6B6980">12</text><line x1="90" y1="170.0" x2="900" y2="170.0" stroke="#E0DFEA" stroke-width="2"/><text x="74" y="177.0" text-anchor="end" font-size="20" fill="#6B6980">18</text><line x1="90" y1="70.0" x2="900" y2="70.0" stroke="#E0DFEA" stroke-width="2"/><text x="74" y="77.0" text-anchor="end" font-size="20" fill="#6B6980">24</text><text x="90.0" y="504" text-anchor="middle" font-size="20" fill="#6B6980">0</text><text x="252.0" y="504" text-anchor="middle" font-size="20" fill="#6B6980">2</text><text x="414.0" y="504" text-anchor="middle" font-size="20" fill="#6B6980">4</text><text x="576.0" y="504" text-anchor="middle" font-size="20" fill="#6B6980">6</text><text x="738.0" y="504" text-anchor="middle" font-size="20" fill="#6B6980">8</text><text x="900.0" y="504" text-anchor="middle" font-size="20" fill="#6B6980">10</text><text x="495.0" y="534" text-anchor="middle" font-size="20" fill="#4C4A5E">School days in the sprint</text><text x="26" y="270.0" text-anchor="middle" font-size="20" fill="#4C4A5E" transform="rotate(-90 26 270.0)">Points left</text><line x1="90.0" y1="70.0" x2="900.0" y2="470.0" stroke="#6B6980" stroke-width="3" stroke-dasharray="10 8"/><polyline points="90.0,70.0 171.0,70.0 252.0,103.33333333333331 333.0,103.33333333333331 414.0,103.33333333333331 495.0,186.66666666666669 576.0,236.66666666666666 657.0,236.66666666666666 738.0,320.0 819.0,386.6666666666667 900.0,420.0" fill="none" stroke="#5B4BC4" stroke-width="5"/><circle cx="90.0" cy="70.0" r="6" fill="#5B4BC4"/><circle cx="171.0" cy="70.0" r="6" fill="#5B4BC4"/><circle cx="252.0" cy="103.33333333333331" r="6" fill="#5B4BC4"/><circle cx="333.0" cy="103.33333333333331" r="6" fill="#5B4BC4"/><circle cx="414.0" cy="103.33333333333331" r="6" fill="#5B4BC4"/><circle cx="495.0" cy="186.66666666666669" r="6" fill="#5B4BC4"/><circle cx="576.0" cy="236.66666666666666" r="6" fill="#5B4BC4"/><circle cx="657.0" cy="236.66666666666666" r="6" fill="#5B4BC4"/><circle cx="738.0" cy="320.0" r="6" fill="#5B4BC4"/><circle cx="819.0" cy="386.6666666666667" r="6" fill="#5B4BC4"/><circle cx="900.0" cy="420.0" r="6" fill="#5B4BC4"/><text x="203.4" y="220.0" font-size="21" fill="#6B6980">ideal</text><text x="252.0" y="42" font-size="21" fill="#5B4BC4" font-weight="600" text-anchor="middle">flat: stuck or not updated</text><text x="916.0" y="427.0" font-size="21" fill="#5B4BC4" font-weight="600">3 left</text></svg>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Above the line</h3><p style="font-size:24px; line-height:1.4">Behind plan. Cut scope early, not on the last day.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Flat stretches</h3><p style="font-size:24px; line-height:1.4">Nothing finished. Blocked, too-big tasks, or a stale board.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">At the end</h3><p style="font-size:24px; line-height:1.4">Unfinished stories go back to the backlog. Never "90% done".</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="This links Week 4 traceability to the Week 7 Git workflow. GitHub closes an issue automatically when a merged pull request description contains &quot;Closes #N&quot;, &quot;Fixes #N&quot; or &quot;Resolves #N&quot;." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Issue tracking</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">One thread from story to merged code</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Issue #10</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Story with acceptance criteria</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Branch</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">10-today-list</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Commits</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">"Add date filter to events API (#10)"</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Pull request</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">"Closes #10"; reviewed by Cara</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Merged</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Issue closes; card moves to Done</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Traceability</h3><p style="font-size:25px; line-height:1.4">Anyone can go from a requirement to the code and tests that satisfy it, and back.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Contribution evidence</h3><p style="font-size:25px; line-height:1.4">Each step carries your name and a timestamp. This is what the log links to.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Fewer meetings</h3><p style="font-size:25px; line-height:1.4">The repository answers "what is the status of #10?" without asking.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="Martin Fowler&#x27;s 2006 article &quot;Continuous Integration&quot; is the standard reference; the practice comes from Extreme Programming (Beck, 1999). &quot;If it hurts, do it more often&quot; is a common summary of the same idea. Continuous delivery and deployment extend CI to automatic releases, which comes up in Week 10." aria-label="Slide 15">
+<section id="s15" data-section="Integration" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Integration</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Continuous integration</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">Team members <b>merge their work into main frequently</b>, at least daily, and each merge is <b>verified by an automated build and tests</b>.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Merge small and often</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Hours or a day of work per pull request, not weeks</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Automate the checks</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Lint, build, and tests run on every push and PR</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">3</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Fix a red build first</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">A broken main blocks everyone; it is the top priority</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Integration pain grows with the time between merges.</b> If it hurts, do it more often.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">M. Fowler, "Continuous Integration" (2006), martinfowler.com</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a minimal GitHub Actions workflow for a Node project. GitHub Actions is free for public repositories and has a free monthly allowance for private ones. Teams on other stacks swap the setup and commands; the shape stays the same. Teams set this up as part of last week&#x27;s repository milestone." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Integration</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A CI workflow in one file</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.2; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">.github/workflows/ci.yml</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">name:</span> CI
+<span style="color:#7FD4BE">on:</span> [push, pull_request]
+<span style="color:#7FD4BE">jobs:</span>
+  <span style="color:#7FD4BE">check:</span>
+    <span style="color:#7FD4BE">runs-on:</span> ubuntu-latest
+    <span style="color:#7FD4BE">steps:</span>
+      - <span style="color:#7FD4BE">uses:</span> actions/checkout@v4
+      - <span style="color:#7FD4BE">uses:</span> actions/setup-node@v4
+        <span style="color:#7FD4BE">with:</span> { node-version: 20 }
+      - <span style="color:#7FD4BE">run:</span> npm ci          <span style="color:#9592B0"># install exactly</span>
+      - <span style="color:#7FD4BE">run:</span> npm run lint    <span style="color:#9592B0"># style and errors</span>
+      - <span style="color:#7FD4BE">run:</span> npm test        <span style="color:#9592B0"># unit tests</span>
+      - <span style="color:#7FD4BE">run:</span> npm run build   <span style="color:#9592B0"># it compiles</span></pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Runs on every push</h3><p style="font-size:24px; line-height:1.4">A fresh machine, so "works on my laptop" is tested for real.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Blocks bad merges</h3><p style="font-size:24px; line-height:1.4">With branch protection, the merge button waits for green.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Use your stack</h3><p style="font-size:24px; line-height:1.4">Python, PHP, or Java work the same way: install, lint, test, build.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Keep it fast</h3><p style="font-size:24px; line-height:1.4">Under five minutes, or people stop waiting for it.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="Most student integration failures are mismatched assumptions: a field named startTime on one side and start on the other, local time versus UTC, null versus a missing key. Writing one example response before splitting the work removes most of them. OpenAPI is the formal version of this; a markdown example is enough for the course." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Integration</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Agree the contract before you split the work</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.2; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">docs/api.md · GET /events?date=2026-10-20</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0"><span style="color:#F5C451">200 OK</span>
+[
+  {
+    &quot;id&quot;: 12,
+    &quot;title&quot;: &quot;Opening parade&quot;,
+    &quot;start&quot;: &quot;2026-10-20T12:00:00+08:00&quot;,
+    &quot;end&quot;: null,          <span style="color:#9592B0">// may be missing</span>
+    &quot;venue&quot;: { &quot;id&quot;: 3, &quot;name&quot;: &quot;Plaza&quot; }
+  }
+]
+<span style="color:#F5C451">400</span> { &quot;error&quot;: &quot;date must be YYYY-MM-DD&quot; }</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Front end and back end in parallel</h3><p style="font-size:24px; line-height:1.4">Ben builds the screen against this example while Ana builds the endpoint.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Mock until it is real</h3><p style="font-size:24px; line-height:1.4">A JSON file with this shape stands in for the API.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Edge cases in the contract</h3><p style="font-size:24px; line-height:1.4">Missing end time, empty list, bad date: agreed, not discovered.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Change it by pull request</h3><p style="font-size:24px; line-height:1.4">A contract change is reviewed by both sides.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Each row is a real pattern from student projects. The underlying principle is reproducibility: a fresh clone plus the README should produce a running system. CI enforces this daily." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Integration</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">“It works on my machine”</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:32%; color:#F4F4F8">Symptom</th><th style="width:34%; color:#F4F4F8">Usual cause</th><th style="width:34%; color:#F4F4F8">Prevention</th></tr>
+    <tr><td>Teammate's code will not run</td><td>Missing dependency or different version</td><td>Lockfile committed; npm ci, pip -r, or composer install</td></tr>
+    <tr style="background:#F6F5FB"><td>Works locally, fails in CI</td><td>Secret or setting only on one laptop</td><td>.env.example lists every variable; CI sets them</td></tr>
+    <tr><td>Times are off by 8 hours</td><td>Local time versus UTC</td><td>Store UTC; convert for display; test it</td></tr>
+    <tr style="background:#F6F5FB"><td>Merge breaks a page no one touched</td><td>Hidden coupling between modules</td><td>Tests on the shared parts; smaller pull requests</td></tr>
+    <tr><td>Database out of sync</td><td>Someone changed tables by hand</td><td>Migrations in the repository, run in order</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>The fix is always the same idea:</b> put it in the repository so the machine, not memory, sets it up.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="The Scrum Guide describes the review as a working session to inspect the outcome and adapt the backlog, not a presentation. Fifteen to twenty minutes per team is enough. Everyone on the team should be able to drive part of the demo." aria-label="Slide 19">
+<section id="s19" data-section="Sprint review and reflection" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Running the Sprint 1 review</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Sprint goal</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Read it aloud. Was it met? Yes, partly, or no, in one sentence.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Live demo</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Show the deployed prototype doing real stories. Not slides, not a video.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Done and not done</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Which stories meet the Definition of Done; which go back to the backlog.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Board and burndown</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Show the board as it is now. Explain any flat stretches honestly.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Feedback</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Questions from the instructor and classmates. Write them down as issues.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:300px; font-size:26px; font-weight:600; color:#231E3D">Next</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">What changes in the backlog for Sprint 2 because of today.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">K. Schwaber &amp; J. Sutherland, <i>The Scrum Guide</i> (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="This matches the walking-skeleton idea from Part 1. Teams that deliver only the skeleton and one story have still proven their architecture, deployment and workflow, which de-risks Sprint 2. Ask teams to demo from main to reinforce the integration habit." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What counts as a working prototype</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">It is</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Deployed at a URL, or runs from a fresh clone with the README</li><li style="margin:5px 0">At least one story works end to end, through every layer</li><li style="margin:5px 0">Uses real data paths, even with sample data</li><li style="margin:5px 0">Merged on main, with CI green</li><li style="margin:5px 0">Honest about what is missing</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">It is not</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Screenshots or a Figma prototype</li><li style="margin:5px 0">Code that runs only on one laptop</li><li style="margin:5px 0">Features demoed from unmerged branches</li><li style="margin:5px 0">Hard-coded screens with no back end</li><li style="margin:5px 0">"It worked yesterday"</li></ul></div>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Smaller and real beats bigger and fake.</b> One working story is a better Sprint 1 than five mock-ups.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="Start, Stop, Continue is one of many retrospective formats in Derby and Larsen&#x27;s Agile Retrospectives (2006). The rule that keeps retros useful is focusing on the process, not blaming people, and committing to a small number of concrete changes. Norm Kerth&#x27;s Prime Directive is worth reading aloud: everyone did the best job they could, given what they knew at the time." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The retrospective: improve how you work</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Start</h3><p style="font-size:24px; line-height:1.4">Moving cards the moment work starts</p><p style="font-size:24px; line-height:1.4">Posting stand-up answers by 9 PM</p><p style="font-size:24px; line-height:1.4">Writing the test task first</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #B4423A; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#B4423A">Stop</h3><p style="font-size:24px; line-height:1.4">Opening 600-line pull requests</p><p style="font-size:24px; line-height:1.4">Merging without a review on deadline day</p><p style="font-size:24px; line-height:1.4">Fixing bugs without an issue</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Continue</h3><p style="font-size:24px; line-height:1.4">Pairing on hard tasks</p><p style="font-size:24px; line-height:1.4">The API example in docs/</p><p style="font-size:24px; line-height:1.4">Reviews within a day</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Pick one or two changes</b>, write them into the working agreement, and check them at the next retro.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">E. Derby &amp; D. Larsen, <i>Agile Retrospectives: Making Good Teams Great</i> (2006)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="The syllabus assesses individual contribution through verifiable repository evidence. The log is a guide for the instructor to that evidence, not a substitute for it. Hours are self-reported and are used to spot imbalance, not to grade effort directly." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Your evidence</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The contribution log</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:12%; color:#F4F4F8">Date</th><th style="width:40%; color:#F4F4F8">What I did</th><th style="width:36%; color:#F4F4F8">Evidence (link)</th><th style="width:12%; color:#F4F4F8">Hours</th></tr>
+    <tr><td>Oct 13</td><td>Wrote the events API endpoint with date filter and sorting</td><td>PR #24 (merged) · issue #10</td><td>4</td></tr>
+    <tr style="background:#F6F5FB"><td>Oct 14</td><td>Reviewed Ben's event list screen; found the empty-day bug</td><td>Review on PR #25 · issue #26</td><td>1</td></tr>
+    <tr><td>Oct 15</td><td>Fixed the time-zone bug; added three unit tests</td><td>PR #29 · commit 8c1e4d2</td><td>3</td></tr>
+    <tr style="background:#F6F5FB"><td>Oct 16</td><td>Updated the API example and README setup steps</td><td>PR #30 · docs/api.md</td><td>1</td></tr>
+    <tr><td>Oct 17</td><td>Paired with Dan on deployment</td><td>Commit 2b7f0a1 (Co-authored-by)</td><td>2</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Every row has a link</h3><p style="font-size:24px; line-height:1.4">A claim without evidence does not count.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Include reviews and docs</h3><p style="font-size:24px; line-height:1.4">Not only code. Reviewing and writing are real work.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Write it as you go</h3><p style="font-size:24px; line-height:1.4">Five minutes a day beats reconstructing it from memory.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="The individual sprint reflection is due this week alongside the contribution log. Half a page to one page is enough. The estimate-versus-actual item prepares students for estimation in Week 11." aria-label="Slide 23">
+<section id="s23" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Your evidence</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Writing a sprint reflection that is worth reading</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">What I contributed</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Two or three items from your log, with links</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">What went well</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One practice that helped you or the team, and why</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">What was hard</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A real problem, specific, without blaming anyone</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">What I learned</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A technical or teamwork lesson you did not know in Week 7</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Estimate versus actual</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One task you guessed wrong, and by how much</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">One change for Sprint 2</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Concrete enough that someone could check it</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Specific beats long.</b> "My first PR was 600 lines and took four days to review; I will keep them under 200" says more than a page of "teamwork is important".</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: too big and vague; no clear finish; cannot be shared or tracked. Split into small, owned tasks covering data, API, screen, states and tests, each a day or less. Q2: the board was not used to manage work; there was no early warning, no useful burndown, and likely last-minute integration. Q3: agree an API contract with an example response before splitting the work, mock against it, and review contract changes. Q4: protect the sprint goal: finish and integrate the most valuable stories, move the rest back to the backlog, and say so honestly in the review. Do not demo half-done work." aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What would you do?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">A story has one task: "<b>Build the booking page</b>". What is wrong, and how would you fix it?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">The board shows everything in To do until the last evening, then all Done. What does that tell the team?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">Ana's screen expects <b>startTime</b>; Ben's API sends <b>start</b>. How could the team have avoided this?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">Two days before the review, three of five stories are unfinished. What should the team do?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="Three parts, matching the syllabus milestone. Individually, each member submits a contribution log and a sprint reflection. The board will be compared with the repository history, so cards and commits should tell the same story." aria-label="Slide 25">
+<section id="s25" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Sprint 1 review, prototype, and board</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Sprint 1 review</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Sprint goal: met, partly, or not</li><li style="margin:5px 0">Live demo of the stories that are Done</li><li style="margin:5px 0">What goes back to the backlog, and why</li><li style="margin:5px 0">Feedback captured as issues</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Working prototype</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Deployed, or runs from a fresh clone</li><li style="margin:5px 0">At least one story end to end</li><li style="margin:5px 0">Built from main with CI green</li><li style="margin:5px 0">README setup steps that work</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Project board update</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Every story and task with an owner</li><li style="margin:5px 0">Cards in their true columns</li><li style="margin:5px 0">Unfinished work moved to Sprint 2</li><li style="margin:5px 0">Retro actions added to the agreement</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="Walk around and check: tasks that are a day or less with one owner each, a test task, a bug issue someone else could reproduce, a board with a WIP limit that shows a realistic mid-sprint state, and feedback aimed at the process, not people. Ask one or two teams to show their board and explain the blocker." aria-label="Slide 26">
+<section id="s26" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Plan it, track it, reflect on it</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">3 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Form teams of 3 or 4.</b> Pick a scenario on the right.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Split one story</b> into 5 or 6 tasks with an owner and an hour estimate each.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write one bug issue</b> for the scenario: title, steps, expected, actual, labels.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Draw the board</b> on day 4 of a 10-day sprint, with WIP limits. Mark one blocker.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Swap with a team:</b> give each other one Start, one Stop, one Continue.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">"As a student, I want to order my lunch before 11 AM, so that I skip the queue."</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay document requests</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">"As a resident, I want to request a barangay clearance online, so that I visit only once."</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Jeepney route finder</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">"As a commuter, I want to see which jeepneys pass my stop, so that I know which to take."</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 8 · Iterative development, task planning, issue tracking, and integration</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Rough is fine; the aim is to practise the habits they will use in Sprint 2." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Fill these in on paper or in a document</h2>
+  </div>
+  <div style="flex-direction:row; gap:20px; height:600px"><div style="flex:1; gap:20px"><div style="flex:1.3; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Story → tasks: task · owner · hours</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Bug issue: title · steps · expected · actual · labels</p></div></div><div style="flex:1.25; gap:20px"><div style="flex:1.3; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Board on day 4: To do · In progress (limit) · In review · Done · one blocker</p></div><div style="flex:1; flex-direction:row; gap:20px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Start</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Stop</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Continue</p></div></div></div></div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: canteen pre-ordering · B: barangay document requests · C: jeepney route finder</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="Iterative and incremental development delivers small working increments and refines them with feedback; build vertical slices, starting with a walking skeleton. Break stories into tasks of a day or less, each owned and testable, and size work relatively. Write issues with clear titles, reproduction steps and labels, keep the board current with WIP limits, read the burndown, and link issues, branches and pull requests. Integrate continuously with automated checks, agree API contracts before splitting work, and keep setup in the repository. Run the review as a live demo of Done work, hold a short retrospective, and back your contribution log with links. Next week: software quality assurance, testing levels, test design and defects." aria-label="Slide 28">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Small slices, visible work, early integration</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Build thin vertical slices; skeleton first</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Split stories into small, owned tasks</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Write issues others can act on</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Keep the board true; limit WIP</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Integrate daily; agree API contracts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Demo what works; reflect; adjust</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">If it is not merged, tested, and on the board, it is not done.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>

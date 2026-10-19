@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 12: Final Demonstration, Defense, Evaluation, and Course Synthesis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 12, the final week. Teams present, demonstrate and defend their systems, and submit the final repository, release and report. This short deck covers defense-day logistics, the final submission, how evaluation works, the individual contribution reflection and final peer evaluation, and closes with a synthesis of the whole course." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Final demonstration,<br>defense, and<br>course synthesis</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Defense day, the final repository, release, and report, how the work is evaluated, your contribution reflection and peer evaluation, and what to carry beyond this course</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 12</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Most of the class time this week goes to the defenses themselves. These slides can be used briefly at the start of the week and for the closing session after the defenses." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Show it, hand it over, and look back</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Defense day</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Run of show, setup, and handling hard moments</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Final submission</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Repository, release, and report</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Contribution evidence</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Contribution table and statements</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Evaluation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">How the work is assessed; peer evaluation</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Course synthesis</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The whole life cycle, and what lasts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Beyond CSC181</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Ethics, careers, and your portfolio</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the contribution reflection and final peer evaluation (individual), and the final repository, release, report, and team presentation and defense (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="This week assesses all course learning outcomes together through the final product, documentation, defense and individual evidence, and adds the professional and ethical outlook in CLO 9." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this week you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Present and defend</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">a working system with engineering evidence</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Deliver a complete release</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">repository, tag, notes, and report</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Document individual contribution</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">honestly, with verifiable evidence</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Evaluate peers fairly</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with specific, behaviour-based ratings</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Connect the course practices</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">across the whole software life cycle</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Act as a professional</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">guided by the software engineering code of ethics</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Use this slide to remind teams that the defense covers the whole life cycle. A panel may ask about stakeholders from Week 3 or test design from Week 9 just as readily as about the demo." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Twelve weeks, one life cycle</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Weeks 1–2</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Foundations, processes, Agile</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Weeks 3–5</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Problem, requirements, qualities</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Weeks 6–7</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Design, architecture, Git</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Weeks 8–10</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Build, test, harden, document</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Week 11</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Plan the finish</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Week 12</h3><p style="font-size:20px; line-height:1.3; color:#C9C5E0">Demonstrate and defend</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Every week left evidence</h3><p style="font-size:25px; line-height:1.4">Proposals, stories, models, ADRs, PRs, tests, docs. The defense draws on all of it.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">The product is half the story</h3><p style="font-size:25px; line-height:1.4">How you built it, and how you know it works, is the other half.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="Adjust the order and times to the official defense schedule and rubric. Typical slots are 20 minutes of presentation and demo plus 10 to 15 minutes of questions. Remind teams that the panel will often direct questions to specific members." aria-label="Slide 5">
+<section id="s5" data-section="Defense day" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defense day</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Run of show</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Before your slot</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Arrive early. Set up, connect, open the deployed v1.0.0, reset demo data.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Presentation</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Problem, solution, and how you built it, with every member speaking.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Live demo</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Two or three user journeys on the deployed release, following your script.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Questions</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">The panel questions the team and individual members about any part.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Panel feedback</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Strengths and improvements. Take notes; they help the final report.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">After</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Submit anything outstanding; fix nothing on main without a pull request.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="This repeats the Week 11 demo checklist in &quot;day-of&quot; form. A five-minute setup routine, written down and rehearsed, removes most of the risk." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defense day</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Before you walk in</h2>
+  </div>
+  <div style="flex-direction:row; gap:22px"><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">The product</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">v1.0.0 deployed and smoke-tested this morning</li><li style="margin:5px 0">Demo accounts signed in or ready</li><li style="margin:5px 0">Seed data reset to the demo story</li><li style="margin:5px 0">Phone hotspot ready as a fallback</li></ul></div><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">The presentation</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Slides as PDF on two devices and a USB drive</li><li style="margin:5px 0">Backup demo video opened, not just saved</li><li style="margin:5px 0">Notifications and auto-updates off</li><li style="margin:5px 0">Font size and zoom set for the room</li></ul></div><div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">The team</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Who says what, and who drives the demo</li><li style="margin:5px 0">Who answers which area first</li><li style="margin:5px 0">The repository open, ready to show evidence</li><li style="margin:5px 0">Water, a timer, and a calm start</li></ul></div></div>
+  <p style="font-size:26px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Most demo failures happen before the demo starts</b>: expired sessions, a sleeping laptop, a captive Wi-Fi page.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="These situations happen in almost every defense session. Panels judge how the team responds as much as the original answer. Acknowledging a known limitation with a clear plan is a sign of engineering maturity." aria-label="Slide 7">
+<section id="s7" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defense day</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Handling the hard moments</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:36%; color:#F4F4F8">When this happens</th><th style="width:64%; color:#F4F4F8">Do this</th></tr>
+    <tr><td>The demo breaks</td><td>Say so calmly, switch to the backup video or screenshots, and keep telling the story.</td></tr>
+    <tr style="background:#F6F5FB"><td>You do not know the answer</td><td>"I'm not sure. Here is how I would find out." Do not guess or bluff.</td></tr>
+    <tr><td>A teammate is stuck</td><td>Let them finish their thought, then add briefly: "To add to that…". Do not take over.</td></tr>
+    <tr style="background:#F6F5FB"><td>You are running over time</td><td>Skip to the demo and results. Cut detail, never the demo.</td></tr>
+    <tr><td>A panelist points out a flaw</td><td>Thank them, acknowledge it, say what you would change. It is not an attack.</td></tr>
+    <tr style="background:#F6F5FB"><td>A question is about someone else's part</td><td>Answer what you know about how it fits the system, then hand over.</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="Teams should do a final repository walk-through together before submitting. Rewriting or squashing history to tidy it up removes contribution evidence and is not allowed; the syllabus treats falsifying commit history as an integrity violation." aria-label="Slide 8">
+<section id="s8" data-section="Final submission" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Final submission</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The final repository</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">README</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">What, who for, live URL, setup that works on a fresh clone</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Docs</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">User guide, technical docs, ADRs, test plan, diagrams in docs/</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Tests and CI</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Tests pass on main; CI badge green</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Release v1.0.0</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Tagged, with notes and known issues</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Clean and safe</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">No secrets, merged or deleted branches, a LICENSE</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Issues tell the truth</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Done closed; next steps labelled and open</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>The repository is the record.</b> Commits, pull requests, reviews, and issues are the main evidence of how the team worked and who did what.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="A GitHub Release bundles a tag, notes and files. Attaching the report and slides to the release makes the submission self-contained and lets anyone see exactly what was evaluated. Follow any submission instructions in the course portal as well." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Final submission</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The release</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.2; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:26px 30px"><p><span style="display:inline-block; font-size:19px; font-weight:600; color:#FFFFFF; background:#0E7C66; border-radius:999px; padding:3px 14px; margin-right:8px">Latest</span><span style="font-size:20px; color:#6B6980">v1.0.0 · tagged on main</span></p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:700; color:#231E3D">Diyandi Festival Guide 1.0</p><p style="font-size:22px; line-height:1.45">Today's festival events, offline schedule, and organizer editing. Live at the public URL in the README.</p><p style="font-size:22px; line-height:1.45"><b>Highlights:</b> near-me filter, cancel and notify, WCAG 2.2 AA checks on key screens.</p><p style="font-size:22px; line-height:1.45"><b>Known issues:</b> list takes about 4 s on slow 3G (#38).</p><div style="gap:8px; margin-top:6px"><p style="font-size:20px; font-weight:600; color:#231E3D">Assets</p><p style="font-size:20px; color:#5B4BC4">final-report.pdf · defense-slides.pdf · demo-video.mp4 · Source code (zip)</p></div></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Tag the exact version</h3><p style="font-size:24px; line-height:1.4">The one deployed and demoed. Not "whatever is on main later".</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Notes for humans</h3><p style="font-size:24px; line-height:1.4">What it does, what is new, what is known to be broken.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Attach the deliverables</h3><p style="font-size:24px; line-height:1.4">Report, slides, and demo video live with the code they describe.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="The report is largely an edited assembly of artifacts already produced, which is the payoff for documenting as you go. Each section should link to the source artifact in the repository. Check the course&#x27;s report template and page limits if provided." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Final submission</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The final report</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:340px; font-size:26px; font-weight:600; color:#231E3D">Problem and stakeholders</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Context, users, problem statement, scope, and feasibility (Week 3).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:340px; font-size:26px; font-weight:600; color:#231E3D">Requirements</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Stories, use cases, NFRs, constraints, risks, and ethics (Weeks 4–5).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:340px; font-size:26px; font-weight:600; color:#231E3D">Design and architecture</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Models, UI, architecture, key ADRs (Weeks 6–7).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:340px; font-size:26px; font-weight:600; color:#231E3D">Implementation and process</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Sprints, workflow, board, and integration (Weeks 7–8).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:340px; font-size:26px; font-weight:600; color:#231E3D">Quality and readiness</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Test plan and results, defects, security, deployment (Weeks 9–10).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:340px; font-size:26px; font-weight:600; color:#231E3D">Results and reflection</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">What works, what does not, lessons, next steps, contribution table.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="The team contribution table is part of the final report; the individual contribution reflection is each student&#x27;s own account. The two should be consistent with each other and with the repository. Review counts are a useful, often overlooked, measure of contribution." aria-label="Slide 11">
+<section id="s11" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Final submission</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The contribution table</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:14%; color:#F4F4F8">Member</th><th style="width:36%; color:#F4F4F8">Main areas</th><th style="width:38%; color:#F4F4F8">Evidence</th><th style="width:12%; color:#F4F4F8">Agreed</th></tr>
+    <tr><td>Ana</td><td>Events API, data model, unit and integration tests</td><td>PRs #24, #29, #35 · 31 reviews · docs/api.md</td><td>✓ all</td></tr>
+    <tr style="background:#F6F5FB"><td>Ben</td><td>Event list and details screens, offline cache</td><td>PRs #25, #31, #44 · user guide sections 2–4</td><td>✓ all</td></tr>
+    <tr><td>Cara</td><td>Organizer editing, access control, test plan</td><td>PRs #33, #41 · test plan · defect log</td><td>✓ all</td></tr>
+    <tr style="background:#F6F5FB"><td>Dan</td><td>CI, deployment, monitoring, release, README</td><td>PRs #9, #19, #48 · ci.yml · release v1.0.0</td><td>✓ all</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Specific and linked</h3><p style="font-size:24px; line-height:1.4">Areas and evidence anyone can check in the repository.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Agreed by everyone</h3><p style="font-size:24px; line-height:1.4">The whole team reviews it before submission.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Disagreement is allowed</h3><p style="font-size:24px; line-height:1.4">If you do not agree, say so in your individual reflection, with evidence.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="Replace the categories with the official weights from the syllabus if presenting them. The key message is that individual grades can differ within a team, based on verifiable evidence, individual defense answers and peer evaluation." aria-label="Slide 12">
+<section id="s12" data-section="Evaluation" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Evaluation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">How the final work is evaluated</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">The product</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Does it work, for real users, as specified?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">The process</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Requirements, design, workflow, testing, and management evidence</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">The documentation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Report, README, user guide, technical docs</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">The defense</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Presentation, demo, and answers to questions</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Individual evidence</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Repository activity, contribution reflection, and individual answers</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Peer evaluation</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Teammates' structured assessment of each member</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Team grade, individual adjustment.</b> See the syllabus and rubric for the exact components and weights.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="This extends the Week 8 sprint reflection and the Week 11 project reflection into a final, individual account. It is confidential to the instructor. It is the right place to raise contribution concerns, with evidence, rather than in the defense." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Evaluation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your contribution reflection</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">What I did</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Main contributions across the semester, each with links</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">How I worked</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Reviews given, help offered, meetings, communication</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">My best work</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One contribution you are proud of, and why it matters</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">What I would change</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One thing about your own work, honestly</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Team view</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">How the team worked; anything the instructor should know</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Growth</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">How you have changed as an engineer since Week 1</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Write it so a stranger could verify it.</b> Every claim should point to something in the repository or the documents.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="Behaviourally anchored scales reduce bias compared with a single overall score. Peer evaluations are confidential and are read alongside repository evidence; a rating that contradicts the evidence carries less weight. Use the official form if one is provided." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Evaluation</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Final peer evaluation</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:22%; color:#F4F4F8">Criterion</th><th style="width:26%; color:#F4F4F8">1 · Rarely</th><th style="width:26%; color:#F4F4F8">3 · Usually</th><th style="width:26%; color:#F4F4F8">5 · Consistently</th></tr>
+    <tr><td><b>Contribution</b></td><td>Little visible work</td><td>Did assigned tasks</td><td>Did a full share and more</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Reliability</b></td><td>Missed deadlines and meetings</td><td>Mostly on time; warned when late</td><td>On time; flagged risks early</td></tr>
+    <tr><td><b>Quality</b></td><td>Work often needed redoing</td><td>Solid work with some fixes</td><td>Tested, reviewed, documented work</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Collaboration</b></td><td>Worked alone or blocked others</td><td>Reviewed and helped when asked</td><td>Reviewed, paired, and unblocked others</td></tr>
+    <tr><td><b>Communication</b></td><td>Hard to reach; unclear</td><td>Responsive; clear enough</td><td>Clear, timely, kind, and honest</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Rate behaviour you saw</b>, with an example for each low or high score. Rate yourself with the same honesty.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="The definition is from IEEE Std 610.12 (1990), carried into ISO/IEC/IEEE 24765. Ask students to give one example of each adjective from their own project. Most teams can, which is the point of the course." aria-label="Slide 15">
+<section id="s15" data-section="Course synthesis" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Course synthesis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What software engineering is</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition (IEEE)</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:33px; font-weight:500; line-height:1.35; color:#F4F4F8">The application of a <b>systematic, disciplined, quantifiable</b> approach to the development, operation, and maintenance of software.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Systematic</h3><p style="font-size:25px; line-height:1.4">A process you can explain: sprints, reviews, tests, releases.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Disciplined</h3><p style="font-size:25px; line-height:1.4">You followed it under pressure: the freeze, the PRs, the tests.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Quantifiable</h3><p style="font-size:25px; line-height:1.4">You measured: NFRs, velocity, coverage, defects, estimates versus actuals.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISO/IEC/IEEE 24765:2017, <i>Systems and software engineering: Vocabulary</i></p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="Every row is a set of artifacts the students made. Seeing them together shows that the &quot;process&quot; was not paperwork; each artifact fed the next. This is also a good structure for students to describe the project in job interviews." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Course synthesis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The life cycle, and what you produced</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:26%; color:#F4F4F8">Activity</th><th style="width:14%; color:#F4F4F8">Weeks</th><th style="width:60%; color:#F4F4F8">What your team produced</th></tr>
+    <tr><td><b>Understand the problem</b></td><td>3</td><td>Stakeholder map, problem statement, scope, feasibility</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Specify</b></td><td>4–5</td><td>User stories, use cases, acceptance criteria, NFRs, risk register</td></tr>
+    <tr><td><b>Design</b></td><td>6–7</td><td>Domain and UML models, wireframes, architecture, ADRs</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Build and integrate</b></td><td>7–10</td><td>Repository, pull requests, reviews, CI, two sprints of increments</td></tr>
+    <tr><td><b>Verify and harden</b></td><td>9–10</td><td>Test plan, test cases, defect log, security and readiness checks</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Deliver and reflect</b></td><td>10–12</td><td>Release, documentation, report, defense, reflections</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="Most of these trace back to classic sources covered in the course: Brooks, Parnas, Boehm, Beck and the Agile Manifesto authors. Ask students which one they found hardest to practise; the answer is usually the last one." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Course synthesis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Six ideas that outlast the tools</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Understand before you build</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Stakeholders and the real problem come first</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Make requirements testable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">If you cannot check it, you cannot deliver it</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Design for change</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Cohesion, low coupling, and recorded decisions</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Small, reviewed, integrated steps</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Thin slices, small PRs, merge daily</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Build quality in</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Tests, reviews, and security from the start, not the end</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Software is made by people</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Communicate, give feedback, and share the work</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Frameworks and tools will change</b> many times in your career. These ideas have held for decades.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="These are the eight principles of the ACM/IEEE-CS Software Engineering Code of Ethics and Professional Practice (1999). Connect them to concrete moments in the course: the Data Privacy Act work (Public), honest status reports (Judgment), reviews and contribution tables (Colleagues)." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Course synthesis</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your responsibility as a software engineer</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px"><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Public</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Act in the public interest</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Client and employer</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Serve them, consistent with the public interest</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Product</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Meet the highest professional standards possible</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">4</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Judgment</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Keep integrity and independence</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Management</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Lead ethically</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">6</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Profession</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Advance its integrity and reputation</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">7</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Colleagues</h3><p style="font-size:22px; line-height:1.38; color:#4C4A5E">Be fair to and supportive of them</p></div><div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">8</p><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Self</h3><p style="font-size:22px; line-height:1.38; color:#C9C5E0">Keep learning, and practise ethically</p></div></div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">You already practised several: privacy by design, honest known-issues lists, fair peer evaluation, and credit through co-authored commits.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ACM/IEEE-CS, <i>Software Engineering Code of Ethics and Professional Practice</i> (1999)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Students often underestimate how much of this course is directly employable. A public repository with a good README, a release, tests, CI and visible reviews is strong evidence in internship and job applications. Remind them to check with teammates and clients before making a private repository public." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Beyond CSC181</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Where this course leads</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:28%; color:#F4F4F8">Role</th><th style="width:72%; color:#F4F4F8">What you practised here</th></tr>
+    <tr><td><b>Software developer</b></td><td>Design, clean code, pull requests, reviews, refactoring</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Quality assurance engineer</b></td><td>Test design, automation, defect management, test plans</td></tr>
+    <tr><td><b>DevOps or platform engineer</b></td><td>CI, deployment pipelines, configuration, monitoring, backups</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Product or UX roles</b></td><td>Stakeholders, user research, stories, wireframes, usability tests</td></tr>
+    <tr><td><b>Project or delivery lead</b></td><td>Planning, estimation, risk, status, team health</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Make it a portfolio piece</h3><p style="font-size:25px; line-height:1.4">A clear README, a demo video, and a short case study of your part.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Keep going</h3><p style="font-size:25px; line-height:1.4">Contribute to open source; the PR and review habits transfer directly.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="There are no fixed answers this week. Listen for themes to improve the course: common answers are earlier user contact, smaller pull requests, starting tests sooner, and keeping the board current. Collect Q4 answers to share with next year&#x27;s class." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Looking back</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">If your team started again in Week 3, what is the <b>one</b> thing you would do differently?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">Which practice from this course surprised you most by how useful it was?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">Which artifact did your team actually use most: stories, the board, ADRs, tests, or something else? Why?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">What advice would you give next year's CSC181 students in one sentence?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="Three parts, matching the syllabus milestone. Individually, each student submits the contribution reflection and completes the final peer evaluation." aria-label="Slide 21">
+<section id="s21" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Final repository, release, report, and defense</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Final repository and release</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">README, docs, tests, CI green</li><li style="margin:5px 0">v1.0.0 tagged with notes</li><li style="margin:5px 0">Report, slides, video attached</li><li style="margin:5px 0">No secrets; issues up to date</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Final report</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Problem to reflection, linked to artifacts</li><li style="margin:5px 0">Results, known issues, next steps</li><li style="margin:5px 0">Contribution table agreed by all</li><li style="margin:5px 0">Course template and limits followed</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Presentation and defense</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Story, live demo, and evidence</li><li style="margin:5px 0">Every member presents and answers</li><li style="margin:5px 0">Backup ready; rehearsed and timed</li><li style="margin:5px 0">Panel feedback recorded</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="Run this after the defenses, as the closing session. The letters and the voted tips can be shared with next year&#x27;s class in Week 1. The individual notes are good raw material for the contribution reflection." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Course retrospective</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>On your own:</b> write your top lesson, your proudest contribution, and one regret.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>As a team:</b> Start, Stop, Continue for the whole project, not one sprint.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write a short letter</b> to a team starting CSC181 next year: three tips, one warning.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Share:</b> each team reads its best tip and its warning.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">3 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Vote</b> on the three tips the whole class agrees with most.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Prompt 1</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Lesson</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">What do you know now that you wish you had known in Week 3?</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Prompt 2</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Proud</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Which contribution of yours would you show an employer?</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Prompt 3</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Regret</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">What would you do differently, and what stopped you at the time?</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Prompt 4</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Warning</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">What mistake should next year's teams avoid at all costs?</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 12 · Final demonstration, defense, evaluation, and course synthesis</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up during the retrospective." aria-label="Slide 23">
+<section id="s23" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Fill these in on paper or in a document</h2>
+  </div>
+  <div style="flex-direction:row; gap:20px; height:600px"><div style="flex:1; gap:20px"><div style="flex:1.2; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Me: top lesson · proudest contribution · one regret</p></div><div style="flex:1; flex-direction:row; gap:20px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Start</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Stop</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Continue</p></div></div></div><div style="flex:1; gap:20px"><div style="flex:1.6; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Letter to next year's team: three tips · one warning</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Class top three tips</p></div></div></div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 12 · Course retrospective</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="The course followed one life cycle: understanding stakeholders and problems, specifying testable requirements and qualities, designing for change, building in small reviewed increments with Git and CI, verifying with designed tests, hardening for security, reliability and deployment, documenting for real readers, managing the project, and finally demonstrating and defending the result with evidence. Software engineering is a systematic, disciplined, quantifiable approach, practised by people who communicate well and act ethically. Congratulations on finishing; carry the habits, not just the tools." aria-label="Slide 24">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From a problem to software people can use</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Understand people and problems first</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Testable requirements; measurable qualities</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Designs that welcome change</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Small, reviewed, integrated increments</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Quality, security, and docs built in</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Honest evidence; ethical practice</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">Thank you for a semester of building real software together.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>

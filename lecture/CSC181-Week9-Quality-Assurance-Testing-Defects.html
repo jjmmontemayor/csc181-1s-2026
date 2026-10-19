@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 9: Software Quality Assurance, Testing Levels, Test Design, and Defects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 9. Sprint 1 has been reviewed and Sprint 2 is under way. This week is about building confidence that the software works: what quality assurance means, the levels of testing, how to design test cases systematically instead of guessing, and how to log and manage defects. The team milestone is a test plan, test cases and a defect log alongside Sprint 2 implementation." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Software quality assurance,<br>testing, and defects</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Quality assurance and testing, testing levels, the test pyramid, test design techniques, test cases, defect tracking, and the team test plan</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 9</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. Test design in block four is the core skill for the individual exercise. The test plan in block six is the frame the team milestone fills in." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">How do you know your software works?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Quality assurance</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Verification, validation, and the testing principles</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Testing levels</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Unit, integration, system, acceptance</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Automated tests</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The test pyramid, with real examples</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Test design</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Partitions, boundaries, decision tables, states</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Defects</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Life cycle, severity, priority, the defect log</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Test plan</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Scope, approach, criteria, and roles</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the test-case design exercise (individual), and the test plan, test cases, defect log, and Sprint 2 implementation (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 5 (implementation and verification practices), CLO 6 (testing and quality assurance) and CLO 3 (requirements traceability through tests)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Distinguish QA, QC, and testing</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and verification from validation</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Choose the right testing level</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">unit, integration, system, acceptance</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write automated tests</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">that follow arrange, act, assert</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Design test cases systematically</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with partitions, boundaries, and tables</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Log and triage defects</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">by severity and priority</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Write a test plan</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">with entry and exit criteria</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="The common student pattern is to build until Week 11 and then &quot;test&quot;, which finds problems too late to fix. This week moves testing into the sprint: a story is not Done until its tests pass." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Testing runs through Sprint 2, not after it</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 1 review</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 8: first prototype</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Test plan</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Week 9: what, how, when</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 2 build</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Code and tests together</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 2 review</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 10: revised prototype</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Final testing</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 11: before the defense</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Tests come from requirements</h3><p style="font-size:25px; line-height:1.4">Every acceptance criterion from Week 4 becomes at least one test.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Tests live in the repository</h3><p style="font-size:25px; line-height:1.4">They run in CI on every pull request, as set up in Week 8.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Defects are tracked</h3><p style="font-size:25px; line-height:1.4">Each one is an issue with steps, severity, and an owner.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="The verification and validation phrasing is Barry Boehm&#x27;s (1979). Code review and CI from Weeks 7 and 8 are quality assurance; the tests this week are quality control. Validation needs real users, which is why Week 6 usability testing and the sprint reviews matter." aria-label="Slide 5">
+<section id="s5" data-section="Quality assurance" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Quality assurance</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Quality assurance, quality control, and testing</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">QA</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Quality assurance</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Prevent defects through the process: reviews, standards, CI, a Definition of Done</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">QC</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Quality control</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Find defects in the product: inspections and testing</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">T</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Testing</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Run the software under known conditions and compare results with expectations</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Verification</h3><p style="font-size:27px; line-height:1.4"><b>Are we building the product right?</b></p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Does it meet the specification: the stories, criteria, and design?</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Validation</h3><p style="font-size:27px; line-height:1.4"><b>Are we building the right product?</b></p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Does it meet the users' real needs, in their real context?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">B. W. Boehm, "Guidelines for Verifying and Validating Software Requirements and Design Specifications" (1979)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="This terminology follows the ISTQB glossary and IEEE usage. Students often use &quot;bug&quot; for all three; the distinction helps them write better reports (describe the failure) and better fixes (remove the defect, and ask how the error happened)." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Quality assurance</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Error, defect, failure</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Error (mistake)</h3><p style="font-size:23px; line-height:1.3; color:#4C4A5E">A person writes h % 12 and forgets that 12 % 12 is 0</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Defect (fault, bug)</h3><p style="font-size:23px; line-height:1.3; color:#4C4A5E">The wrong line sits in formatTime in the repository</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">3</p><h3 style="font-size:27px; font-weight:600; color:#F4F4F8">Failure</h3><p style="font-size:23px; line-height:1.3; color:#C9C5E0">A visitor sees "0:00 PM" for the noon parade</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Not every defect fails</h3><p style="font-size:25px; line-height:1.4">A defect in code no one runs stays hidden until someone does.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Testing finds failures</h3><p style="font-size:25px; line-height:1.4">Debugging then finds the defect that caused them.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Reviews find defects directly</h3><p style="font-size:25px; line-height:1.4">Without running anything. That is why code review is QA.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISTQB, <i>Certified Tester Foundation Level Syllabus</i> v4.0 (2023)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="These are the seven principles from the ISTQB Foundation syllabus. Principle 1 echoes Dijkstra: &quot;Program testing can be used to show the presence of bugs, but never to show their absence&quot; (1970). Principle 7 links back to validation and to Week 3 problem framing." aria-label="Slide 7">
+<section id="s7" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Quality assurance</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Seven principles of testing</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:42%; color:#F4F4F8">Principle</th><th style="width:58%; color:#F4F4F8">In practice</th></tr>
+    <tr><td>1. Testing shows the presence of defects, not their absence</td><td>Passing tests raise confidence; they do not prove correctness</td></tr>
+    <tr style="background:#F6F5FB"><td>2. Exhaustive testing is impossible</td><td>Choose tests with techniques and risk, not at random</td></tr>
+    <tr><td>3. Early testing saves time and money</td><td>Test the requirements and design, then each story as it is built</td></tr>
+    <tr style="background:#F6F5FB"><td>4. Defects cluster together</td><td>Most bugs hide in a few modules: dates, money, permissions</td></tr>
+    <tr><td>5. Tests wear out</td><td>The same tests stop finding new bugs; add and vary them</td></tr>
+    <tr style="background:#F6F5FB"><td>6. Testing is context dependent</td><td>A festival guide and a payment app need different rigour</td></tr>
+    <tr><td>7. "No bugs" does not mean useful</td><td>A defect-free app that solves the wrong problem still fails</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISTQB, <i>Certified Tester Foundation Level Syllabus</i> v4.0 (2023)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="The levels follow the ISTQB model and the right-hand side of the V-model from Week 2: unit tests verify detailed design, integration tests verify architecture, system tests verify requirements, and acceptance tests validate user needs." aria-label="Slide 8">
+<section id="s8" data-section="Testing levels" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Testing levels</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Four levels of testing</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:16%; color:#F4F4F8">Level</th><th style="width:28%; color:#F4F4F8">Tests</th><th style="width:18%; color:#F4F4F8">Who</th><th style="width:38%; color:#F4F4F8">Diyandi example</th></tr>
+    <tr><td><b>Unit</b></td><td>One function or class, in isolation</td><td>Developer</td><td>formatTime(noon) returns "12:00 PM"</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Integration</b></td><td>Parts working together: API with database, front end with API</td><td>Developers</td><td>GET /events?date= returns only that day, sorted</td></tr>
+    <tr><td><b>System</b></td><td>The whole deployed system, end to end, including NFRs</td><td>Team or testers</td><td>On a phone over 3G, the list loads in under 3 s</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Acceptance</b></td><td>Does it meet the acceptance criteria and the user's need?</td><td>Product owner and users</td><td>An organizer edits an event and visitors see the change</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Each level catches different defects.</b> Unit tests miss integration mismatches; system tests are too slow to check every edge case.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="The test pyramid is from Mike Cohn&#x27;s Succeeding with Agile (2009) and was popularised by Martin Fowler. The shape is guidance: lots of fast, cheap tests at the bottom and few slow, brittle ones at the top. An inverted pyramid (&quot;ice-cream cone&quot;) of mostly manual end-to-end testing is the common anti-pattern." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Testing levels</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The test pyramid</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:40px">
+    <svg width="760" height="460" viewBox="0 0 760 460" style="flex:none; font-family:'IBM Plex Sans', Arial, sans-serif"><polygon points="253.22033898305085,70 506.77966101694915,70 573.0508474576271,185 186.94915254237287,185" fill="#231E3D"/><text x="380" y="123.5" text-anchor="middle" font-size="27" font-weight="600" fill="#F4F4F8">End to end</text><text x="380" y="155.5" text-anchor="middle" font-size="21" fill="#F4F4F8">few · slow · real browser</text><polygon points="181.1864406779661,195 578.8135593220339,195 647.9661016949153,315 112.03389830508473,315" fill="#5B4BC4"/><text x="380" y="251.0" text-anchor="middle" font-size="27" font-weight="600" fill="#FFFFFF">Integration</text><text x="380" y="283.0" text-anchor="middle" font-size="21" fill="#FFFFFF">some · API and database</text><polygon points="106.27118644067798,325 653.728813559322,325 720.0,440 40.0,440" fill="#0E7C66"/><text x="380" y="378.5" text-anchor="middle" font-size="27" font-weight="600" fill="#FFFFFF">Unit</text><text x="380" y="410.5" text-anchor="middle" font-size="21" fill="#FFFFFF">many · fast · isolated</text></svg>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Many unit tests</h3><p style="font-size:24px; line-height:1.4">Milliseconds each. Run on every save. Pinpoint the broken function.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Some integration tests</h3><p style="font-size:24px; line-height:1.4">Check the contracts between parts: the API, the database, the queries.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #231E3D; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#231E3D">A few end-to-end tests</h3><p style="font-size:24px; line-height:1.4">Only the critical journeys: view today's events, organizer edits one.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #6B6980; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#6B6980">Plus exploratory testing</h3><p style="font-size:24px; line-height:1.4">A person trying to break it. Finds what no one thought to automate.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">M. Cohn, <i>Succeeding with Agile</i> (2009) · M. Fowler, "TestPyramid" (2012)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="This uses Jest; pytest, PHPUnit and JUnit follow the same arrange, act, assert pattern (also called given, when, then). The time-zone point matters: CI runners default to UTC, so a date test that passes on a laptop in Manila can fail in CI. Setting TZ in the test script removes the difference." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Testing levels · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A unit test: arrange, act, assert</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.25; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">lib/time.test.js</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">import</span> { formatTime } <span style="color:#7FD4BE">from</span> &#x27;./time&#x27;;
+
+test(<span style="color:#F5C451">&#x27;noon shows as 12:00 PM&#x27;</span>, () =&gt; {
+  <span style="color:#9592B0">// Arrange</span>
+  <span style="color:#7FD4BE">const</span> noon = <span style="color:#7FD4BE">new</span> Date(&#x27;2026-10-20T12:00:00+08:00&#x27;);
+  <span style="color:#9592B0">// Act</span>
+  <span style="color:#7FD4BE">const</span> label = formatTime(noon);
+  <span style="color:#9592B0">// Assert</span>
+  expect(label).toBe(&#x27;12:00 PM&#x27;);
+});
+
+test(<span style="color:#F5C451">&#x27;midnight shows as 12:00 AM&#x27;</span>, () =&gt; {
+  <span style="color:#7FD4BE">const</span> midnight = <span style="color:#7FD4BE">new</span> Date(&#x27;2026-10-20T00:00:00+08:00&#x27;);
+  expect(formatTime(midnight)).toBe(&#x27;12:00 AM&#x27;);
+});</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">One behaviour per test</h3><p style="font-size:24px; line-height:1.4">The name says what should happen. A failure tells you exactly what broke.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Test the edges</h3><p style="font-size:24px; line-height:1.4">Noon and midnight are where the Week 2 bug lived.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Fast and independent</h3><p style="font-size:24px; line-height:1.4">No network, no shared state, any order.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Fix the time zone</h3><p style="font-size:24px; line-height:1.4">Run tests with TZ=Asia/Manila so CI matches your laptop.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="supertest calls the API in-process without starting a server. The key practice is a clean, known database for each test; otherwise tests pass or fail depending on what ran before. For PHP or Python stacks, Laravel&#x27;s HTTP tests and pytest with a test client work the same way." aria-label="Slide 11">
+<section id="s11" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Testing levels · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">An integration test: API and database together</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.3; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">tests/events.api.test.js</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:21px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">import</span> request <span style="color:#7FD4BE">from</span> &#x27;supertest&#x27;;
+<span style="color:#7FD4BE">import</span> app <span style="color:#7FD4BE">from</span> &#x27;../src/api/app&#x27;;
+<span style="color:#7FD4BE">import</span> { resetDb, seed } <span style="color:#7FD4BE">from</span> &#x27;./helpers&#x27;;
+
+beforeEach(resetDb);
+
+test(<span style="color:#F5C451">&#x27;lists only that day, sorted by time&#x27;</span>, <span style="color:#7FD4BE">async</span> () =&gt; {
+  <span style="color:#7FD4BE">await</span> seed([
+    { title: &#x27;B&#x27;, start: &#x27;2026-10-20T19:00+08:00&#x27; },
+    { title: &#x27;A&#x27;, start: &#x27;2026-10-20T18:00+08:00&#x27; },
+    { title: &#x27;X&#x27;, start: &#x27;2026-10-21T18:00+08:00&#x27; },
+  ]);
+  <span style="color:#7FD4BE">const</span> res = <span style="color:#7FD4BE">await</span> request(app).get(&#x27;/events?date=2026-10-20&#x27;);
+  expect(res.status).toBe(200);
+  expect(res.body.map(e =&gt; e.title)).toEqual([&#x27;A&#x27;, &#x27;B&#x27;]);
+});</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Real parts, test data</h3><p style="font-size:24px; line-height:1.4">A test database, reset before each test, so results repeat.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Checks the contract</h3><p style="font-size:24px; line-height:1.4">Status code and shape from the Week 8 API example.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Covers two criteria at once</h3><p style="font-size:24px; line-height:1.4">Only that date, and sorted by start time.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="Non-functional requirements were written to be measurable in Week 5 precisely so they could be tested now. Teams do not need every tool; they need at least one concrete check per top NFR, recorded in the test plan with its result." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Testing levels</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Testing the qualities, not only the features</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Week 5 NFR</th><th style="width:40%; color:#F4F4F8">How to test it</th><th style="width:30%; color:#F4F4F8">Tool or method</th></tr>
+    <tr><td>List loads in &lt; 3 s on 3G</td><td>Load the deployed page with network throttling; measure</td><td>Browser DevTools, Lighthouse</td></tr>
+    <tr style="background:#F6F5FB"><td>Readable offline</td><td>Load once, switch to airplane mode, reload</td><td>Manual system test on a phone</td></tr>
+    <tr><td>Only organizers can edit</td><td>Call the edit API as a visitor and as another organizer</td><td>Integration tests: expect 401 or 403</td></tr>
+    <tr style="background:#F6F5FB"><td>WCAG 2.2 AA contrast and labels</td><td>Automated scan, then keyboard-only and screen-reader check</td><td>axe DevTools, TalkBack or NVDA</td></tr>
+    <tr><td>Survives festival-night traffic</td><td>Simulate many visitors reading the schedule</td><td>k6 or a simple load script</td></tr>
+    <tr style="background:#F6F5FB"><td>First-time organizer finishes in 5 min</td><td>Watch 3 to 5 real users try it</td><td>Usability test (Week 6)</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="Writing the failing test first is the core of test-driven development (Beck, 2002), applied here only to bug fixes, which is an easy habit to start with. Over two sprints, this builds a regression suite exactly where the defects clustered." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Testing levels</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Regression testing and automation</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Regression</h3><p style="font-size:26px; line-height:1.4">A change breaks something that used to work.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">Fixing the noon bug must not break midnight. A test for each fixed bug keeps it fixed.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Automate what repeats</h3><p style="font-size:26px; line-height:1.4">Unit and integration tests run in CI on every pull request.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">The merge button waits for green, as set up in Week 8.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Keep some manual</h3><p style="font-size:26px; line-height:1.4">Exploratory sessions, usability, and look-and-feel on real phones.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E">People find what scripts were never told to check.</p></div>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Rule for this course:</b> every defect you fix gets a test that fails before the fix and passes after it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="Both views are complementary. Black-box design catches requirements that were never implemented, which coverage can never show, because missing code has no lines to cover." aria-label="Slide 14">
+<section id="s14" data-section="Test design" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Black-box and white-box testing</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Black-box (specification-based)</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Designed from requirements and criteria</li><li style="margin:5px 0">No knowledge of the code needed</li><li style="margin:5px 0">Equivalence partitions, boundary values, decision tables, state transitions</li><li style="margin:5px 0">Finds missing and misunderstood behaviour</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">White-box (structure-based)</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Designed from the code itself</li><li style="margin:5px 0">Aims to exercise statements and branches</li><li style="margin:5px 0">Measured with code coverage</li><li style="margin:5px 0">Finds untested paths and dead code</li></ul></div>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Start black-box</b> from the acceptance criteria, then use coverage to see what you missed.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="Equivalence partitioning divides inputs into groups the system should treat identically, then tests one representative of each. Students usually remember the valid range and forget the non-numeric and empty partitions, which is where real crashes come from." aria-label="Slide 15">
+<section id="s15" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Equivalence partitioning</h2>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Rule:</b> a visitor can RSVP to an event for a party of <b>1 to 8 people</b>.</p>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:28%; color:#F4F4F8">Partition</th><th style="width:18%; color:#F4F4F8">Values</th><th style="width:12%; color:#F4F4F8">Valid?</th><th style="width:18%; color:#F4F4F8">One test value</th><th style="width:24%; color:#F4F4F8">Expected</th></tr>
+    <tr><td>Below the range</td><td>≤ 0</td><td>No</td><td>0</td><td>Error: "at least 1"</td></tr>
+    <tr style="background:#F6F5FB"><td>In the range</td><td>1 to 8</td><td>Yes</td><td>4</td><td>RSVP saved</td></tr>
+    <tr><td>Above the range</td><td>≥ 9</td><td>No</td><td>12</td><td>Error: "at most 8"</td></tr>
+    <tr style="background:#F6F5FB"><td>Not a whole number</td><td>2.5</td><td>No</td><td>2.5</td><td>Error: "whole number"</td></tr>
+    <tr><td>Not a number or empty</td><td>abc, blank</td><td>No</td><td>blank</td><td>Error: "required"</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">If the system treats every value in a group the same way, <b>one value per group</b> is enough.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the three-value form of boundary value analysis (ISTQB v4.0 also describes a two-value form: the boundary and its nearest neighbour outside). Combined with equivalence partitioning, a 1 to 8 rule needs about eight tests, not a hundred. The Week 2 noon bug was a boundary bug: 12 is the edge of a 12-hour clock." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Boundary value analysis</h2>
+  </div>
+<svg width="1664" height="214" viewBox="0 0 1790 230" style="flex:none; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px"><rect x="374.54545454545456" y="80" width="1030.909090909091" height="60" rx="10" fill="#E1F3EE"/><line x1="50" y1="110" x2="1730" y2="110" stroke="#6B6980" stroke-width="3"/><line x1="80.0" y1="98" x2="80.0" y2="122" stroke="#6B6980" stroke-width="3"/><text x="80.0" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">-1</text><line x1="227.27272727272728" y1="98" x2="227.27272727272728" y2="122" stroke="#6B6980" stroke-width="3"/><text x="227.27272727272728" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">0</text><line x1="374.54545454545456" y1="98" x2="374.54545454545456" y2="122" stroke="#6B6980" stroke-width="3"/><text x="374.54545454545456" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">1</text><line x1="521.8181818181818" y1="98" x2="521.8181818181818" y2="122" stroke="#6B6980" stroke-width="3"/><text x="521.8181818181818" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">2</text><line x1="669.0909090909091" y1="98" x2="669.0909090909091" y2="122" stroke="#6B6980" stroke-width="3"/><text x="669.0909090909091" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">3</text><line x1="816.3636363636364" y1="98" x2="816.3636363636364" y2="122" stroke="#6B6980" stroke-width="3"/><text x="816.3636363636364" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">4</text><line x1="963.6363636363636" y1="98" x2="963.6363636363636" y2="122" stroke="#6B6980" stroke-width="3"/><text x="963.6363636363636" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">5</text><line x1="1110.909090909091" y1="98" x2="1110.909090909091" y2="122" stroke="#6B6980" stroke-width="3"/><text x="1110.909090909091" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">6</text><line x1="1258.1818181818182" y1="98" x2="1258.1818181818182" y2="122" stroke="#6B6980" stroke-width="3"/><text x="1258.1818181818182" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">7</text><line x1="1405.4545454545455" y1="98" x2="1405.4545454545455" y2="122" stroke="#6B6980" stroke-width="3"/><text x="1405.4545454545455" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">8</text><line x1="1552.7272727272727" y1="98" x2="1552.7272727272727" y2="122" stroke="#6B6980" stroke-width="3"/><text x="1552.7272727272727" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">9</text><line x1="1700.0" y1="98" x2="1700.0" y2="122" stroke="#6B6980" stroke-width="3"/><text x="1700.0" y="160" text-anchor="middle" font-size="26" fill="#4C4A5E">10</text><circle cx="227.27272727272728" cy="110" r="17" fill="#B4423A"/><circle cx="374.54545454545456" cy="110" r="17" fill="#0E7C66"/><circle cx="521.8181818181818" cy="110" r="17" fill="#0E7C66"/><circle cx="1258.1818181818182" cy="110" r="17" fill="#0E7C66"/><circle cx="1405.4545454545455" cy="110" r="17" fill="#0E7C66"/><circle cx="1552.7272727272727" cy="110" r="17" fill="#B4423A"/><text x="890.0" y="62" text-anchor="middle" font-size="26" font-weight="600" fill="#0E7C66">valid: 1 to 8</text><text x="153.63636363636363" y="62" text-anchor="middle" font-size="24" fill="#B4423A">invalid</text><text x="1626.3636363636363" y="62" text-anchor="middle" font-size="24" fill="#B4423A">invalid</text><text x="895" y="210" text-anchor="middle" font-size="24" fill="#4C4A5E">Test values: 0, 1, 2 at the lower edge and 7, 8, 9 at the upper edge</text></svg>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Bugs live at the edges</h3><p style="font-size:25px; line-height:1.4">"&lt; 8" instead of "≤ 8" is a one-character defect that only the value 8 reveals.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Test on and around each edge</h3><p style="font-size:25px; line-height:1.4">The boundary, and the values just inside and just outside it.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Edges are everywhere</h3><p style="font-size:25px; line-height:1.4">Dates (23:59 and 00:00), lengths (empty, max), lists (0, 1, many).</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="A decision table lists conditions as rows and each combination as a column (a rule), with &quot;–&quot; meaning &quot;does not matter&quot;. Three yes/no conditions give eight combinations, which collapse to four rules here. The table often exposes requirements no one decided, which is a requirements finding as much as a testing one." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Decision tables for combinations of rules</h2>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Rule:</b> who can edit an event?</p>
+  <table style="font-size:26px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:44%; color:#F4F4F8"></th><th style="width:14%; color:#F4F4F8">R1</th><th style="width:14%; color:#F4F4F8">R2</th><th style="width:14%; color:#F4F4F8">R3</th><th style="width:14%; color:#F4F4F8">R4</th></tr>
+    <tr><td><b>Condition:</b> signed in</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Condition:</b> is an organizer</td><td>–</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td><b>Condition:</b> event already ended</td><td>–</td><td>–</td><td>No</td><td>Yes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Action:</b> result</td><td>Go to sign-in</td><td>403 error</td><td>Edit form</td><td>Read-only, "past event"</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">One test per rule</h3><p style="font-size:25px; line-height:1.4">Four columns, four test cases. Nothing forgotten.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Gaps become visible</h3><p style="font-size:25px; line-height:1.4">Writing R4 forces the question: may past events be edited?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Use the state diagrams from Week 6. Cover every valid transition at least once (S1 to S3), then try the invalid ones (S4, S5, marked ✕), which is where defects usually hide: the button was hidden in the UI, but the API still accepts the request." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">State transition testing</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Draft</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Only the organizer sees it</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#F4F4F8">Published</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">Visitors see it; edits notify savers</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Cancelled</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Shown struck through; no edits</p></div>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:10%; color:#F4F4F8">Test</th><th style="width:22%; color:#F4F4F8">Start state</th><th style="width:26%; color:#F4F4F8">Event</th><th style="width:42%; color:#F4F4F8">Expected</th></tr>
+    <tr><td>S1</td><td>Draft</td><td>Publish</td><td>Published; appears in today's list</td></tr>
+    <tr style="background:#F6F5FB"><td>S2</td><td>Published</td><td>Edit start time</td><td>Still published; savers notified</td></tr>
+    <tr><td>S3</td><td>Published</td><td>Cancel</td><td>Cancelled; savers notified</td></tr>
+    <tr style="background:#F6F5FB"><td>S4 <span style="color:#B4423A">✕</span></td><td>Cancelled</td><td>Publish</td><td>Refused: "cancelled events cannot be republished"</td></tr>
+    <tr><td>S5 <span style="color:#B4423A">✕</span></td><td>Cancelled</td><td>Edit title</td><td>Refused; form is read-only</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="This continues story #10 from Week 8. TC-10-4 adds a boundary case the criteria did not mention, which is exactly what test design techniques are for. The failed case produced defect #33, which shows up in the defect log later." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From acceptance criteria to test cases</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:10%; color:#F4F4F8">ID</th><th style="width:16%; color:#F4F4F8">Criterion</th><th style="width:30%; color:#F4F4F8">Steps and data</th><th style="width:22%; color:#F4F4F8">Expected</th><th style="width:12%; color:#F4F4F8">Actual</th><th style="width:10%; color:#F4F4F8">Status</th></tr>
+    <tr><td>TC-10-1</td><td>Today only</td><td>Seed events on Oct 20 and 21; open the list on Oct 20</td><td>Only Oct 20 events</td><td>As expected</td><td><b style="color:#0E7C66">Pass</b></td></tr>
+    <tr style="background:#F6F5FB"><td>TC-10-2</td><td>Sorted; ties by name</td><td>Events B 19:00, C 18:00, A 18:00</td><td>A, C, B</td><td>As expected</td><td><b style="color:#0E7C66">Pass</b></td></tr>
+    <tr><td>TC-10-3</td><td>Empty day</td><td>No events on Oct 22; open the list</td><td>"No events today" message</td><td>Blank page</td><td><b style="color:#B4423A">Fail</b> #33</td></tr>
+    <tr style="background:#F6F5FB"><td>TC-10-4</td><td>Today only (edge)</td><td>Events at 23:59 Oct 20 and 00:00 Oct 21</td><td>Only the 23:59 event</td><td>As expected</td><td><b style="color:#0E7C66">Pass</b></td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Traceable</h3><p style="font-size:24px; line-height:1.4">Each case names its story and criterion.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Repeatable</h3><p style="font-size:24px; line-height:1.4">Exact data and steps; anyone gets the same result.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Failures become defects</h3><p style="font-size:24px; line-height:1.4">A failed case links to its defect issue.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="These criteria are what the individual test-case design exercise is assessed against. A common weakness is expected results like &quot;works correctly&quot;, which cannot fail; insist on something observable." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What makes a good test case</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Specific</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Exact input data and steps, not "enter some events"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">One expected result</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Observable and unambiguous: what you should see</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Independent</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Sets up its own data; does not depend on another case</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Traceable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Linked to a story and an acceptance criterion</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Designed, not guessed</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Chosen from partitions, boundaries, tables, states</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Includes the unhappy path</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Errors, empty states, no permission, no network</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Test that it fails correctly</b>, not only that it works. Most real users hit an error path within their first minute.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="Most test runners report coverage (jest --coverage, pytest-cov). Goodhart&#x27;s law applies: when coverage becomes a target, teams write tests that execute code without checking anything. Use it to look for untested areas, especially branches in the defect-prone modules." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Code coverage: a useful flashlight, a poor target</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.2; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">src/events/label.js</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; font-variant-ligatures:none; white-space:pre-wrap; margin:0"><span style="color:#7FD4BE">function</span> label(event) {
+  <span style="color:#7FD4BE">let</span> text = event.title;
+  <span style="color:#7FD4BE">if</span> (event.cancelled) {
+    text += &#x27; (cancelled)&#x27;;
+  }
+  <span style="color:#7FD4BE">return</span> text;
+}
+
+<span style="color:#9592B0">// One test: label({ title: &quot;Parade&quot;, cancelled: true })</span>
+<span style="color:#F5C451">// Statement coverage: 100%  ·  Branch coverage: 50%</span></pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Statement coverage</h3><p style="font-size:24px; line-height:1.4">Every line ran at least once.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Branch coverage</h3><p style="font-size:24px; line-height:1.4">Every decision went both ways. Here, the not-cancelled path never ran.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Use it to find gaps</h3><p style="font-size:24px; line-height:1.4">Low coverage shows untested code. High coverage proves little.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Tests need assertions</h3><p style="font-size:24px; line-height:1.4">Code that runs without any expect() is "covered" but untested.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="The states vary between tools, but the shape is standard. The two steps students skip are triage (so everything is &quot;urgent&quot;) and verification (so &quot;fixed&quot; means &quot;I changed something&quot;)." aria-label="Slide 22">
+<section id="s22" data-section="Defects" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defects</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The defect life cycle</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">New</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Reported with steps</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Triaged</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Severity, priority, owner</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">In progress</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Branch and failing test</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Fixed</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Pull request merged</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">5</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Verified</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Reporter retests</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">6</p><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Closed</h3><p style="font-size:20px; line-height:1.3; color:#C9C5E0">Test stays in the suite</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4"><b>Reopened</b> if verification fails. <b>Rejected</b> if it cannot be reproduced, is a duplicate, or works as designed, always with a reason.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Someone else verifies</h3><p style="font-size:25px; line-height:1.4">The person who reported it, or a teammate. Not only the person who fixed it.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Use the board</h3><p style="font-size:25px; line-height:1.4">Labels or columns on GitHub Projects track the states. No separate tool needed.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="Severity scales are often Critical, Major, Minor, Trivial; priority is often P1 to P4. The off-diagonal cases are the point: a typo can be urgent (it is on the home page, and the mayor is demoing it) while a crash can wait (no one uses that path yet)." aria-label="Slide 23">
+<section id="s23" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defects</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Severity is impact; priority is urgency</h2>
+  </div>
+  <div style="flex-direction:row; gap:16px; align-items:stretch"><div style="width:150px; justify-content:space-around; align-items:flex-end; padding-right:8px"><p style="font-size:24px; font-weight:600; color:#231E3D; text-align:right">High<br>severity</p><p style="font-size:24px; font-weight:600; color:#231E3D; text-align:right">Low<br>severity</p></div><div style="flex:1; gap:16px"><div style="flex-direction:row; gap:16px"><div style="flex:1; gap:8px; background:#231E3D; border-radius:14px; padding:24px 28px"><p style="font-size:26px; font-weight:600; color:#F5C451">Fix now</p><p style="font-size:23px; line-height:1.4; color:#C9C5E0">Organizers cannot sign in at all, two days before the festival.</p></div><div style="flex:1; gap:8px; background:#ECE9FB; border-radius:14px; padding:24px 28px"><p style="font-size:26px; font-weight:600; color:#1E1B2E">Fix soon, plan it</p><p style="font-size:23px; line-height:1.4; color:#4C4A5E">Importing a 10,000-row event spreadsheet crashes the server. No one imports yet.</p></div></div><div style="flex-direction:row; gap:16px"><div style="flex:1; gap:8px; background:#E1F3EE; border-radius:14px; padding:24px 28px"><p style="font-size:26px; font-weight:600; color:#1E1B2E">Fix soon, quick win</p><p style="font-size:23px; line-height:1.4; color:#4C4A5E">The festival name is misspelled on the home page.</p></div><div style="flex:1; gap:8px; background:#ECECF2; border-radius:14px; padding:24px 28px"><p style="font-size:26px; font-weight:600; color:#1E1B2E">Backlog</p><p style="font-size:23px; line-height:1.4; color:#4C4A5E">An icon is 2 px off on one tablet in landscape.</p></div></div><div style="flex-direction:row; gap:16px"><p style="flex:1; font-size:24px; font-weight:600; color:#231E3D; text-align:center">High priority</p><p style="flex:1; font-size:24px; font-weight:600; color:#231E3D; text-align:center">Low priority</p></div></div></div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Severity</b> is set by the tester from the impact. <b>Priority</b> is set by the product owner from the context: deadlines, users, risk.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="Each row links to the test case or technique that found it, which demonstrates that test design paid off. #34 was found by the decision table and is a security defect, so it is Critical regardless of how few people would try it. Teams can export the filtered issue list for the milestone submission." aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defects</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The defect log</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:7%; color:#F4F4F8">ID</th><th style="width:31%; color:#F4F4F8">Title</th><th style="width:11%; color:#F4F4F8">Severity</th><th style="width:10%; color:#F4F4F8">Priority</th><th style="width:17%; color:#F4F4F8">Found by · in</th><th style="width:11%; color:#F4F4F8">Status</th><th style="width:13%; color:#F4F4F8">Fix</th></tr>
+    <tr><td>#27</td><td>Noon shows as 0:00 PM in event list</td><td>Major</td><td>P1</td><td>Cara · TC-W2-3</td><td>Closed</td><td>PR #31</td></tr>
+    <tr style="background:#F6F5FB"><td>#33</td><td>Empty day shows blank page, no message</td><td>Minor</td><td>P2</td><td>Ana · TC-10-3</td><td>Fixed</td><td>PR #35</td></tr>
+    <tr><td>#34</td><td>Visitor can call edit API directly (no 403)</td><td>Critical</td><td>P1</td><td>Dan · R2 table</td><td>In progress</td><td>Branch 34-…</td></tr>
+    <tr style="background:#F6F5FB"><td>#36</td><td>Cancelled event can be republished</td><td>Major</td><td>P2</td><td>Ben · S4</td><td>Triaged</td><td>–</td></tr>
+    <tr><td>#38</td><td>List takes 6 s on 3G (NFR: 3 s)</td><td>Major</td><td>P2</td><td>Cara · NFR-1</td><td>New</td><td>–</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">It is your issue tracker</h3><p style="font-size:24px; line-height:1.4">A "bug" label and a saved view. The log is a filter, not a spreadsheet.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">It tells a story</h3><p style="font-size:24px; line-height:1.4">Where defects cluster: here, permissions and states. Test those harder.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="The strong column matches the issue template from Week 8. A good report saves the fixer far more time than it costs the reporter. Encourage teams to add a bug report template to .github/ISSUE_TEMPLATE so the fields appear automatically." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Defects</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Write a bug report someone can act on</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:40%; color:#F4F4F8">Weak</th><th style="width:60%; color:#F4F4F8">Strong</th></tr>
+    <tr><td>"Times are broken"</td><td>"Event list shows 0:00 PM for events at 12:00 noon"</td></tr>
+    <tr style="background:#F6F5FB"><td>"It doesn't work on my phone"</td><td>"On Chrome 129, Android 14, Galaxy A15: tapping Save does nothing"</td></tr>
+    <tr><td>(no steps)</td><td>"1. Sign in as organizer  2. Open Parade  3. Set time 12:00  4. Save"</td></tr>
+    <tr style="background:#F6F5FB"><td>"Should be fixed ASAP!!!"</td><td>"Expected 12:00 PM; actual 0:00 PM. Screenshot attached. Severity: Major"</td></tr>
+    <tr><td>Three bugs in one issue</td><td>One issue per defect, each with its own owner and status</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Describe the failure, not your guess at the cause.</b> Add a hunch in "Notes" if you have one.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="The outline is a lightweight version of the test plan in ISO/IEC/IEEE 29119-3 (which replaced IEEE 829). Two to four pages is enough. The risk-based part links to the Week 5 risk register: test effort should follow risk." aria-label="Slide 26">
+<section id="s26" data-section="Test plan" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test plan</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your test plan, in six parts</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Scope</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Which stories and NFRs are tested this sprint; what is explicitly out of scope.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Approach</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Levels and techniques: unit and integration in CI, system tests on phones, one usability round.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Environment</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Test database and seed data, browsers and devices, the deployed test URL.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Entry and exit criteria</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">When testing starts (story merged) and stops (all P1 fixed, criteria pass).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Roles and schedule</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Who designs, runs, and verifies; when each round happens in Sprint 2.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Risks</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Riskiest areas from the register get the most tests: dates, permissions, offline.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISO/IEC/IEEE 29119-3:2021, <i>Software testing: Test documentation</i></p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="Without exit criteria, testing ends when time runs out. With them, the team can say honestly at the Sprint 2 review what was tested and what is still known to be broken, which is a strength in a defense, not a weakness." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Test plan</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">When to start testing, and when to stop</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Entry: ready to test when</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">The story is merged to main and deployed to the test URL</li><li style="margin:5px 0">Its acceptance criteria are written and agreed</li><li style="margin:5px 0">Seed data and test accounts exist</li><li style="margin:5px 0">CI is green</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Exit: done testing when</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Every acceptance criterion has a passing test case</li><li style="margin:5px 0">No open Critical or P1 defects</li><li style="margin:5px 0">Top NFRs measured and recorded</li><li style="margin:5px 0">Known minor defects listed in the release notes</li></ul></div>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Put the exit criteria in your Definition of Done.</b> Then "done" means tested, not just coded.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: 7, 8, 9 and 63, 64, 65 characters (plus empty, as its own partition). Q2: not necessarily; tests show presence, not absence, of defects; coverage says code ran, not that results were checked; tests may not cover the acceptance criteria, NFRs, or the right problem (validation). Q3: answers vary, for example a misspelled sponsor or school name on the landing page before a demo. Q4: call the edit API directly as a visitor and expect 401 or 403; hiding the UI is not access control (the R2 rule and defect #34)." aria-label="Slide 28">
+<section id="s28" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What would you test?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">A field accepts a password of <b>8 to 64 characters</b>. List your boundary test values.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">All 120 tests pass, and coverage is 95%. Is the app ready? Why or why not?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">Give an example of a defect with <b>low severity</b> but <b>high priority</b> in your own project.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">The organizer edit button is hidden for visitors. What test is still missing?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="Three parts, matching the syllabus milestone. Individually, each student completes the test-case design exercise, which practises the techniques from Part 3 on a given specification." aria-label="Slide 29">
+<section id="s29" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Test plan, test cases, defect log, Sprint 2</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Test plan</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Scope, approach, environment</li><li style="margin:5px 0">Entry and exit criteria</li><li style="margin:5px 0">Roles and schedule</li><li style="margin:5px 0">Risk-based priorities</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Test cases</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Linked to stories and criteria</li><li style="margin:5px 0">Designed with at least two techniques</li><li style="margin:5px 0">Automated where possible, in CI</li><li style="margin:5px 0">Results: pass or fail with date</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Defect log and Sprint 2</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Every defect an issue with severity and priority</li><li style="margin:5px 0">Failed cases linked to defects</li><li style="margin:5px 0">Sprint 2 stories in progress on the board</li><li style="margin:5px 0">A regression test for each fix</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected highlights. A: quantity partitions (≤0, 1–5, ≥6, non-numeric) and boundaries 0, 1, 2, 4, 5, 6; time boundaries 10:59, 11:00, 11:01 (what does &quot;closes at 11:00&quot; mean exactly?). B: decision table with age and residency (four rules); boundaries 17, 18 and 5, 6 months; what about exactly 18 today? C: distance boundaries 4.0 and just above; rounding of partial kilometres; discount combinations. The ambiguities students find are requirements defects worth raising." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Design the tests</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">3 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Pairs or threes.</b> Pick a rule on the right.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Partitions:</b> list valid and invalid groups, one value each.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Boundaries:</b> list the values on and around each edge.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write 6 test cases</b> (ID, steps and data, expected). Add a decision table if the rule combines conditions.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Swap with a pair:</b> find one case they missed and write it as a bug report as if it failed.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Order 1 to 5 of each item. Orders close at 11:00 AM for same-day lunch.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay document requests</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Clearance needs age 18 or over and at least 6 months' residency.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Jeepney route finder</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Example rule: ₱13 for the first 4 km, ₱1.80 per km after. Students, seniors, and PWDs get 20% off.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 9 · Software quality assurance, testing levels, test design, and defects</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Check that expected results are observable and that at least one invalid input is tested." aria-label="Slide 31">
+<section id="s31" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Fill these in on paper or in a document</h2>
+  </div>
+  <div style="flex-direction:row; gap:20px; height:600px"><div style="flex:1; gap:20px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Partitions: group · valid? · one value</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Boundaries: edge · values to test</p></div></div><div style="flex:1.5; gap:20px"><div style="flex:1.6; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Test cases: ID · steps and data · expected</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Missed case, as a bug report: title · steps · expected · actual · severity</p></div></div></div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: canteen pre-ordering · B: barangay document requests · C: jeepney route finder</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">31</p>
+</section>
+</div>
+<div class="frame" data-notes="Quality assurance prevents defects through process; testing finds failures. Verification checks the product against its specification; validation checks it against real needs. Testing shows the presence of defects, never their absence, and exhaustive testing is impossible, so tests must be designed. Use unit, integration, system and acceptance levels, shaped like a pyramid. Design cases from requirements with equivalence partitions, boundary values, decision tables and state transitions; use coverage only to find gaps. Track defects through a life cycle, separate severity from priority, add a regression test for every fix, and write a short, risk-based test plan with entry and exit criteria. Next week: security, reliability, deployment readiness, documentation and maintenance." aria-label="Slide 32">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Testing builds justified confidence</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">QA prevents; testing finds failures</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Unit, integration, system, acceptance</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Many fast tests, few slow ones</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Design tests: partitions, boundaries</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Tables and states for rules and flows</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Log defects by severity and priority</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">A test that cannot fail tells you nothing.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>

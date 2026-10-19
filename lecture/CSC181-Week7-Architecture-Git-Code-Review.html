@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 7: Architecture, Design Principles, Git Workflows, and Code Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 7. Last week teams produced models, wireframes and a first component sketch. This week turns that into an architecture with recorded decisions, sets up a repository and a team Git workflow, introduces pull requests and code review, and plans Sprint 1, which is reviewed next week. The running example stays the Diyandi festival guide." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Architecture,<br>design principles,<br>and code review</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Software architecture and its styles, modularity and design principles, Git branching workflows, pull requests, code review, and planning Sprint 1</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 7</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. The first three are design; the last three are how the team will build together. From this week on, repository activity (commits, pull requests and reviews) is the main evidence of individual contribution, so the Git and review habits matter for grades as well as quality." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From a design to a codebase the whole team can work in</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Software architecture</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Structures, decisions, and the C4 model</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Architecture styles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Layered, MVC, client–server, monolith</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Modularity &amp; principles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Cohesion, coupling, SOLID, DRY, KISS</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Git workflows</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Branches, commits, merges, conflicts</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Pull requests &amp; review</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Giving and receiving feedback</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Sprint 1 plan</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Goal, stories, tasks, owners</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the Git workflow and pull-request activity (individual), and the architecture and design document, repository setup, and Sprint 1 implementation plan (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 3 (architecture and design descriptions), CLO 4 (design principles), CLO 5 (Git, pull requests, code review, task planning) and CLO 8 (verifiable individual contributions)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Explain software architecture</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and how quality attributes drive it</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Compare architecture styles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and record a decision as an ADR</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Apply design principles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">cohesion, coupling, SOLID, DRY</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Use a Git branching workflow</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with clear commits and branches</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Open and review pull requests</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with useful, respectful feedback</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Plan a sprint</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">with a goal, tasks, and owners</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Recall the course process from Week 2: Weeks 3 to 7 are front-loaded planning, then two sprints. Everything this week should be just enough to start building confidently on Monday of Week 8." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The last step before building</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Design package</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 6: models, wireframes, components</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Architecture</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Week 7: structure and decisions</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Repository</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 7: structure, rules, workflow</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 1 plan</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 7: what we build first</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint 1 review</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 8: a working prototype</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Decide what is hard to change</h3><p style="font-size:25px; line-height:1.4">Architecture is the set of decisions that are expensive to reverse later.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Agree how to work</h3><p style="font-size:25px; line-height:1.4">A Git workflow and review rules prevent most "who broke main?" moments.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Start small</h3><p style="font-size:25px; line-height:1.4">Sprint 1 builds a thin slice through every layer: the walking skeleton.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="The definition is from Bass, Clements and Kazman, Software Architecture in Practice. The &quot;hard to change&quot; framing is commonly attributed to Martin Fowler and Ralph Johnson. Ask students for decisions in their projects that would be painful to reverse in Week 10: the framework, the database, hosting, how authentication works." aria-label="Slide 5">
+<section id="s5" data-section="Software architecture" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What is software architecture?</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">The set of <b>structures</b> needed to reason about a system: its <b>elements</b>, the <b>relations</b> among them, and the <b>properties</b> of both.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Elements</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Components, services, modules, databases</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Relationships</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Who calls whom, what data flows where, what depends on what</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">3</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Decisions and rationale</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Why it is this way, and what alternatives were rejected</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Architecture is the decisions that are hard to change.</b> Choosing a database is architecture; choosing a variable name is not.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">L. Bass, P. Clements &amp; R. Kazman, <i>Software Architecture in Practice</i>, 4th ed. (2021)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="Each row links a measurable NFR from Week 5 to a decision and the price paid for it. This is exactly what an architecture document should record. Any architecture can deliver the features; the qualities decide which one fits." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Quality attributes drive architecture</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:32%; color:#F4F4F8">Week 5 NFR</th><th style="width:38%; color:#F4F4F8">Architectural decision</th><th style="width:30%; color:#F4F4F8">Trade-off accepted</th></tr>
+    <tr><td>Event list loads in &lt; 3 s on 3G</td><td>Pre-render the schedule as static pages served from a CDN</td><td>Pages rebuild a few seconds after an edit</td></tr>
+    <tr style="background:#F6F5FB"><td>Schedule readable offline</td><td>Cache the schedule on the device with a service worker</td><td>Possible stale data; show "last updated"</td></tr>
+    <tr><td>Only organizers can edit</td><td>Use the framework's auth; check permissions in the API</td><td>Visitors cannot contribute content</td></tr>
+    <tr style="background:#F6F5FB"><td>Survives festival-night traffic</td><td>Visitors read static files; only edits hit the server</td><td>Two paths to maintain: read and write</td></tr>
+    <tr><td>Next year's team can maintain it</td><td>One language across front end and back end; a README</td><td>Not the "best" tool for every part</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="Styles combine: a web app is typically client–server, layered on the server, with MVC in the UI framework. Sommerville Chapter 6 and Bass et al. both catalogue these patterns. The point is to choose consciously and write down why." aria-label="Slide 7">
+<section id="s7" data-section="Architecture styles" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Architecture styles</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Common architecture styles</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:17%; color:#F4F4F8">Style</th><th style="width:31%; color:#F4F4F8">Idea</th><th style="width:26%; color:#F4F4F8">Good for</th><th style="width:26%; color:#F4F4F8">Watch out</th></tr>
+    <tr><td><b>Layered</b></td><td>Presentation, application, data; each layer uses the one below</td><td>Most business and web apps</td><td>Layers bypassed "just this once"</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Client–server</b></td><td>Clients request; a server responds</td><td>Shared data, many users</td><td>Server is a single point of failure</td></tr>
+    <tr><td><b>Model–View–Controller</b></td><td>Separate data, display, and input handling</td><td>Interactive UIs, web frameworks</td><td>Fat controllers with all the logic</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Monolith</b></td><td>One deployable application</td><td>Small teams, early products</td><td>Becomes tangled without modules</td></tr>
+    <tr><td><b>Microservices</b></td><td>Many small services, deployed separately</td><td>Large orgs, independent teams</td><td>Network, deployment, and debugging overhead</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the same component sketch from Week 6, now shown as a request path. It also shows why layering helps testing in Week 9: the service layer can be unit-tested without a browser or a real database." aria-label="Slide 8">
+<section id="s8" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Architecture styles · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Following one request through the layers</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">View</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Visitor taps "Near me now"</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Controller</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Reads location; calls the events service</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Service / model</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Filters events: 1 km, next 60 min; sorts</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Data access</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Queries events joined with venues</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Database</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Returns rows</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">The result travels back up: the view only formats and displays; it never queries the database itself.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Each layer has one job</h3><p style="font-size:25px; line-height:1.4">Swap the database or redesign the screen without rewriting the filtering rule.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Rules live in one place</h3><p style="font-size:25px; line-height:1.4">The "1 km, 60 minutes" rule is in the service layer, so it is tested once.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Common mistake</h3><p style="font-size:25px; line-height:1.4">SQL inside button-click handlers: impossible to test and reuse.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="Martin Fowler&#x27;s &quot;MonolithFirst&quot; (2015) argues that almost all successful microservice systems started as monoliths that were split later. Student teams that start with microservices typically spend Sprint 1 on infrastructure and have nothing to demonstrate in Week 8." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Architecture styles</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Start with a modular monolith</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Modular monolith</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">One codebase, one deployment</li><li style="margin:5px 0">Clear modules inside: events, auth, notifications</li><li style="margin:5px 0">Easy to run, test, and debug on a laptop</li><li style="margin:5px 0">Can be split later if a module needs to scale</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Microservices</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Many services, many deployments</li><li style="margin:5px 0">Network calls instead of function calls</li><li style="margin:5px 0">Needs containers, monitoring, and service discovery</li><li style="margin:5px 0">Pays off with many teams and heavy scale</li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>For a 12-week, 4-person project, choose the monolith.</b> Microservices solve organizational problems you do not have.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">M. Fowler, "MonolithFirst" (2015)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="Architecture Decision Records were proposed by Michael Nygard in 2011. They replace the large, quickly outdated architecture document with a log of small decisions. Teams should write two to five ADRs this week: framework, database, hosting, and any significant trade-off from Week 5." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Record decisions as ADRs</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.3; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">docs/adr/002-cached-schedule.md</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:21px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0"><span style="color:#F5C451"># ADR-002: Cache the schedule; show &quot;last updated&quot;</span>
+
+<span style="color:#7FD4BE">Status:</span> Accepted (Week 7)
+
+<span style="color:#7FD4BE">Context:</span> Visitors have weak signal at venues.
+Real-time sync needs a constant connection.
+
+<span style="color:#7FD4BE">Decision:</span> Cache the schedule on the device.
+Label every event with its last update time.
+
+<span style="color:#7FD4BE">Consequences:</span> Works offline. Data can be up to
+15 minutes old. Notify savers of changes.</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Short</h3><p style="font-size:24px; line-height:1.4">One page per decision. Context, decision, consequences.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Kept in the repository</h3><p style="font-size:24px; line-height:1.4">docs/adr/, numbered, reviewed in pull requests like code.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Never deleted</h3><p style="font-size:24px; line-height:1.4">If a decision changes, write a new ADR that supersedes the old one.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Defense evidence</h3><p style="font-size:24px; line-height:1.4">Answers "why did you do it this way?" months later.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">M. Nygard, "Documenting Architecture Decisions" (2011)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="This is Simon Brown&#x27;s C4 model. It is notation-independent: boxes and arrows with clear labels are enough. Most student teams already have levels 1 and 3 from Weeks 3 and 6; the container diagram is the new piece and usually matches the technology choices recorded in ADRs." aria-label="Slide 11">
+<section id="s11" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Draw architecture at the right zoom level</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">1 · Context</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The system as one box, with its users and external systems. <i>Week 3's context diagram.</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">2 · Containers</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The deployable parts: web app, API, database, and how they talk.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">3 · Components</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The main modules inside one container. <i>Week 6's component sketch.</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #6B6980"><h3 style="font-size:28px; font-weight:600; color:#231E3D">4 · Code</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Classes and functions. Usually left to the code itself.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>For your document:</b> a context diagram and a container diagram, each with a short legend.</p>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Like map zoom levels: country, city, street, building. Each diagram answers a different question for a different reader.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">S. Brown, The C4 model for visualising software architecture (c4model.com)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a lightweight outline for the milestone; a few pages plus diagrams and ADRs. It deliberately reuses earlier artifacts by linking to them rather than copying them. Keep it in docs/ in the repository so it is versioned and reviewed." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Software architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your architecture and design document</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Overview</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Problem, users, and scope in one paragraph (from Week 3).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Quality drivers</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">The top NFRs from Week 5 that shaped the design.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Architecture</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Context and container diagrams; chosen style and why.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Components and data</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Component responsibilities and the data design from Week 6.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Decisions</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Links to ADRs: technology, hosting, key trade-offs.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Risks and open questions</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Technical risks from the register; what you still need to learn.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="Cohesion and coupling come from Larry Constantine&#x27;s structured design work in the 1970s and remain the most practical measures of modularity. David Parnas&#x27;s 1972 paper &quot;On the Criteria To Be Used in Decomposing Systems into Modules&quot; introduced information hiding: modules should hide decisions likely to change." aria-label="Slide 13">
+<section id="s13" data-section="Modularity and design principles" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Modularity</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Cohesion and coupling</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">High cohesion: good</h3><p style="font-size:28px; line-height:1.4">Everything in a module serves <b>one purpose</b>.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>events/ holds event rules, validation, and queries. Nothing about passwords.</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Low coupling: good</h3><p style="font-size:28px; line-height:1.4">Modules depend on each other <b>as little as possible</b>, through small interfaces.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>The notifier gets "event 12 changed"; it does not read the events table directly.</i></p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>The test:</b> how many files must change to make one small change? If the answer is "many, in many folders", coupling is too high.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Recall Week 2: the time-format bug that needed the same fix in three places was a cohesion and duplication problem.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">D. Parnas (1972) · W. Stevens, G. Myers &amp; L. Constantine, "Structured Design" (1974)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="DRY is from Hunt and Thomas, The Pragmatic Programmer (1999); YAGNI from Extreme Programming. The callout echoes Sandi Metz&#x27;s point that duplication is far cheaper than the wrong abstraction. KISS and YAGNI are the most useful for student teams, whose most common design error is over-engineering for scale they will never see." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Design principles</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Six principles you will use every week</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Separation of concerns</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Different jobs in different places: UI, rules, data</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Single responsibility</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A module or function has one reason to change</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Information hiding</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Hide decisions likely to change behind an interface</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">DRY</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Don't Repeat Yourself: one source for each piece of knowledge</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">KISS</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Keep it simple: the simplest design that meets the need</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">YAGNI</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">You Aren't Gonna Need It: do not build for imagined futures</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Principles are <b>guides, not laws</b>. Two similar lines are not always duplication; a little repetition beats the wrong abstraction.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="SOLID was collected by Robert C. Martin in the early 2000s. These are object-oriented principles but apply to functions and modules in any language. Dependency inversion is especially useful in Week 9: a service that asks for &quot;an event store&quot; can be tested with a fake one." aria-label="Slide 15">
+<section id="s15" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Design principles</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">SOLID, in one line each</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:24%; color:#F4F4F8">Principle</th><th style="width:38%; color:#F4F4F8">In plain words</th><th style="width:38%; color:#F4F4F8">Diyandi example</th></tr>
+    <tr><td><b>S</b>ingle responsibility</td><td>One reason to change</td><td>EventValidator only validates; it does not save or notify</td></tr>
+    <tr style="background:#F6F5FB"><td><b>O</b>pen–closed</td><td>Add behaviour without editing working code</td><td>Add an SMS notifier beside push, without changing callers</td></tr>
+    <tr><td><b>L</b>iskov substitution</td><td>Subtypes work wherever the parent is expected</td><td>Any Notifier can be passed where a Notifier is needed</td></tr>
+    <tr style="background:#F6F5FB"><td><b>I</b>nterface segregation</td><td>Small, focused interfaces</td><td>The visitor view needs read-only event access, not edit methods</td></tr>
+    <tr><td><b>D</b>ependency inversion</td><td>Depend on abstractions, not details</td><td>The service asks for "an event store", not a specific database</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">R. C. Martin, <i>Agile Software Development: Principles, Patterns, and Practices</i> (2002)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="This is the Diyandi bug from Week 2 made concrete. The hand-written version has two defects: 12 o&#x27;clock becomes 0, and minutes below ten lose their leading zero. The refactored version fixes both by delegating to the built-in locale formatter, and lives in one module that can be unit-tested in Week 9." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Design principles · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Refactoring toward one responsibility</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Before: repeated in 3 files</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0"><span style="color:#9592B0">// eventList.js, vendorList.js, venueList.js</span>
+const h = d.getHours();
+const m = d.getMinutes();
+label = (h % 12) + &quot;:&quot; + m +
+  (h &lt; 12 ? &quot; AM&quot; : &quot; PM&quot;);
+<span style="color:#9592B0">// bug: 12 PM shows as &quot;0:5 PM&quot;</span></pre></div>
+    <div style="flex:1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">After: one tested function</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0"><span style="color:#9592B0">// lib/time.js</span>
+<span style="color:#7FD4BE">export function</span> formatTime(d) {
+  <span style="color:#7FD4BE">return</span> d.toLocaleTimeString(&quot;en-PH&quot;,
+    { hour: &quot;numeric&quot;, minute: &quot;2-digit&quot; });
+}
+<span style="color:#9592B0">// every list imports formatTime</span></pre></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">DRY</h3><p style="font-size:24px; line-height:1.4">One place to fix the bug, one place to test.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Single responsibility</h3><p style="font-size:24px; line-height:1.4">Lists display; lib/time formats.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">KISS</h3><p style="font-size:24px; line-height:1.4">Use the platform's formatter instead of hand-made rules.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="This is an example layout, not a requirement; frameworks impose their own structure and teams should follow it. What matters: a README that works, no secrets, documents versioned beside the code, and folders that make the architecture visible. The syllabus requires a clear README.md." aria-label="Slide 17">
+<section id="s17" data-section="Repository setup" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Repository setup</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A repository structure that matches the architecture</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.2; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">diyandi-guide/</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:21px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0">README.md          <span style="color:#9592B0">setup, run, test, team</span>
+.gitignore         <span style="color:#9592B0">includes .env</span>
+.env.example       <span style="color:#9592B0">names only, no values</span>
+.github/
+  pull_request_template.md
+  workflows/ci.yml   <span style="color:#9592B0">lint and tests</span>
+docs/
+  proposal.md  requirements.md
+  architecture.md  adr/  diagrams/
+src/
+  web/  api/  lib/
+tests/</pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">README first</h3><p style="font-size:24px; line-height:1.4">How to install, run, and test in under 10 steps (Week 5 NFR).</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Secrets stay out</h3><p style="font-size:24px; line-height:1.4">.env is ignored; .env.example lists the variable names.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Docs live with code</h3><p style="font-size:24px; line-height:1.4">Proposal, requirements, ADRs, and diagrams under docs/.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Folders follow layers</h3><p style="font-size:24px; line-height:1.4">web, api, lib mirror the component sketch.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Most students learned these commands in Week 1 setup. The new idea this week is working on branches and merging through pull requests. Pro Git (Chacon and Straub) is free online and is the reference to give students." aria-label="Slide 18">
+<section id="s18" data-section="Git workflows" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Git workflows</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Git in one picture</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Working directory</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">You edit files</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Staging area</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">git add: choose what goes in</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:27px; font-weight:600; color:#1E1B2E">Local repository</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">git commit: save a snapshot</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">4</p><h3 style="font-size:27px; font-weight:600; color:#F4F4F8">Remote (GitHub)</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">git push: share it</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">git pull brings teammates' commits back down. Pull before you start; push when a piece of work is ready.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">A commit is a snapshot</h3><p style="font-size:25px; line-height:1.4">With an author, a time, a message, and a parent. That is your contribution record.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">A branch is a pointer</h3><p style="font-size:25px; line-height:1.4">A movable label on a line of commits. Cheap to create, cheap to delete.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">main is shared</h3><p style="font-size:25px; line-height:1.4">Always working, always deployable. Never commit straight to it.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">S. Chacon &amp; B. Straub, <i>Pro Git</i>, 2nd ed. (git-scm.com/book)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Vincent Driessen published Git flow in 2010 and later added a note recommending simpler workflows for continuously delivered web apps. GitHub flow is the lightest option that still gives review on every change, which is why the course uses it." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Git workflows</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Branching strategies</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Strategy</th><th style="width:50%; color:#F4F4F8">How it works</th><th style="width:30%; color:#F4F4F8">Good fit</th></tr>
+    <tr><td><b>GitHub flow</b></td><td>Short-lived feature branches off main; merge via pull request after review</td><td><b>Small teams; continuous delivery. Use this.</b></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Trunk-based</b></td><td>Everyone merges tiny changes to main at least daily, often behind feature flags</td><td>Experienced teams with strong CI</td></tr>
+    <tr><td><b>Git flow</b></td><td>Long-lived develop and main branches, plus feature, release, and hotfix branches</td><td>Scheduled releases of versioned products</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Course recommendation:</b> GitHub flow. One branch per issue, one pull request per branch, merged within a few days.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Long-lived branches drift away from main and end in painful merges. <b>Merge small and often.</b></p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="Walk through these steps live in the course repository or a demo repository if possible. The &quot;Closes #12&quot; keyword in a pull request description automatically closes the issue on merge, which keeps the board accurate without extra work." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Git workflows</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">GitHub flow, step by step</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Pick an issue</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Assign yourself issue #12 on the board; move it to "In progress".</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Create a branch</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">git switch -c 12-near-me-now (from an up-to-date main).</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Commit in small steps</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Each commit does one thing and has a clear message.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Push and open a pull request</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Link the issue with "Closes #12"; describe what and how you tested.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Review and CI</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">A teammate reviews; automated checks run; fix and push again.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:330px; font-size:26px; font-weight:600; color:#231E3D">Merge and clean up</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Merge to main, delete the branch; the issue closes itself.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="Commit-message conventions follow Chris Beams&#x27;s widely used &quot;How to Write a Git Commit Message&quot; (2014). Some teams adopt Conventional Commits (feat:, fix:); either is fine if consistent. Remind students that commit history is contribution evidence, and the syllabus treats falsifying commit history as an integrity violation." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Git workflows</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Branch names and commit messages</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:16%; color:#F4F4F8"></th><th style="width:36%; color:#F4F4F8">Weak</th><th style="width:48%; color:#F4F4F8">Strong</th></tr>
+    <tr><td><b>Branch</b></td><td>juan-branch</td><td>12-near-me-now</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Branch</b></td><td>final-final-2</td><td>27-fix-midnight-time-format</td></tr>
+    <tr><td><b>Commit</b></td><td>update</td><td>Add near-me filter to event list (#12)</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Commit</b></td><td>fixed stuff</td><td>Fix 12 PM showing as 0 in formatTime</td></tr>
+    <tr><td><b>Commit</b></td><td>asdf / wip / changes</td><td>Move venue query into events service</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Imperative mood</h3><p style="font-size:24px; line-height:1.4">"Add", "Fix", "Move": completes "This commit will…"</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Short subject</h3><p style="font-size:24px; line-height:1.4">About 50 characters; details in the body if needed.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Link the issue</h3><p style="font-size:24px; line-height:1.4">Branch name and message mention the issue number.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="Students are often afraid of conflicts and end up emailing zip files instead. Practising one in class removes the fear. Low coupling helps here too: when responsibilities are separated, two people rarely edit the same lines." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Git workflows</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Merge conflicts: normal, fixable, preventable</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">What a conflict looks like</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:23px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0"><span style="color:#F5C451">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+const RADIUS_KM = 1;
+<span style="color:#F5C451">=======</span>
+const RADIUS_KM = 0.5;
+<span style="color:#F5C451">&gt;&gt;&gt;&gt;&gt;&gt;&gt; 31-smaller-radius</span>
+
+<span style="color:#9592B0">// after talking it through: keep 1 km,</span>
+<span style="color:#9592B0">// make it a setting for organizers</span>
+<span style="color:#7FD4BE">const RADIUS_KM = config.nearMeRadiusKm ?? 1;</span></pre></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Why it happens</h3><p style="font-size:24px; line-height:1.4">Two branches changed the same lines differently. Git cannot guess which is right.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">How to resolve</h3><p style="font-size:24px; line-height:1.4">Talk to the other author, edit to the correct version, delete the markers, run tests, commit.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">How to prevent</h3><p style="font-size:24px; line-height:1.4">Small branches, merged in days; pull main often; split big files by responsibility.</p></div>
+  </div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">A conflict is a <b>conversation</b>, not an error. The right answer is a decision, sometimes neither version.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="The ~400-line guidance comes from a SmartBear/Cisco code-review study, which found review effectiveness drops sharply beyond a few hundred lines. A pull request template in .github/ makes the what/how/tested structure automatic." aria-label="Slide 23">
+<section id="s23" data-section="Pull requests and code review" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Pull requests and code review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Anatomy of a good pull request</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.2; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:26px 30px"><p style="font-size:29px; font-weight:600; color:#231E3D">Add near-me filter to event list <span style="color:#6B6980; font-weight:400">#34</span></p><p><span style="display:inline-block; font-size:19px; font-weight:600; color:#FFFFFF; background:#0E7C66; border-radius:999px; padding:3px 14px; margin-right:8px">open</span><span style="font-size:20px; color:#4C4A5E">12-near-me-now → main · 4 commits · 3 files</span></p><p style="font-size:22px; line-height:1.45"><b>What:</b> Lists events within 1 km starting in the next 60 minutes. Closes #12.</p><p style="font-size:22px; line-height:1.45"><b>How:</b> New <span style="font-family:'JetBrains Mono', Consolas, monospace">nearNow()</span> in the events service; list view calls it.</p><p style="font-size:22px; line-height:1.45"><b>Tested:</b> unit tests for 0, 1, and 5 events; checked on a phone with location off.</p><p style="font-size:22px; line-height:1.45"><b>Screenshots:</b> list, empty state, location denied.</p><p style="font-size:20px; color:#6B6980">Reviewer: @cara · Checks: lint ✓ tests ✓</p><div style="margin-top:auto; gap:6px; background:#ECE9FB; border-radius:10px; padding:16px 20px"><p style="font-size:19px; color:#5B4BC4; font-weight:600">@cara commented on events/service.js</p><p style="font-size:21px; line-height:1.4">What happens if an event has no end time? Could we add a test for that case?</p></div><div style="gap:6px; background:#E1F3EE; border-radius:10px; padding:16px 20px"><p style="font-size:19px; color:#0E7C66; font-weight:600">@ana replied</p><p style="font-size:21px; line-height:1.4">Good catch: it was skipped. Fixed in the latest commit, with a test.</p></div></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Small</h3><p style="font-size:24px; line-height:1.4">Ideally under about 400 changed lines. Big PRs get skimmed, not reviewed.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Linked</h3><p style="font-size:24px; line-height:1.4">"Closes #12" ties the code to the story and its acceptance criteria.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Self-reviewed</h3><p style="font-size:24px; line-height:1.4">Read your own diff first; remove debug code and stray files.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Templated</h3><p style="font-size:24px; line-height:1.4">A pull_request_template.md prompts what, how, tested, screenshots.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="The callout paraphrases Google&#x27;s engineering practices guide: reviewers should favour approving a change once it definitely improves overall code health, rather than seeking perfection. Knowledge sharing matters for the course: in the defense, every member must be able to explain parts of the system they did not write." aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Pull requests and code review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Why review code, and what to look for</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Why review</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Catch defects early, when they are cheap</li><li style="margin:5px 0">Share knowledge: no part known by only one person</li><li style="margin:5px 0">Keep the codebase consistent</li><li style="margin:5px 0">Mentor and learn from each other</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">What reviewers check</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Does it meet the story's <b>acceptance criteria</b>?</li><li style="margin:5px 0">Is it <b>correct</b>, including edge cases and errors?</li><li style="margin:5px 0">Is it <b>readable</b>: names, structure, comments where needed?</li><li style="margin:5px 0">Are there <b>tests</b>? Any <b>secrets</b> or debug code?</li><li style="margin:5px 0">Does it respect the <b>architecture</b> and layers?</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Approve when the change makes the codebase better</b>, even if it is not exactly how you would have written it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Google Engineering Practices: Code Review Developer Guide (google.github.io/eng-practices)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="The &quot;nit:&quot; prefix is a widely used convention for optional, minor suggestions. Respectful review is part of the professional-conduct expectations in the syllabus. Reviews that only say &quot;LGTM&quot; (looks good to me) on large changes are not meaningful contribution evidence." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Pull requests and code review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Giving and receiving feedback</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:40%; color:#F4F4F8">Instead of</th><th style="width:60%; color:#F4F4F8">Try</th></tr>
+    <tr><td>"This is wrong."</td><td>"This returns events from yesterday when it's past midnight. Could we compare full dates?"</td></tr>
+    <tr style="background:#F6F5FB"><td>"Why would you do it like this?"</td><td>"What led you to query inside the view? Moving it to the service would let us test it."</td></tr>
+    <tr><td>"Rename this."</td><td>"nit: maybe nearNow instead of getData2, so it says what it returns?"</td></tr>
+    <tr style="background:#F6F5FB"><td>"LGTM" on a 900-line PR</td><td>"Could we split this? I can't review it properly in one go."</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Reviewers</h3><p style="font-size:24px; line-height:1.4">Be specific, explain why, ask questions, mark small things as "nit:".</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Authors</h3><p style="font-size:24px; line-height:1.4">Assume good intent, reply to every comment, push fixes, say thanks.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Everyone</h3><p style="font-size:24px; line-height:1.4">Review the code, not the person.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="All of these are free on GitHub for public repositories and for education accounts. Recall the Week 2 example condition: a pull request is merged only after one approving review and passing tests. Branch protection turns that process rule into something the tool enforces." aria-label="Slide 26">
+<section id="s26" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Pull requests and code review</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Protect main with rules and automation</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Branch protection</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">No direct pushes to main; changes arrive only through pull requests</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Required review</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">At least one approving review from a teammate before merging</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Required checks</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Lint and tests must pass in CI before the merge button turns green</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">GitHub Actions</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A short workflow file runs your checks on every push and pull request</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">PR template</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Prompts for what, how, tested, screenshots, linked issue</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">CODEOWNERS (optional)</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Automatically requests review from whoever owns a folder</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Set these up <b>this week</b>, before Sprint 1. Adding rules later always feels like a punishment.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="This is Sprint Planning from the Scrum Guide, adapted for a one-week student sprint: the goal answers &quot;why is this sprint valuable?&quot;, selection answers &quot;what can be done?&quot;, and tasks answer &quot;how?&quot;. Week 11 covers estimation more formally." aria-label="Slide 27">
+<section id="s27" data-section="Sprint 1 plan" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint 1 plan</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Planning Sprint 1</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Sprint goal</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">One sentence: what will be true at the review?</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Select stories</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">From the top of the ordered backlog</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Break into tasks</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Hours-to-a-day sized pieces</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Check capacity</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Hours each person really has</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Assign owners</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Every story has one owner and one reviewer</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Pull, don't push</h3><p style="font-size:25px; line-height:1.4">The team chooses how much it can finish; the product owner decides the order.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Thin slice</h3><p style="font-size:25px; line-height:1.4">Better: three stories done end-to-end than eight half-built.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Leave slack</h3><p style="font-size:25px; line-height:1.4">Plan for about 70% of available hours. Something always takes longer.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">K. Schwaber &amp; J. Sutherland, <i>The Scrum Guide</i> (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="Names are fictional. The goal is a walking skeleton: every layer exists and works for one simple path, including deployment. Deploying in Sprint 1 rather than Week 10 flushes out hosting surprises early (a risk from the Week 5 register). Offline caching and near-me sorting wait for Sprint 2." aria-label="Slide 28">
+<section id="s28" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint 1 plan · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A Sprint 1 plan</h2>
+  </div>
+  <p style="font-size:27px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>Sprint goal:</b> a visitor can open the guide on a phone and see today's events by time, and an organizer can edit one, deployed at a public URL.</p>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Story</th><th style="width:8%; color:#F4F4F8">Size</th><th style="width:11%; color:#F4F4F8">Owner</th><th style="width:11%; color:#F4F4F8">Reviewer</th><th style="width:40%; color:#F4F4F8">Key tasks</th></tr>
+    <tr><td>#10 Today's list by time</td><td>M</td><td>Ana</td><td>Ben</td><td>Events API read endpoint · list view · seed data</td></tr>
+    <tr style="background:#F6F5FB"><td>#11 Event details page</td><td>S</td><td>Ben</td><td>Cara</td><td>Details view · formatTime in lib/ · empty state</td></tr>
+    <tr><td>#15 Organizer edits an event</td><td>L</td><td>Cara</td><td>Dan</td><td>Auth setup · edit form · validation · update endpoint</td></tr>
+    <tr style="background:#F6F5FB"><td>#19 Deploy to a public URL</td><td>S</td><td>Dan</td><td>Ana</td><td>Hosting · CI workflow · environment variables</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Every story names an <b>owner and a reviewer</b>. Everyone codes, everyone reviews.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="Update the working agreement from Week 2 with these code-specific rules and commit it to the repository. The review turnaround rule matters most: pull requests waiting days for review are the most common cause of end-of-sprint merge pile-ups (a risk example from Week 5)." aria-label="Slide 29">
+<section id="s29" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint 1 plan</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your working agreement for code</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Branching</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">GitHub flow; one branch per issue; branch names start with the issue number</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Reviews</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Every PR needs one approval; reviews within 24 hours on school days</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Definition of Done</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Meets acceptance criteria · reviewed · CI green · works on a phone · docs updated</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Stand-ups</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Three short check-ins a week: done, next, blocked</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">When stuck</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Ask in the team channel after 30 minutes stuck, not 3 days</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Board hygiene</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Move your issue as you work; the board shows the truth</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="The syllabus says individual grades may differ from the team grade based on repository activity, contribution records and peer evaluation, and lists falsifying commit history as an integrity violation. GitHub recognizes &quot;Co-authored-by: Name &lt;email&gt;&quot; trailers and credits both authors." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint 1 plan</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your contribution is visible in the repository</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">What counts as evidence</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Commits with clear messages</li><li style="margin:5px 0">Pull requests you opened, linked to issues</li><li style="margin:5px 0">Reviews you gave, with real comments</li><li style="margin:5px 0">Issues you created, refined, or closed</li><li style="margin:5px 0">Docs, diagrams, tests, and ADRs you wrote</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">What undermines it</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Committing a teammate's work under your name</li><li style="margin:5px 0">Rewriting history to change authorship</li><li style="margin:5px 0">Giant last-minute commits of everything</li><li style="margin:5px 0">Approving PRs you did not read</li><li style="margin:5px 0">Work done outside the repository and never pushed</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Pair programming? Add a <b>Co-authored-by:</b> line to the commit so both people get credit.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: security (SQL injection; use parameterized queries) and design (no separation of concerns: query, rules and view in one place; hard to test). Q2: something specific in the imperative, such as &quot;Add venue filter to event list (#14)&quot;. Q3: the branch drifts from main; a large, painful merge with many conflicts; work invisible to the team and reviewers; merge small and often. Q4: specific, kind and actionable, for example &quot;The loop runs a query per event; could we fetch all venues in one query? It is slow with 200 events.&quot;" aria-label="Slide 31">
+<section id="s31" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What would you change?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">The event list page builds SQL from the search box text and renders the HTML in the same function. Name <b>two</b> problems.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">Rewrite this commit message: "<b>changes</b>".</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">A teammate has worked on one branch for <b>three weeks</b> without merging. What will happen?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">Rewrite this review comment: "<b>Bad code, redo.</b>"</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">31</p>
+</section>
+</div>
+<div class="frame" data-notes="Three parts, matching the syllabus milestone. The Sprint 1 review in Week 8 will check the plan against what was delivered, so a realistic plan is worth more than an ambitious one." aria-label="Slide 32">
+<section id="s32" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Architecture, repository, and Sprint 1 plan</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Architecture and design document</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Quality drivers and chosen style</li><li style="margin:5px 0">Context and container diagrams</li><li style="margin:5px 0">Components and data design (from Week 6)</li><li style="margin:5px 0">2 to 5 ADRs for key decisions</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Repository setup</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">README: install, run, test</li><li style="margin:5px 0">.gitignore, .env.example, PR template</li><li style="margin:5px 0">Branch protection and one required review</li><li style="margin:5px 0">CI running lint and tests on PRs</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Sprint 1 plan</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">A one-sentence sprint goal</li><li style="margin:5px 0">Selected stories with owners and reviewers</li><li style="margin:5px 0">Tasks on the board, sized</li><li style="margin:5px 0">Updated working agreement</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">32</p>
+</section>
+</div>
+<div class="frame" data-notes="This rehearses the individual Git workflow and pull-request activity in a safe space. Walk around and look for: branch names with issue numbers, imperative commit messages, PR descriptions with a testing note, and review comments that explain why. The deliberate conflict is the most valuable step; most students have never resolved one." aria-label="Slide 33">
+<section id="s33" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Branch, commit, review</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">3 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Pair up.</b> One practice repository per pair (or use paper, right).</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Each person:</b> create a branch, edit the README, commit with a good message, push.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Open a pull request</b> with What / How / Tested, linked to an issue.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Review your partner's PR:</b> one question, one suggestion, one "nit:". Then merge.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Make a conflict on purpose:</b> both edit the same line, merge, and resolve it together.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Option 1</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">With a laptop</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Use a new GitHub repository with both partners as collaborators, or the GitHub web editor.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Option 2</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Without a laptop</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Write the branch name, three commit messages, a PR description, and three review comments on paper.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Option 3</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Stretch goal</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Turn on branch protection so main requires one approval.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">33</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up during the activity. git switch requires Git 2.23 or later; older installations can use git checkout -b. Students using the GitHub web editor can do the whole exercise without the command line." aria-label="Slide 34">
+<section id="s34" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · reference</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Commands you will need</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Branch, commit, push</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0">git switch main
+git pull
+git switch -c 7-update-readme
+<span style="color:#9592B0"># edit README.md</span>
+git add README.md
+git commit -m &quot;Add setup steps to README (#7)&quot;
+git push -u origin 7-update-readme</pre></div>
+    <div style="flex:1; gap:10px; background:#1B1730; border-radius:14px; padding:22px 26px; border:1px solid #1B1730"><p style="font-size:20px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Resolve a conflict</p><pre style="font-family:'JetBrains Mono', Consolas, monospace; font-size:22px; line-height:1.5; color:#E8E6F5; white-space:pre-wrap; margin:0">git switch 7-update-readme
+git pull origin main      <span style="color:#9592B0"># conflict!</span>
+<span style="color:#9592B0"># open the file, choose the right text,</span>
+<span style="color:#9592B0"># delete &lt;&lt;&lt;&lt;&lt;&lt;&lt; ======= &gt;&gt;&gt;&gt;&gt;&gt;&gt; lines</span>
+git add README.md
+git commit
+git push</pre></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">On GitHub: <b>Compare &amp; pull request</b> → fill the template → request a reviewer → <b>Files changed</b> to comment → <b>Merge</b> → <b>Delete branch</b>.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 7 · Architecture, design principles, Git workflows, and code review</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">34</p>
+</section>
+</div>
+<div class="frame" data-notes="Architecture is the set of structures and hard-to-change decisions, driven by quality attributes. Common styles combine; for a small team a layered, modular monolith is the sensible default. Record decisions in short ADRs and draw context and container diagrams. Aim for high cohesion and low coupling and use design principles as guides. Use GitHub flow with issue-numbered branches and imperative commit messages; resolve conflicts by talking. Open small, linked pull requests, review for correctness and clarity with kind and specific comments, and protect main with required reviews and CI. Plan Sprint 1 with a goal, owners and reviewers. Next week: the Sprint 1 review and a working prototype." aria-label="Slide 35">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From design to a team codebase</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Architecture: hard-to-change decisions</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Qualities pick the style; ADRs record why</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">High cohesion, low coupling</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">DRY, KISS, YAGNI, SOLID as guides</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">GitHub flow: small branches, clear commits</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Review kindly; protect main; plan Sprint 1</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">Small, reviewed changes on a clear structure beat heroic merges.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>

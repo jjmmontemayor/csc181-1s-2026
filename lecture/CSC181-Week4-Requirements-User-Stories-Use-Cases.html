@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 4: Requirements, User Stories, Use Cases, and Acceptance Criteria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 4. Last week teams wrote a problem statement, a stakeholder list and an initial scope. This week turns those into requirements: what exactly the software must do, written so that a developer can build it and a tester can check it. The running example stays the Diyandi festival guide." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Requirements,<br>user stories, and<br>use cases</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">Turning stakeholder needs into clear, testable requirements: elicitation, user stories, acceptance criteria, use cases, and a prioritized product backlog</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 4</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. The first three are about requirements in general, the next two are the two main formats the syllabus allows (user stories or use cases), and the last one turns them into an ordered backlog that Sprint 1 will draw from in Week 7." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From a problem statement to a buildable backlog</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Requirements engineering</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">What a requirement is; the RE process</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Eliciting requirements</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Interviews, observation, and notes to needs</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Writing them well</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Quality criteria, ambiguity, EARS patterns</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">User stories</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Format, INVEST, splitting, story maps</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Acceptance criteria &amp; use cases</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Given–When–Then; actors and scenarios</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">The product backlog</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Prioritize, track, and trace</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the requirements-writing practice (individual), and user stories or use cases with acceptance criteria and a prioritized product backlog (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 2 (translate informal needs into clear functional and quality requirements) and CLO 3 (user stories, acceptance criteria, use cases). The backlog also supports CLO 5 (issue tracking)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Distinguish requirement types</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">functional, non-functional, and constraints</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Elicit requirements</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and turn stakeholder notes into needs</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write clear requirements</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">unambiguous, verifiable, and traceable</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write user stories</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">that satisfy INVEST</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write acceptance criteria and use cases</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">including unhappy paths</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Build a prioritized backlog</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">and trace it back to the problem</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Requirements are the contract between the problem and the solution. The middle box is this week. The three bars set the target: agile teams do not write a complete specification upfront, but each item must be clear by the time it is built. This is the &quot;just in time&quot; detail Week 2 mentioned under agile." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Requirements connect the problem to the code</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Problem statement</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 3: who suffers, and why</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Goals</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 3: measurable success</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Requirements</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Week 4: what the system must do</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Design &amp; code</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Weeks 6–10: how it does it</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Tests</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Week 9: proof that it does</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Too vague</h3><p style="font-size:25px; line-height:1.4">"The app should be user-friendly." Developers guess, testers cannot check, and arguments start at the demo.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Too detailed, too early</h3><p style="font-size:25px; line-height:1.4">Fixing button colours before anyone has seen a prototype. Detail should grow as the work gets closer.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Just enough</h3><p style="font-size:25px; line-height:1.4">Clear enough to build and test the next sprint's work; rough for the rest.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="Definition adapted from IEEE 610.12 and ISO/IEC/IEEE 29148. Sommerville distinguishes user requirements (for customers, in natural language and diagrams) from system requirements (for developers, detailed and precise). The same need appears at both levels: user requirements are written for stakeholders to confirm; system requirements are written for builders and testers." aria-label="Slide 5">
+<section id="s5" data-section="Requirements engineering" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Requirements engineering</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What is a requirement?</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">A statement of a <b>capability</b> or <b>condition</b> a system must have to solve a stakeholder’s problem or meet an agreement, written so it can be <b>verified</b>.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">User requirements</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Plain-language statements of what users need to do. <i>"Visitors can see what is on near them."</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">System requirements</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Detailed, precise statements of what the system does. <i>"The system shall list events within 1 km starting in the next 60 minutes."</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Constraints</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Limits on how it is built. <i>"Must run in a mobile browser; no paid services."</i></p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISO/IEC/IEEE 29148:2018 · Sommerville, <i>Software Engineering</i>, 10th ed., Ch. 4</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="This is Sommerville&#x27;s spiral view of requirements engineering, flattened. In your project, elicitation was started in Week 3 with stakeholder conversations, analysis and specification happen this week, validation happens when you show stakeholders your stories and wireframes, and management happens on the GitHub board for the rest of the semester." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Requirements engineering</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The requirements engineering process</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Elicitation</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Discover needs from stakeholders</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Analysis</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Organize, resolve conflicts, prioritize</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Specification</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Write them down clearly</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:26px; font-weight:600; color:#1E1B2E">Validation</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Check they are right with stakeholders</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:26px; font-weight:600; color:#F4F4F8">Management</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Track changes and traceability</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">Each activity feeds back into the others. Requirements are refined continuously, not written once.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">In plan-driven projects</h3><p style="font-size:25px; line-height:1.4">Mostly done upfront and signed off as a specification document.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">In agile projects</h3><p style="font-size:25px; line-height:1.4">Done continuously: the backlog is refined every sprint with the product owner.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="Students often write non-functional requirements as features (&quot;add security&quot;). A quick test: if you can draw it as a button or a screen, it is probably functional; if it describes how fast, how safe or how easy, it is non-functional. Non-functional requirements often shape the architecture more than functional ones do." aria-label="Slide 7">
+<section id="s7" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Requirements engineering</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Functional, non-functional, and constraints</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Functional</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">What the system <b>does</b></li><li style="margin:5px 0">Inputs, outputs, behaviour</li><li style="margin:5px 0"><i>Visitors can filter events by venue.</i></li><li style="margin:5px 0"><i>Organizers can change an event time.</i></li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Non-functional</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">How <b>well</b> it does it</li><li style="margin:5px 0">Performance, usability, security, reliability</li><li style="margin:5px 0"><i>Search results appear within 2 seconds on 3G.</i></li><li style="margin:5px 0"><i>Readable at 200% zoom.</i></li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">Constraints</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Limits on the <b>solution</b></li><li style="margin:5px 0">Technology, law, budget, standards</li><li style="margin:5px 0"><i>Must comply with the Data Privacy Act.</i></li><li style="margin:5px 0"><i>Free hosting only.</i></li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">This week focuses on <b>functional</b> requirements. Week 5 goes deep on quality attributes and non-functional requirements.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="Most teams should combine at least two: interviews to understand, observation or documents to check what people say against what they do. Week 6 returns to prototypes and wireframes as a validation tool. Ask: which technique would reveal that barangay staff keep a second, unofficial logbook? (Observation or document analysis; interviews rarely surface workarounds.)" aria-label="Slide 8">
+<section id="s8" data-section="Eliciting requirements" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Eliciting requirements</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Elicitation techniques</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Technique</th><th style="width:40%; color:#F4F4F8">Best for</th><th style="width:40%; color:#F4F4F8">Watch out for</th></tr>
+    <tr><td><b>Interviews</b></td><td>Understanding goals, frustrations, and context in depth</td><td>Leading questions; hearing only one voice</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Observation</b></td><td>Seeing what people actually do, including workarounds</td><td>People act differently when watched</td></tr>
+    <tr><td><b>Surveys</b></td><td>Measuring how common a need is across many people</td><td>Only answers the questions you thought to ask</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Workshops</b></td><td>Getting several stakeholders to agree on priorities</td><td>Loudest voice wins; needs a facilitator</td></tr>
+    <tr><td><b>Document analysis</b></td><td>Forms, logbooks, policies, existing systems</td><td>Documents describe the official process, not the real one</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Prototypes</b></td><td>Reacting to something concrete: sketches, mock-ups</td><td>Feedback on looks instead of needs</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="Good elicitation questions ask about specific past behaviour. People are generous and will say yes to almost any hypothetical feature, which produces false confidence. Record notes with the date and who was interviewed (by role, not full name, unless they agree), so the team can trace requirements back to evidence." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Eliciting requirements</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Asking good interview questions</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Ask</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">"Walk me through the last time you…"</li><li style="margin:5px 0">"What was the hardest part?"</li><li style="margin:5px 0">"What do you do when that happens?"</li><li style="margin:5px 0">"What have you tried already?"</li><li style="margin:5px 0">"Who else should we talk to?"</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Avoid</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">"Would you use an app that…?" <i>(hypothetical)</i></li><li style="margin:5px 0">"Don't you think a map would help?" <i>(leading)</i></li><li style="margin:5px 0">"Do you want notifications?" <i>(yes/no)</i></li><li style="margin:5px 0">"What features do you want?" <i>(asks them to design)</i></li><li style="margin:5px 0">Pitching your idea before listening</li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Listen for problems, workarounds, and numbers.</b> "I check three Facebook pages and still miss things" is worth more than "an app would be nice."</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="Walk the rows left to right. The middle column is the analysis step: the need behind the words. Notice that nobody asked for &quot;notifications&quot; or &quot;offline mode&quot;; those are the team&#x27;s solutions to stated problems, and should be validated with the same stakeholders later." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Eliciting requirements · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From interview notes to requirements</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:36%; color:#F4F4F8">What we heard</th><th style="width:26%; color:#F4F4F8">Underlying need</th><th style="width:38%; color:#F4F4F8">Requirement</th></tr>
+    <tr><td>"I saw the parade time on a poster, but they moved it and I missed it."</td><td>Know about schedule changes</td><td>Visitors are notified when an event they saved changes time or venue</td></tr>
+    <tr style="background:#F6F5FB"><td>"Signal is terrible near the plaza; pages just spin."</td><td>Use the schedule without signal</td><td>The last-loaded schedule is readable offline</td></tr>
+    <tr><td>"We get the same question 50 times a day: where is the stage?"</td><td>Reduce repeated questions</td><td>Each event shows its venue on a map and walking directions link</td></tr>
+    <tr style="background:#F6F5FB"><td>"I update our page, then the tourism office posts something different."</td><td>One source of truth</td><td>Only designated organizers can edit an event; edits show who and when</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Every requirement should trace back to <b>something a stakeholder said or did</b>. That is your evidence in the final defense.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="These characteristics come from ISO/IEC/IEEE 29148, the international standard for requirements engineering. They apply to user stories and use cases too. Students can use the list as a review checklist on each other&#x27;s requirements during the activity." aria-label="Slide 11">
+<section id="s11" data-section="Writing requirements" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Writing requirements</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What makes a requirement good</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Necessary</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Traces to a real stakeholder need</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Unambiguous</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Only one way to read it</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Verifiable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">You can test whether it is met</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Feasible</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Can be built with your time and tools</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Singular</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">States one thing, not three joined by "and"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">6</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Consistent</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Does not contradict another requirement</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">7</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Complete</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Nothing a builder must guess</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">8</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Traceable</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Has an ID and a source</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">The two that fail most often: <b>unambiguous</b> and <b>verifiable</b>. If you cannot write a test for it, rewrite it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Characteristics of well-formed requirements: ISO/IEC/IEEE 29148:2018</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="Have students call out the weak word in each row before revealing the fix. The improved versions introduce numbers and rules, which also forces a conversation with stakeholders about what the numbers should be. &quot;2 seconds&quot; and &quot;1 km&quot; are decisions, not facts; record who agreed to them." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Writing requirements</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Hunt for weak words</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Weak</th><th style="width:22%; color:#F4F4F8">Problem</th><th style="width:48%; color:#F4F4F8">Better</th></tr>
+    <tr><td>"The app shall be <b>fast</b>."</td><td>Fast for whom, doing what?</td><td>"Search results appear within 2 s on a 3G connection."</td></tr>
+    <tr style="background:#F6F5FB"><td>"The app shall be <b>user-friendly</b>."</td><td>Not testable</td><td>"A first-time visitor finds tonight's main event in under 30 s."</td></tr>
+    <tr><td>"Show <b>relevant</b> events."</td><td>Relevant by what rule?</td><td>"Show events within 1 km that start in the next 60 minutes."</td></tr>
+    <tr style="background:#F6F5FB"><td>"Organizers <b>can easily</b> update events <b>etc.</b>"</td><td>Vague and open-ended</td><td>"Organizers can change an event's time, venue, or description."</td></tr>
+    <tr><td>"Support <b>all</b> devices."</td><td>Impossible to verify</td><td>"Works on Chrome for Android 10+ and current desktop browsers."</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Weak words to flag:</b> fast, easy, user-friendly, flexible, robust, relevant, appropriate, etc., and/or, all, some, should be able to.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="EARS (Easy Approach to Requirements Syntax) was developed by Alistair Mavin and colleagues at Rolls-Royce in 2009. It is popular because the keywords (When, While, If/then, Where) push writers to state triggers and conditions explicitly, which is where ambiguity usually hides. Teams using use cases or a &quot;shall&quot; specification can adopt these patterns directly." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Writing requirements</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">EARS: five sentence patterns for clear requirements</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:17%; color:#F4F4F8">Pattern</th><th style="width:35%; color:#F4F4F8">Template</th><th style="width:48%; color:#F4F4F8">Example</th></tr>
+    <tr><td><b>Ubiquitous</b></td><td>The &lt;system&gt; shall &lt;response&gt;.</td><td>The guide shall display event times in Philippine Time.</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Event-driven</b></td><td><b>When</b> &lt;trigger&gt;, the &lt;system&gt; shall…</td><td>When an organizer changes an event time, the guide shall notify visitors who saved it.</td></tr>
+    <tr><td><b>State-driven</b></td><td><b>While</b> &lt;state&gt;, the &lt;system&gt; shall…</td><td>While the device is offline, the guide shall show the last-loaded schedule.</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Unwanted behaviour</b></td><td><b>If</b> &lt;condition&gt;, <b>then</b> the &lt;system&gt; shall…</td><td>If an event has no venue, then the guide shall hide it from the map view.</td></tr>
+    <tr><td><b>Optional feature</b></td><td><b>Where</b> &lt;feature&gt;, the &lt;system&gt; shall…</td><td>Where location access is allowed, the guide shall sort events by distance.</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">A. Mavin et al., "Easy Approach to Requirements Syntax (EARS)," IEEE RE (2009)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="This &quot;role–goal–benefit&quot; template is often called the Connextra format, from the team where Rachel Davies introduced it around 2001. The &quot;so that&quot; clause is the most skipped and the most important: it connects the story to the problem statement and lets the team find a better solution than the one the story suggests." aria-label="Slide 14">
+<section id="s14" data-section="User stories" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">User stories</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The user story format</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Template</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:34px; font-weight:500; line-height:1.35; color:#F4F4F8">As a <span style="color:#F5C451">&lt;role&gt;</span>, I want <span style="color:#F5C451">&lt;goal&gt;</span>, so that <span style="color:#F5C451">&lt;benefit&gt;</span>.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Role</h3><p style="font-size:25px; line-height:1.4">A real stakeholder from your Week 3 list or persona: <b>out-of-town visitor</b>, not "user".</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Goal</h3><p style="font-size:25px; line-height:1.4">What they want to do, in their words: <b>see what is on near me in the next hour</b>.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Benefit</h3><p style="font-size:25px; line-height:1.4">Why it matters, tied to the problem: <b>so that I don't miss events while walking around</b>.</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>As an out-of-town visitor, I want to see what is on near me in the next hour, so that I don't miss events while walking around.</b></p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Connextra format · M. Cohn, <i>User Stories Applied</i> (2004)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="Ron Jeffries described the 3 Cs in 2001. Teams that treat the card as the complete requirement end up building the wrong thing. Encourage teams to record key decisions from the conversation in the issue, so the history is visible to the instructor as process evidence." aria-label="Slide 15">
+<section id="s15" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">User stories</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A story is a promise of a conversation: the 3 Cs</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Card</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A short written story, small enough for an index card or a GitHub issue title</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Conversation</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The details are worked out by talking with the product owner and stakeholders</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">3</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Confirmation</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Acceptance criteria that confirm when the story is done</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">A user story is <b>not</b> a full specification. The card is a reminder; the conversation fills in the details; the confirmation makes it testable.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">In your repository: the <b>card</b> is the issue title and story, the <b>conversation</b> is in the issue comments, and the <b>confirmation</b> is a checklist of acceptance criteria.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">R. Jeffries, "Essential XP: Card, Conversation, Confirmation" (2001)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="INVEST is Bill Wake&#x27;s 2003 checklist. Independence is the hardest to achieve fully; aim to minimize dependencies rather than eliminate them. Technical tasks such as setting up the database or CI belong inside stories (as sub-tasks) or as separate tasks on the board, but they should not be dressed up as user stories." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">User stories</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">INVEST: checking a story</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">I</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Independent</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Can be built in any order, without waiting for another story</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">N</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Negotiable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Details are open for discussion, not a fixed contract</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">V</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Valuable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Delivers something a stakeholder cares about</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">E</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Estimable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The team can roughly size it</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">S</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Small</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Fits in one sprint, ideally a few days of work</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">T</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Testable</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Has clear acceptance criteria</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">"Valuable" is about the <b>user</b>. "Set up the database" is a task, not a story; it has no value on its own to a visitor.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">B. Wake, "INVEST in Good Stories, and SMART Tasks" (2003)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="Ask students to apply INVEST to each weak story and say which letter fails. Row 1 fails V; row 2 fails T; row 3 fails S; row 4 is not a story at all; row 5 is missing the &quot;so that&quot;, which hides whether a map is even the right answer." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">User stories</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Weak and strong user stories</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Weak</th><th style="width:22%; color:#F4F4F8">What is wrong</th><th style="width:48%; color:#F4F4F8">Stronger</th></tr>
+    <tr><td>"As a user, I want a database."</td><td>Not valuable to a user; vague role</td><td>"As an organizer, I want my event edits saved, so that visitors see the change."</td></tr>
+    <tr style="background:#F6F5FB"><td>"As a visitor, I want the app to be good."</td><td>Not testable</td><td>"As a visitor, I want to filter events by venue, so that I can plan my evening around one area."</td></tr>
+    <tr><td>"As a visitor, I want to browse, search, filter, save, and share events."</td><td>Not small or singular</td><td>Split into five stories, one per action</td></tr>
+    <tr style="background:#F6F5FB"><td>"As a developer, I want to use React."</td><td>A technical choice, not a need</td><td>Record it as a design decision, not a story</td></tr>
+    <tr><td>"As a visitor, I want a map."</td><td>No benefit stated</td><td>"…a map of venues, so that I can walk to the next event without asking."</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="These splitting patterns are adapted from Richard Lawrence&#x27;s story-splitting guide. Avoid splitting by technical layer (front end, back end, database), because none of those pieces is valuable on its own; that is a classic mistake. Each slice should cut through all layers and give the user something working." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">User stories</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Splitting big stories (epics)</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Epic</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:500; line-height:1.35; color:#F4F4F8">A story too big for one sprint. Split it until each piece is small, valuable, and testable.</p>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:26%; color:#F4F4F8">Split by</th><th style="width:74%; color:#F4F4F8">Epic: "As a visitor, I want to find events"</th></tr>
+    <tr><td><b>Workflow step</b></td><td>browse today's list → open an event → get directions</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Rule or variation</b></td><td>filter by venue · filter by time · filter by category</td></tr>
+    <tr><td><b>Role</b></td><td>visitor view · organizer preview of their own events</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Simple, then complex</b></td><td>list sorted by time first; sorted by distance later</td></tr>
+    <tr><td><b>Happy path, then errors</b></td><td>event found; then no events, offline, location denied</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Adapted from R. Lawrence, "Patterns for Splitting User Stories" (2009)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Jeff Patton&#x27;s story mapping (User Story Mapping, 2014). The navy row is the backbone: the big activities in the order a user does them. Stories sit underneath, ordered by priority. Drawing horizontal lines across the map cuts releases; the first release touches every activity so the user can complete the whole journey, even if crudely. This matches the MVP idea from Week 3." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">User stories</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A story map shows the whole journey</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:12px"><div style="width:230px; flex:none"></div><div style="flex:1; background:#231E3D; border-radius:10px; padding:14px 18px"><p style="font-size:24px; font-weight:600; color:#F5C451">Find events</p></div><div style="flex:1; background:#231E3D; border-radius:10px; padding:14px 18px"><p style="font-size:24px; font-weight:600; color:#F5C451">Decide</p></div><div style="flex:1; background:#231E3D; border-radius:10px; padding:14px 18px"><p style="font-size:24px; font-weight:600; color:#F5C451">Get there</p></div><div style="flex:1; background:#231E3D; border-radius:10px; padding:14px 18px"><p style="font-size:24px; font-weight:600; color:#F5C451">Stay updated</p></div></div>
+    <div style="display:flex; flex-direction:row; gap:12px; padding-top:12px; border-top:2px dashed #E0DFEA"><div style="width:230px; flex:none; justify-content:center"><p style="font-size:22px; font-weight:600; color:#0E7C66">Release 1 · MVP</p></div><div style="flex:1; background:#E1F3EE; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Today's list by time</p></div><div style="flex:1; background:#E1F3EE; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Event details</p></div><div style="flex:1; background:#E1F3EE; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Venue name and address</p></div><div style="flex:1; background:#E1F3EE; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Last-updated label</p></div></div>
+    <div style="display:flex; flex-direction:row; gap:12px; padding-top:12px; border-top:2px dashed #E0DFEA"><div style="width:230px; flex:none; justify-content:center"><p style="font-size:22px; font-weight:600; color:#6B6980">Release 2</p></div><div style="flex:1; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Filter by venue</p></div><div style="flex:1; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Save an event</p></div><div style="flex:1; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Map with directions link</p></div><div style="flex:1; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Notify on change</p></div></div>
+    <div style="display:flex; flex-direction:row; gap:12px; padding-top:12px; border-top:2px dashed #E0DFEA"><div style="width:230px; flex:none; justify-content:center"><p style="font-size:22px; font-weight:600; color:#6B6980">Later</p></div><div style="flex:1; background:#ECECF2; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Near-me sorting</p></div><div style="flex:1; background:#ECECF2; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Share an event</p></div><div style="flex:1; background:#ECECF2; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Offline map tiles</p></div><div style="flex:1; background:#ECECF2; border:1px solid #E0DFEA; border-radius:10px; padding:14px 18px"><p style="font-size:23px; line-height:1.3">Language options</p></div></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Read <b>across</b> for the user's journey; read <b>down</b> for priority. Release 1 is a thin slice through every step: a walking skeleton.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">J. Patton, <i>User Story Mapping</i> (2014)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="A checklist format like this is the simplest form and fine for most stories. Note the last two criteria: unhappy paths. Students almost always write only the happy path; prompting &quot;what if location is off?&quot; or &quot;what if nothing matches?&quot; is where many real defects are prevented. These criteria become test cases in Week 9." aria-label="Slide 20">
+<section id="s20" data-section="Acceptance criteria" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Acceptance criteria</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Acceptance criteria say when a story is done</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">Conditions a story must satisfy to be accepted by the product owner. Each one is <b>specific</b> and <b>testable</b>.</p>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Story</h3><p style="font-size:27px; line-height:1.4">As an out-of-town visitor, I want to see what is on near me in the next hour, so that I don't miss events while walking around.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Acceptance criteria</h3><ul style="font-size:24px; line-height:1.4"><li style="margin:5px 0">Shows events within 1 km that start in the next 60 minutes</li><li style="margin:5px 0">Sorted by start time, soonest first</li><li style="margin:5px 0">Each item shows name, venue, start time, and distance</li><li style="margin:5px 0">If location is denied, asks the visitor to pick a venue area instead</li><li style="margin:5px 0">If no events match, says so and shows the next three events</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="This format comes from behaviour-driven development (Dan North, 2006) and the Gherkin language. Concrete values (7:00 PM, two events, 1 km) make scenarios unambiguous. Teams do not have to automate them in this course, but writing them in this form makes the Week 9 test plan much faster." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Acceptance criteria</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Given–When–Then scenarios</h2>
+  </div>
+  <table style="font-size:26px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:14%; color:#F4F4F8"></th><th style="width:43%; color:#F4F4F8">Scenario 1: events nearby</th><th style="width:43%; color:#F4F4F8">Scenario 2: location denied</th></tr>
+    <tr><td><b>Given</b></td><td>it is 7:00 PM and two events within 1 km start before 8:00 PM</td><td>the visitor has blocked location access</td></tr>
+    <tr style="background:#F6F5FB"><td><b>When</b></td><td>the visitor opens "Near me now"</td><td>the visitor opens "Near me now"</td></tr>
+    <tr><td><b>Then</b></td><td>both events are listed, soonest first, with distance shown</td><td>the guide asks them to choose a venue area, and lists events there</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Given</h3><p style="font-size:25px; line-height:1.4">The starting state or context.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">When</h3><p style="font-size:25px; line-height:1.4">The action or event.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Then</h3><p style="font-size:25px; line-height:1.4">The observable result you can check.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Given–When–Then reads like a test script. Later it can become an <b>automated test</b> with tools such as Cucumber.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">D. North, "Introducing BDD" (2006)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="The Definition of Done is a Scrum artifact commitment introduced in Week 2. Students confuse the two constantly. A quick test: if the item would be true for every story (&quot;code is reviewed&quot;), it belongs in the Definition of Done; if it describes this feature&#x27;s behaviour, it is an acceptance criterion." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Acceptance criteria</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Acceptance criteria vs. Definition of Done</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Acceptance criteria</h3><p style="font-size:28px; line-height:1.4"><b>Specific to one story.</b> What this feature must do.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>Shows events within 1 km in the next 60 minutes.</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Definition of Done</h3><p style="font-size:28px; line-height:1.4"><b>Applies to every story.</b> The team's quality bar.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>Code reviewed in a pull request · tests pass · works on a phone · README updated.</i></p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">A story is done when it meets <b>its acceptance criteria and the team's Definition of Done</b>.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Write your team's Definition of Done this week. You will apply it from Sprint 1.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="UML use-case diagram. Actors are roles, not people: one person can be both a visitor and an organizer. The diagram is only an index; the value is in the written use-case descriptions on the next slide. Week 6 covers UML more fully." aria-label="Slide 23">
+<section id="s23" data-section="Use cases" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Use cases</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Use cases: actors, goals, and a boundary</h2>
+  </div>
+  <svg width="1664" height="520" viewBox="0 0 1664 520" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Arial, sans-serif">
+    <rect x="360" y="10" width="944" height="500" rx="20" fill="#ECE9FB" stroke="#5B4BC4" stroke-width="2"/><text x="390" y="50" font-size="22" font-weight="600" letter-spacing="2" fill="#5B4BC4">DIYANDI FESTIVAL GUIDE</text>
+    <line x1="190" y1="230" x2="600" y2="120" stroke="#6B6980" stroke-width="3"/><line x1="190" y1="230" x2="600" y2="230" stroke="#6B6980" stroke-width="3"/><line x1="190" y1="230" x2="600" y2="340" stroke="#6B6980" stroke-width="3"/><line x1="1474" y1="230" x2="1064" y2="450" stroke="#6B6980" stroke-width="3"/>
+    <ellipse cx="832" cy="120" rx="230" ry="46" fill="#FFFFFF" stroke="#5B4BC4" stroke-width="3"/><text x="832" y="128" text-anchor="middle" font-size="24" fill="#1E1B2E">Browse today's schedule</text><ellipse cx="832" cy="230" rx="230" ry="46" fill="#FFFFFF" stroke="#5B4BC4" stroke-width="3"/><text x="832" y="238" text-anchor="middle" font-size="24" fill="#1E1B2E">Find events near me</text><ellipse cx="832" cy="340" rx="230" ry="46" fill="#FFFFFF" stroke="#5B4BC4" stroke-width="3"/><text x="832" y="348" text-anchor="middle" font-size="24" fill="#1E1B2E">Save an event</text><ellipse cx="832" cy="450" rx="230" ry="46" fill="#FFFFFF" stroke="#5B4BC4" stroke-width="3"/><text x="832" y="458" text-anchor="middle" font-size="24" fill="#1E1B2E">Update an event</text>
+    <g stroke="#231E3D" stroke-width="4" fill="none"><circle cx="150" cy="150" r="22"/><line x1="150" y1="172" x2="150" y2="240"/><line x1="110" y1="200" x2="190" y2="200"/><line x1="150" y1="240" x2="118" y2="290"/><line x1="150" y1="240" x2="182" y2="290"/></g><text x="150" y="330" text-anchor="middle" font-size="26" font-weight="600" fill="#231E3D">Visitor</text><g stroke="#231E3D" stroke-width="4" fill="none"><circle cx="1514" cy="150" r="22"/><line x1="1514" y1="172" x2="1514" y2="240"/><line x1="1474" y1="200" x2="1554" y2="200"/><line x1="1514" y1="240" x2="1482" y2="290"/><line x1="1514" y1="240" x2="1546" y2="290"/></g><text x="1514" y="330" text-anchor="middle" font-size="26" font-weight="600" fill="#231E3D">Organizer</text>
+  </svg>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">An <b>actor</b> is a role outside the system. A <b>use case</b> is a goal the actor achieves with the system. The box is the scope from Week 3.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Use-case diagram notation: OMG UML 2.5 · I. Jacobson, <i>Object-Oriented Software Engineering</i> (1992)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a &quot;casual-to-fully dressed&quot; format based on Alistair Cockburn&#x27;s Writing Effective Use Cases. The main success scenario is the happy path, numbered; extensions are the alternatives and failures, numbered against the step where they branch. Extensions are where most of the value is, the same way unhappy-path acceptance criteria are." aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Use cases · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A use-case description</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:22%; color:#F4F4F8">Field</th><th style="width:78%; color:#F4F4F8">UC-04: Update an event</th></tr>
+    <tr><td><b>Primary actor</b></td><td>Festival organizer</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Precondition</b></td><td>Organizer is signed in and owns the event</td></tr>
+    <tr><td><b>Main success scenario</b></td><td>1. Organizer opens the event.<br>2. Edits the time or venue.<br>3. Saves.<br>4. System validates and publishes the change.<br>5. System notifies visitors who saved the event.</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Extensions</b></td><td>3a. New time is in the past: system rejects it and explains why.<br>4a. Network fails: system keeps the draft and retries.</td></tr>
+    <tr><td><b>Postcondition</b></td><td>Visitors see the new details, labelled "updated" with the time of change</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">A. Cockburn, <i>Writing Effective Use Cases</i> (2001)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="The syllabus accepts either. They are complementary: a use case often corresponds to an epic, and its main path and extensions can be split into several user stories. The important thing is consistency and that every item has acceptance criteria." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Use cases</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">User stories or use cases?</h2>
+  </div>
+  <table style="font-size:26px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:24%; color:#F4F4F8"></th><th style="width:38%; color:#F4F4F8">User stories</th><th style="width:38%; color:#F4F4F8">Use cases</th></tr>
+    <tr><td><b>Size</b></td><td>One small slice of value</td><td>A full goal with all its paths</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Detail</b></td><td>Light; grows through conversation</td><td>Richer: steps, extensions, conditions</td></tr>
+    <tr><td><b>Best for</b></td><td>Agile backlogs, frequent change</td><td>Complex workflows, many error paths</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Testing</b></td><td>Acceptance criteria per story</td><td>Each path becomes a test scenario</td></tr>
+    <tr><td><b>In GitHub</b></td><td>One issue per story</td><td>One document per use case, linked from issues</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>For your project, choose one primary format.</b> Many teams use stories for the backlog and write a use case for their one complex workflow.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="DEEP is Roman Pichler&#x27;s summary of a healthy backlog (Agile Product Management with Scrum, 2010). The Scrum Guide calls it &quot;ordered&quot; rather than &quot;prioritized&quot;: there is one sequence, no ties. Estimation is covered properly in Week 11; for now, T-shirt sizes are enough." aria-label="Slide 26">
+<section id="s26" data-section="The product backlog" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The product backlog</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Definition</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:500; line-height:1.35; color:#F4F4F8">An <b>ordered</b> list of everything the product might need, owned by the product owner. The top is detailed and ready; the bottom is rough.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">D</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Detailed appropriately</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Top items are small with acceptance criteria; lower items can be epics</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">E</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Estimated</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Each item has a rough size, even just S / M / L</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">E</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Emergent</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Items are added, split, and removed as the team learns</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">P</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Prioritized</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Ordered by value and risk; the top goes into the next sprint</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">R. Pichler, <i>Agile Product Management with Scrum</i> (2010) · <i>The Scrum Guide</i> (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="MoSCoW comes from Dai Clegg (1994) and the DSDM framework. &quot;Must&quot; means the release is a failure without it, not &quot;the team really wants it&quot;. DSDM guidance suggests keeping Must-haves at no more than about 60% of effort. The &quot;Won&#x27;t have&quot; column is the out-of-scope list from Week 3." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">MoSCoW prioritization</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Must have</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Today's list by time</li><li style="margin:5px 0">Event details page</li><li style="margin:5px 0">Organizer can edit events</li><li style="margin:5px 0">Last-updated label</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Should have</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Filter by venue</li><li style="margin:5px 0">Save an event</li><li style="margin:5px 0">Offline schedule</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Could have</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Near-me sorting</li><li style="margin:5px 0">Notify on change</li><li style="margin:5px 0">Share an event</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">Won't have (this time)</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Ticket sales</li><li style="margin:5px 0">Live GPS of floats</li><li style="margin:5px 0">Visitor chat</li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Rule of thumb:</b> Must-haves should take no more than about 60% of your capacity, leaving room for surprises.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">MoSCoW: D. Clegg (1994) · DSDM / Agile Business Consortium</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="A simple visual alternative or complement to MoSCoW. Teams can place sticky notes on this grid in a 10-minute meeting. Value should come from stakeholders and the problem statement, effort from the developers; that division keeps the product owner from guessing effort and developers from guessing value. Also consider risk: a risky item may deserve to go early so the team learns sooner, as in the spiral model." aria-label="Slide 28">
+<section id="s28" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Value versus effort</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:56px 1fr 1fr; grid-template-rows:1fr 1fr 44px; gap:14px; height:600px">
+    <div style="grid-row:1 / span 2; display:flex; align-items:center; justify-content:center"><p style="writing-mode:vertical-rl; transform:rotate(180deg); font-size:22px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Value: low → high</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#F5C451">Quick wins: do first</h3><p style="font-size:22px; line-height:1.35; color:#C9C5E0">High value, low effort.</p><p style="font-size:21px; line-height:1.35; color:#C9C5E0"><i>e.g. last-updated label</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#5B4BC4">Big bets: plan carefully</h3><p style="font-size:22px; line-height:1.35; color:#4C4A5E">High value, high effort. Split them.</p><p style="font-size:21px; line-height:1.35; color:#4C4A5E"><i>e.g. offline schedule</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#E1F3EE; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#0E7C66">Fillers: if time allows</h3><p style="font-size:22px; line-height:1.35; color:#4C4A5E">Low value, low effort.</p><p style="font-size:21px; line-height:1.35; color:#4C4A5E"><i>e.g. share button</i></p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#ECECF2; border-radius:14px; padding:22px 26px"><h3 style="font-size:30px; font-weight:600; color:#231E3D">Time sinks: avoid</h3><p style="font-size:22px; line-height:1.35; color:#4C4A5E">Low value, high effort.</p><p style="font-size:21px; line-height:1.35; color:#4C4A5E"><i>e.g. animated festival intro</i></p></div>
+    <div></div><div style="grid-column:2 / span 2; display:flex; align-items:center; justify-content:center"><p style="font-size:22px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Effort: low → high</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="GitHub Issues and Projects are the course tools from Week 2. The &quot;Source&quot; line is the traceability link back to elicitation evidence. Task-list checkboxes in an issue body show progress on the board. The instructor can review the backlog directly, and the issue history counts as contribution evidence." aria-label="Slide 29">
+<section id="s29" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your backlog lives in GitHub</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.25; display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:26px 30px"><p style="font-size:30px; font-weight:600; color:#231E3D">See what is on near me now <span style="color:#6B6980; font-weight:400">#12</span></p><p><span style="display:inline-block; font-size:19px; font-weight:600; color:#FFFFFF; background:#5B4BC4; border-radius:999px; padding:3px 14px; margin-right:8px">story</span><span style="display:inline-block; font-size:19px; font-weight:600; color:#FFFFFF; background:#231E3D; border-radius:999px; padding:3px 14px; margin-right:8px">must</span><span style="display:inline-block; font-size:19px; font-weight:600; color:#FFFFFF; background:#0E7C66; border-radius:999px; padding:3px 14px; margin-right:8px">epic: find events</span><span style="display:inline-block; font-size:19px; font-weight:600; color:#FFFFFF; background:#6B6980; border-radius:999px; padding:3px 14px; margin-right:8px">size: M</span></p><p style="font-size:23px; line-height:1.4">As an out-of-town visitor, I want to see what is on near me in the next hour, so that I don't miss events while walking around.</p><p style="font-size:22px; font-weight:600; color:#4C4A5E">Acceptance criteria</p><p style="font-size:22px; line-height:1.5">☐ Events within 1 km starting in the next 60 minutes<br>☐ Sorted soonest first, with distance<br>☐ Location denied: pick a venue area instead<br>☐ No matches: say so and show the next three events</p><p style="font-size:20px; color:#6B6980">Source: visitor interviews, Oct 7 · Milestone: Sprint 1</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">One issue per story</h3><p style="font-size:24px; line-height:1.4">Story text in the body; acceptance criteria as a task list.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Labels</h3><p style="font-size:24px; line-height:1.4">Type, MoSCoW priority, epic, and size.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Milestones</h3><p style="font-size:24px; line-height:1.4">One per sprint: Sprint 1, Sprint 2.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Project board</h3><p style="font-size:24px; line-height:1.4">Order the backlog column top to bottom by priority.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="A requirements traceability matrix can be a Markdown table in the repository. Any story that traces to no goal is a candidate for removal (gold-plating); any goal with no stories is a gap. The test column stays empty until Week 9." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Traceability: from problem to test</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Problem</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Visitors miss events</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Goal</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Find nearby events fast</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Story #12</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">See what is on near me now</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Acceptance criteria</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">1 km, 60 min, sorted</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Test case</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">TC-12a, TC-12b (Week 9)</p></div>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:34%; color:#F4F4F8">Story</th><th style="width:26%; color:#F4F4F8">Goal</th><th style="width:24%; color:#F4F4F8">Stakeholder source</th><th style="width:16%; color:#F4F4F8">Tests</th></tr>
+    <tr><td>#12 See what is on near me now</td><td>Find relevant events fast</td><td>Visitor interviews</td><td>TC-12a, b</td></tr>
+    <tr style="background:#F6F5FB"><td>#15 Organizer edits event time</td><td>Schedule stays trustworthy</td><td>Organizer meeting</td><td>TC-15a, b, c</td></tr>
+    <tr><td>#18 Offline last-loaded schedule</td><td>Works in crowded venues</td><td>Observation at plaza</td><td>TC-18a</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">A simple traceability table answers the defense question: <b>"Why did you build this?"</b></p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="Validation links back to the Week 3 distinction between building the right thing and building it right. Requirements reviews are among the cheapest ways to catch defects. Encourage teams to show their story map to at least one stakeholder before submitting the backlog." aria-label="Slide 31">
+<section id="s31" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Validate before you build</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Review together</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Read each story aloud with the team; apply INVEST and the quality checklist</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Walk through with stakeholders</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Show the story map: "Is anything missing? Is the order right?"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Prototype</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A paper sketch answers more questions than a paragraph (Week 6)</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Write the test first</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">If you cannot write a test for a criterion, it is not clear yet</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Validation asks:</b> are these the right requirements? Did we understand what the stakeholders actually need?</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">31</p>
+</section>
+</div>
+<div class="frame" data-notes="Use this as a self-review checklist before the team submits. The last row matters for grading: the syllabus asks for an issue board, and repository activity is part of individual contribution evidence." aria-label="Slide 32">
+<section id="s32" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The product backlog</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Common requirements mistakes</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Mistake</th><th style="width:34%; color:#F4F4F8">Why it hurts</th><th style="width:36%; color:#F4F4F8">Fix</th></tr>
+    <tr><td>Every story starts "As a user…"</td><td>Hides who it is for and why</td><td>Use roles from your stakeholder list</td></tr>
+    <tr style="background:#F6F5FB"><td>No "so that"</td><td>No link to the problem; no room to find a better solution</td><td>State the benefit every time</td></tr>
+    <tr><td>Only happy-path criteria</td><td>Errors are found in the demo</td><td>Add at least one unhappy path per story</td></tr>
+    <tr style="background:#F6F5FB"><td>Stories are technical tasks</td><td>No user value; hard to prioritize</td><td>Move tasks under stories</td></tr>
+    <tr><td>Everything is a Must</td><td>No real priority; nothing can be cut</td><td>Keep Musts to about 60% of capacity</td></tr>
+    <tr style="background:#F6F5FB"><td>Backlog is a document, not issues</td><td>Hard to track, assign, or show progress</td><td>One GitHub issue per story</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">32</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: two requirements in one, both non-verifiable; split and quantify (&quot;a first-time visitor finds X in under 30 s&quot;; &quot;pages load in under 2 s on 3G&quot;). Q2: vague role and no benefit; login is rarely valuable by itself; ask who needs to log in and why (organizers, so that only they can edit their events). Q3: an epic; split into add, edit, delete, and import, and import is probably a Could-have. Q4: not testable; replace with concrete Given–When–Then scenarios including no-results and misspelled searches." aria-label="Slide 33">
+<section id="s33" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What is wrong with these requirements?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">"The system shall be <b>easy to use</b> and <b>load quickly</b>."</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">"As a <b>user</b>, I want to <b>log in</b>."</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">"As an organizer, I want to add, edit, delete, and <b>import events from Excel</b>, so that the schedule is current."</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">Acceptance criterion: "<b>The search works correctly.</b>"</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">33</p>
+</section>
+</div>
+<div class="frame" data-notes="The requirements package builds directly on the Week 3 proposal; teams should revise the proposal if elicitation changed their understanding of the problem. The backlog will be refined again in Week 7 when the Sprint 1 plan is made." aria-label="Slide 34">
+<section id="s34" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Requirements package and prioritized backlog</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Your requirements package</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">User stories <b>or</b> use cases for your MVP and next release</li><li style="margin:5px 0">Acceptance criteria for every story, with unhappy paths</li><li style="margin:5px 0">A story map or use-case diagram</li><li style="margin:5px 0">Your team's Definition of Done</li><li style="margin:5px 0">A traceability table: story → goal → source</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Your product backlog</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">One GitHub issue per story</li><li style="margin:5px 0">Labels for priority (MoSCoW), epic, and size</li><li style="margin:5px 0">Ordered top to bottom on the project board</li><li style="margin:5px 0">Top items small and ready for Sprint 1</li><li style="margin:5px 0">"Won't have" items recorded, not deleted</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">34</p>
+</section>
+</div>
+<div class="frame" data-notes="Run a visible timer. What to look for. Stories should name a specific role and a benefit tied to the scenario&#x27;s problem. Good unhappy paths: A, the item sells out after ordering; B, a required document such as a valid ID is missing; C, no direct route exists so a transfer is needed. For MoSCoW, push the class to say what would make the first release fail; that is the Must." aria-label="Slide 35">
+<section id="s35" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From need to test</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">2 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Choose</b> one scenario on the right (the same as last week).</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write three user stories</b> for different roles, with "so that".</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">4 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>INVEST check:</b> swap with a neighbour; mark any letter that fails.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Write two Given–When–Then scenarios</b> for one story: one happy, one unhappy.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Share and prioritize:</b> two students read their stories; the class sorts them with MoSCoW.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Students order lunch ahead and pick it up. Roles: student, cashier, cook, concessionaire.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay document requests</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Residents request clearances online and pick them up. Roles: resident, secretary, captain.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Jeepney route finder</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Commuters find which jeepney to take between two places. Roles: commuter, driver, route mapper.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 4 · Requirements, user stories, use cases, and acceptance criteria</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">35</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Short answers are fine. When reviewing, check that the unhappy-path scenario has a concrete &quot;Then&quot; that a tester could observe." aria-label="Slide 36">
+<section id="s36" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Copy this worksheet on paper or in a document</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:28%; color:#F4F4F8"></th><th style="width:72%; color:#F4F4F8">Your answer</th></tr>
+    <tr><td><b>Story 1</b> As a… I want… so that…</td><td><div style="height:68px"></div></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Story 2</b></td><td><div style="height:68px"></div></td></tr>
+    <tr><td><b>Story 3</b></td><td><div style="height:68px"></div></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Given–When–Then</b> happy path</td><td><div style="height:68px"></div></td></tr>
+    <tr><td><b>Given–When–Then</b> unhappy path</td><td><div style="height:68px"></div></td></tr>
+    <tr style="background:#F6F5FB"><td><b>MoSCoW</b> for stories 1–3</td><td><div style="height:40px"></div></td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: canteen pre-ordering · B: barangay document requests · C: jeepney route finder</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">36</p>
+</section>
+</div>
+<div class="frame" data-notes="A requirement states a capability or condition and must be verifiable. Elicit from what stakeholders actually do and turn notes into needs. Write requirements that are unambiguous and testable; EARS patterns help. User stories follow role, goal and benefit and should satisfy INVEST; split epics into thin vertical slices and use a story map to see the journey. Acceptance criteria, ideally as Given–When–Then, make stories testable; include unhappy paths. Use cases suit complex flows. The backlog is ordered, lives in GitHub, and traces to the problem. Next week: quality attributes, risk, ethics, privacy, accessibility and security." aria-label="Slide 37">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From needs to a buildable backlog</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Requirements must be verifiable</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Elicit from real behaviour</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Kill weak words; use EARS</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Stories: role, goal, benefit; INVEST</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Criteria: happy and unhappy paths</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Order the backlog; trace it</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">If you cannot test it, you have not finished writing it.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>

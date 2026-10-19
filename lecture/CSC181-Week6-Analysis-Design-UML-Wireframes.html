@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 6: Analysis and Design, UML Models, UI/UX, and Wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Welcome to Week 6. Weeks 3 to 5 described the problem and the requirements. This week starts the &quot;how&quot;: modeling the domain and the behaviour, designing the user interface with wireframes, and sketching the main data and components. Week 7 then turns this into an architecture and a repository. The running example stays the Diyandi festival guide." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Analysis, design,<br>and wireframes</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">From requirements to a design you can build: structural and behavioural models in UML, data and component design, UI/UX principles, and wireframes tested with users</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Week 6</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Six blocks. Blocks two to four are modeling; five and six are interface design. The milestone asks for &quot;a system model&quot;: a domain or class diagram plus at least one behavioural diagram is a good default. Wireframes should cover the MVP stories from the Week 4 backlog." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">This week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Models and sketches before code</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">01</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Analysis and design</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">From "what" to "how"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">02</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Modeling and UML</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Why we draw, and which diagrams</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">03</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Structure</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Domain model, class diagram, data design</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">04</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Behaviour</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Activity, sequence, and state diagrams</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">05</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">UI/UX</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Heuristics, mobile and local context, user flows</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">06</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Wireframes</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Fidelity, states, testing with users</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px"><b>Due this week:</b> the diagram or wireframe exercise (individual), and a system model, wireframes, and a preliminary data and component design (team milestone).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="Objectives map to CLO 3 (process or UML diagrams, wireframes, design descriptions) and CLO 4 (modular, maintainable, usable design)." aria-label="Slide 3">
+<section id="s3" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Learning objectives</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">By the end of this session you can</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Distinguish analysis from design</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">and explain why we model</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Draw a domain and class model</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">with correct relationships</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Draw behavioural models</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">activity, sequence, and state diagrams</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Apply usability heuristics</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">to a mobile interface</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Create annotated wireframes</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">including empty and error states</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Sketch data and components</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">traceable to your stories</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="Sommerville (Chapter 5, System modeling) separates models of the existing context, interaction models, structural models and behavioural models. The flow shows the order most teams find natural, but in practice they iterate: a wireframe often reveals a missing class or a missing story." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">From requirements to design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Analysis asks “what”; design asks “how”</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Analysis</h3><p style="font-size:28px; line-height:1.4">Models the <b>problem domain</b>: the things, people, and rules in the world.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>Events happen at venues; organizers own events; visitors save events.</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Design</h3><p style="font-size:28px; line-height:1.4">Models the <b>solution</b>: screens, components, data tables, and interfaces.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>An Event table with a venue_id; an API endpoint to update an event; a "Near me" screen.</i></p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">User stories</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Week 4</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Domain model</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Things and relationships</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Behaviour</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Flows and states</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">UI design</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Wireframes</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Components &amp; data</h3><p style="font-size:20px; line-height:1.3; color:#C9C5E0">What to build</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="The quotation is from statistician George Box (1976). The sketch, blueprint and programming-language modes come from Martin Fowler&#x27;s UML Distilled. Agile teams mostly sketch; the course expects clean diagrams in a tool for the milestone, but they do not need to be complete blueprints." aria-label="Slide 5">
+<section id="s5" data-section="Modeling" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Modeling</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Why draw models at all?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Communicate</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">A diagram shows the team and stakeholders the same picture</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Explore</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Cheaply try alternatives before writing code</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Document</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Help future maintainers understand the system</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#F4F4F8; background:#231E3D; padding:22px 30px; border-radius:12px"><b>"All models are wrong, but some are useful."</b> A model leaves things out on purpose. Draw only what helps you decide or explain.</p>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Sketch</h3><p style="font-size:24px; line-height:1.4">Quick, on a whiteboard or paper, to think and discuss. <b>Most of your diagrams.</b></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Blueprint</h3><p style="font-size:24px; line-height:1.4">Detailed enough that someone else could build from it.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #6B6980; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#6B6980">Executable</h3><p style="font-size:24px; line-height:1.4">Models that generate code. Rare outside specialist domains.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">G. Box (1976) · M. Fowler, <i>UML Distilled</i>, 3rd ed. (2003)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="UML 2.5 defines fourteen diagram types; most practitioners use four or five. The syllabus says &quot;UML or equivalent models&quot;, so teams may use, for example, an ER diagram in place of a class diagram for data, or a flowchart in place of an activity diagram, as long as the notation is consistent and explained." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Modeling</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">UML: one language, many diagrams</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Structural: what the system is made of</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0"><b>Class diagram</b>: types, attributes, relationships</li><li style="margin:5px 0"><b>Component diagram</b>: deployable parts and interfaces</li><li style="margin:5px 0"><b>Deployment diagram</b>: where software runs</li><li style="margin:5px 0">Object and package diagrams</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Behavioural: what the system does</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0"><b>Use case diagram</b>: actors and goals (Week 4)</li><li style="margin:5px 0"><b>Activity diagram</b>: steps and decisions in a flow</li><li style="margin:5px 0"><b>Sequence diagram</b>: messages between parts over time</li><li style="margin:5px 0"><b>State machine</b>: how one thing changes state</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>For your milestone:</b> a class or domain model, plus at least one activity, sequence, or state diagram for your most important flow.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">OMG Unified Modeling Language (UML) 2.5.1</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="Noun analysis goes back to Abbott (1983) and is a standard starting point in object-oriented analysis. Not every noun becomes a class: some are attributes (time), some are synonyms, some are outside the system. The last row shows a real design choice: Category could be a class if categories have their own data, or just a field on Event." aria-label="Slide 7">
+<section id="s7" data-section="Structural models" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Structural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Find the domain model in your stories</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px; background:#231E3D; border-radius:16px; padding:30px 36px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Noun and verb analysis</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:500; line-height:1.35; color:#F4F4F8"><b>Nouns</b> in your stories suggest classes and attributes. <b>Verbs</b> suggest operations and relationships.</p>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:44%; color:#F4F4F8">From the stories</th><th style="width:20%; color:#F4F4F8">Candidate class</th><th style="width:36%; color:#F4F4F8">Notes</th></tr>
+    <tr><td>"As an <b>organizer</b>, I want to <b>update</b> an <b>event</b>'s <b>time</b>…"</td><td>Organizer, Event</td><td>time is an attribute of Event; update is an operation</td></tr>
+    <tr style="background:#F6F5FB"><td>"…see events at a <b>venue</b> near me"</td><td>Venue</td><td>Event happens at one Venue</td></tr>
+    <tr><td>"…<b>save</b> an event so I am <b>notified</b> of changes"</td><td>SavedEvent</td><td>Links a visitor's device to an Event</td></tr>
+    <tr style="background:#F6F5FB"><td>"…filter by <b>category</b>, such as street dance"</td><td>Category</td><td>Could be a simple attribute instead</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="Each box has three compartments: name, attributes, operations. Lines are associations, labelled with a name and multiplicities at each end. Keep analysis-level diagrams light: types are optional at this stage, and only interesting operations need listing. Ask: what multiplicity would you put if an event could span two venues? (0..* to 1..*; that change would ripple into the data design.)" aria-label="Slide 8">
+<section id="s8" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Structural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A class diagram for the Diyandi guide</h2>
+  </div>
+  <svg width="1664" height="492" viewBox="0 0 1664 492" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Arial, sans-serif"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B6980"/></marker><marker id="tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="14" markerHeight="14" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#FFFFFF" stroke="#6B6980" stroke-width="1.5"/></marker><marker id="dia" viewBox="0 0 16 10" refX="1" refY="5" markerWidth="18" markerHeight="12" orient="auto"><path d="M0,5 L8,0 L16,5 L8,10 z" fill="#231E3D"/></marker></defs><rect x="40" y="40" width="360" height="178" rx="10" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><rect x="40" y="40" width="360" height="50" rx="10" fill="#231E3D"/><rect x="40" y="80" width="360" height="10" fill="#231E3D"/><text x="220.0" y="73" text-anchor="middle" font-size="26" font-weight="700" fill="#F5C451">Organizer</text><text x="58" y="120" font-size="22" fill="#1E1B2E">name: String</text><text x="58" y="152" font-size="22" fill="#1E1B2E">email: String</text><line x1="40" y1="170" x2="400" y2="170" stroke="#E0DFEA" stroke-width="2"/><text x="58" y="200" font-size="22" fill="#5B4BC4">updateEvent()</text><rect x="652" y="40" width="360" height="274" rx="10" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><rect x="652" y="40" width="360" height="50" rx="10" fill="#231E3D"/><rect x="652" y="80" width="360" height="10" fill="#231E3D"/><text x="832.0" y="73" text-anchor="middle" font-size="26" font-weight="700" fill="#F5C451">Event</text><text x="670" y="120" font-size="22" fill="#1E1B2E">title: String</text><text x="670" y="152" font-size="22" fill="#1E1B2E">start: DateTime</text><text x="670" y="184" font-size="22" fill="#1E1B2E">end: DateTime</text><text x="670" y="216" font-size="22" fill="#1E1B2E">status: Status</text><line x1="652" y1="234" x2="1012" y2="234" stroke="#E0DFEA" stroke-width="2"/><text x="670" y="264" font-size="22" fill="#5B4BC4">publish()</text><text x="670" y="296" font-size="22" fill="#5B4BC4">cancel()</text><rect x="1264" y="40" width="360" height="210" rx="10" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><rect x="1264" y="40" width="360" height="50" rx="10" fill="#231E3D"/><rect x="1264" y="80" width="360" height="10" fill="#231E3D"/><text x="1444.0" y="73" text-anchor="middle" font-size="26" font-weight="700" fill="#F5C451">Venue</text><text x="1282" y="120" font-size="22" fill="#1E1B2E">name: String</text><text x="1282" y="152" font-size="22" fill="#1E1B2E">address: String</text><text x="1282" y="184" font-size="22" fill="#1E1B2E">lat, lng: Number</text><line x1="1264" y1="202" x2="1624" y2="202" stroke="#E0DFEA" stroke-width="2"/><text x="1282" y="232" font-size="22" fill="#5B4BC4">distanceTo(point)</text><rect x="652" y="360" width="360" height="114" rx="10" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><rect x="652" y="360" width="360" height="50" rx="10" fill="#231E3D"/><rect x="652" y="400" width="360" height="10" fill="#231E3D"/><text x="832.0" y="393" text-anchor="middle" font-size="26" font-weight="700" fill="#F5C451">Category</text><text x="670" y="440" font-size="22" fill="#1E1B2E">label: String</text><line x1="652" y1="458" x2="1012" y2="458" stroke="#E0DFEA" stroke-width="2"/><line x1="400" y1="120" x2="652" y2="120" stroke="#6B6980" stroke-width="3"/><text x="420" y="108" text-anchor="start" font-size="24" font-weight="400" fill="#1E1B2E">1</text><text x="632" y="108" text-anchor="end" font-size="24" font-weight="400" fill="#1E1B2E">0..*</text><text x="526" y="150" text-anchor="middle" font-size="21" font-weight="400" fill="#4C4A5E">owns</text><line x1="1012" y1="120" x2="1264" y2="120" stroke="#6B6980" stroke-width="3"/><text x="1032" y="108" text-anchor="start" font-size="24" font-weight="400" fill="#1E1B2E">0..*</text><text x="1244" y="108" text-anchor="end" font-size="24" font-weight="400" fill="#1E1B2E">1</text><text x="1138" y="150" text-anchor="middle" font-size="21" font-weight="400" fill="#4C4A5E">happens at</text><line x1="832" y1="306" x2="832" y2="360" stroke="#6B6980" stroke-width="3"/><text x="846" y="328" text-anchor="start" font-size="22" font-weight="400" fill="#1E1B2E">0..*</text><text x="846" y="354" text-anchor="start" font-size="22" font-weight="400" fill="#1E1B2E">1</text></svg>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Read <b>1</b> and <b>0..*</b> as multiplicities: one organizer owns zero or more events; each event happens at exactly one venue.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Class diagram notation: OMG UML 2.5.1</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="Students often overuse inheritance and diamonds. Composition matters for data design: deleting an Event should delete its time slots, but deleting a Festival need not delete its Events if they can be reused. Generalization should pass the &quot;is a kind of&quot; test in plain English." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Structural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Relationships between classes</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:18%; color:#F4F4F8">Relationship</th><th style="width:30%; color:#F4F4F8">Meaning</th><th style="width:22%; color:#F4F4F8">UML notation</th><th style="width:30%; color:#F4F4F8">Example</th></tr>
+    <tr><td><b>Association</b></td><td>Objects are connected</td><td>Plain line, with multiplicities</td><td>Event — Venue</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Aggregation</b></td><td>Whole and part; the part can exist alone</td><td>Line with hollow diamond at the whole</td><td>Festival ◇— Event</td></tr>
+    <tr><td><b>Composition</b></td><td>Whole and part; the part dies with the whole</td><td>Line with filled diamond at the whole</td><td>Event ◆— TimeSlot</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Generalization</b></td><td>"Is a kind of"</td><td>Line with hollow triangle at the parent</td><td>Organizer ▷ User</td></tr>
+    <tr><td><b>Dependency</b></td><td>One uses another briefly</td><td>Dashed arrow</td><td>Event ⇢ MapService</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">When in doubt, use a plain <b>association</b>. Misused diamonds confuse readers more than missing ones.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a preliminary relational design, enough for the milestone. Foreign keys implement the associations from the class diagram. The first bar is the core idea behind normalization; formal normal forms are covered in a databases course. Teams using a document database should still decide what is embedded and what is referenced." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Structural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">From classes to data design</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Table</th><th style="width:80%; color:#F4F4F8">Columns (PK = primary key, FK = foreign key)</th></tr>
+    <tr><td><b>organizers</b></td><td>id (PK) · name · email · password_hash</td></tr>
+    <tr style="background:#F6F5FB"><td><b>venues</b></td><td>id (PK) · name · address · lat · lng</td></tr>
+    <tr><td><b>events</b></td><td>id (PK) · title · start_at · end_at · status · <b>organizer_id (FK)</b> · <b>venue_id (FK)</b> · category · updated_at</td></tr>
+    <tr style="background:#F6F5FB"><td><b>saved_events</b></td><td>id (PK) · <b>event_id (FK)</b> · device_token · created_at</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">One fact in one place</h3><p style="font-size:24px; line-height:1.4">Store the venue address once, in venues. Events point to it by venue_id.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Remember Week 2</h3><p style="font-size:24px; line-height:1.4">Copying the same data into three places meant fixing the same bug three times.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Privacy by design</h3><p style="font-size:24px; line-height:1.4">saved_events stores a device token, not a name or phone number (Week 5).</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="This is UC-04 &quot;Update an event&quot; from Week 4 drawn as an activity diagram. The [no] branch is extension 3a. Swimlanes can be added to show who does each action (organizer versus system). Activity diagrams are the UML version of a flowchart and are often the easiest diagram for stakeholders to read." aria-label="Slide 11">
+<section id="s11" data-section="Behavioural models" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Behavioural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Activity diagram: steps and decisions</h2>
+  </div>
+  <svg width="1664" height="400" viewBox="0 0 1664 400" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Arial, sans-serif"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B6980"/></marker><marker id="tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="14" markerHeight="14" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#FFFFFF" stroke="#6B6980" stroke-width="1.5"/></marker><marker id="dia" viewBox="0 0 16 10" refX="1" refY="5" markerWidth="18" markerHeight="12" orient="auto"><path d="M0,5 L8,0 L16,5 L8,10 z" fill="#231E3D"/></marker></defs><circle cx="40" cy="120" r="18" fill="#231E3D"/><line x1="58" y1="120" x2="98" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><rect x="100" y="85" width="200" height="70" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="200.0" y="128.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Open event</text><line x1="300" y1="120" x2="340" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><rect x="342" y="85" width="220" height="70" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="452.0" y="128.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Edit time/venue</text><line x1="562" y1="120" x2="602" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><rect x="604" y="85" width="150" height="70" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="679.0" y="128.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Save</text><line x1="754" y1="120" x2="800" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><polygon points="860,70 920,120 860,170 800,120" fill="#FFFFFF" stroke="#5B4BC4" stroke-width="3"/><text x="860" y="128" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">valid?</text><line x1="920" y1="120" x2="990" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="955" y="108" text-anchor="middle" font-size="20" font-weight="400" fill="#0E7C66">[yes]</text><rect x="992" y="85" width="230" height="70" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="1107.0" y="128.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Publish change</text><line x1="1222" y1="120" x2="1262" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><rect x="1264" y="85" width="250" height="70" rx="16" fill="#231E3D" stroke="#231E3D" stroke-width="2"/><text x="1389.0" y="128.0" text-anchor="middle" font-size="23" font-weight="600" fill="#F4F4F8">Notify savers</text><line x1="1514" y1="120" x2="1570" y2="120" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><circle cx="1596" cy="120" r="22" fill="none" stroke="#231E3D" stroke-width="3"/><circle cx="1596" cy="120" r="13" fill="#231E3D"/><line x1="860" y1="170" x2="860" y2="268" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="876" y="225" text-anchor="start" font-size="20" font-weight="400" fill="#5B4BC4">[no]</text><rect x="740" y="270" width="240" height="70" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="860.0" y="313.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Show error</text><path d="M740 305 L452 305 L452 158" stroke="#6B6980" stroke-width="3" fill="none" marker-end="url(#ah)"/><text x="596" y="292" text-anchor="middle" font-size="20" font-weight="400" fill="#4C4A5E">fix and retry</text></svg>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Rounded boxes</h3><p style="font-size:24px; line-height:1.4">Actions: something someone or the system does.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Diamonds</h3><p style="font-size:24px; line-height:1.4">Decisions, with a [guard] on each outgoing path.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Use it for</h3><p style="font-size:24px; line-height:1.4">Workflows with branches, like a use case's main path and extensions.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="The same update flow, now showing the parts of the system. Sequence diagrams are useful before Week 7 because they reveal the interfaces between components: the edit page needs an endpoint like PUT /events/12, and the API needs a way to trigger notifications. Draw one for the most important or most confusing flow only." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:24px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Behavioural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Sequence diagram: who talks to whom, in order</h2>
+  </div>
+  <svg width="1664" height="550" viewBox="0 0 1664 550" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Arial, sans-serif"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B6980"/></marker><marker id="tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="14" markerHeight="14" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#FFFFFF" stroke="#6B6980" stroke-width="1.5"/></marker><marker id="dia" viewBox="0 0 16 10" refX="1" refY="5" markerWidth="18" markerHeight="12" orient="auto"><path d="M0,5 L8,0 L16,5 L8,10 z" fill="#231E3D"/></marker></defs><rect x="30" y="10" width="220" height="56" rx="12" fill="#231E3D"/><text x="140" y="46" text-anchor="middle" font-size="23" font-weight="600" fill="#F5C451">Organizer</text><line x1="140" y1="66" x2="140" y2="540" stroke="#E0DFEA" stroke-width="3" stroke-dasharray="6 6"/><rect x="360" y="10" width="220" height="56" rx="12" fill="#231E3D"/><text x="470" y="46" text-anchor="middle" font-size="23" font-weight="600" fill="#F5C451">Edit page</text><line x1="470" y1="66" x2="470" y2="540" stroke="#E0DFEA" stroke-width="3" stroke-dasharray="6 6"/><rect x="690" y="10" width="220" height="56" rx="12" fill="#231E3D"/><text x="800" y="46" text-anchor="middle" font-size="23" font-weight="600" fill="#F5C451">API server</text><line x1="800" y1="66" x2="800" y2="540" stroke="#E0DFEA" stroke-width="3" stroke-dasharray="6 6"/><rect x="1020" y="10" width="220" height="56" rx="12" fill="#231E3D"/><text x="1130" y="46" text-anchor="middle" font-size="23" font-weight="600" fill="#F5C451">Database</text><line x1="1130" y1="66" x2="1130" y2="540" stroke="#E0DFEA" stroke-width="3" stroke-dasharray="6 6"/><rect x="1350" y="10" width="220" height="56" rx="12" fill="#231E3D"/><text x="1460" y="46" text-anchor="middle" font-size="23" font-weight="600" fill="#F5C451">Notifier</text><line x1="1460" y1="66" x2="1460" y2="540" stroke="#E0DFEA" stroke-width="3" stroke-dasharray="6 6"/><line x1="140" y1="110" x2="464" y2="110" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="305.0" y="100" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">change start time</text><line x1="470" y1="172" x2="794" y2="172" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="635.0" y="162" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">PUT /events/12</text><line x1="800" y1="234" x2="1124" y2="234" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="965.0" y="224" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">UPDATE events …</text><line x1="1130" y1="296" x2="806" y2="296" stroke="#6B6980" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#ah)"/><text x="965.0" y="286" text-anchor="middle" font-size="21" font-weight="400" fill="#6B6980">ok</text><line x1="800" y1="358" x2="1454" y2="358" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="1130.0" y="348" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">notify savers of #12</text><line x1="800" y1="420" x2="476" y2="420" stroke="#6B6980" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#ah)"/><text x="635.0" y="410" text-anchor="middle" font-size="21" font-weight="400" fill="#6B6980">200 OK</text><line x1="470" y1="482" x2="146" y2="482" stroke="#6B6980" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#ah)"/><text x="305.0" y="472" text-anchor="middle" font-size="21" font-weight="400" fill="#6B6980">Saved ✓</text></svg>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Solid arrows</b> are calls; <b>dashed arrows</b> are replies. Time runs top to bottom.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="State machines are ideal for objects with a status field. Each transition is a candidate test case in Week 9, and states with no way out (or no way in) reveal missing requirements. Ask: can a Cancelled event be re-published? The diagram says no; is that what organizers want?" aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Behavioural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">State machine: the life of one event</h2>
+  </div>
+  <svg width="1664" height="430" viewBox="0 0 1664 430" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Arial, sans-serif"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B6980"/></marker><marker id="tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="14" markerHeight="14" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#FFFFFF" stroke="#6B6980" stroke-width="1.5"/></marker><marker id="dia" viewBox="0 0 16 10" refX="1" refY="5" markerWidth="18" markerHeight="12" orient="auto"><path d="M0,5 L8,0 L16,5 L8,10 z" fill="#231E3D"/></marker></defs><circle cx="40" cy="190" r="18" fill="#231E3D"/><line x1="58" y1="190" x2="128" y2="190" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><rect x="130" y="150" width="230" height="80" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="245.0" y="198.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Draft</text><line x1="360" y1="190" x2="548" y2="190" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="454" y="176" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">publish()</text><rect x="550" y="150" width="260" height="80" rx="16" fill="#231E3D" stroke="#231E3D" stroke-width="2"/><text x="680.0" y="198.0" text-anchor="middle" font-size="23" font-weight="600" fill="#F4F4F8">Published</text><path d="M620 150 C 620 60, 740 60, 740 148" stroke="#6B6980" stroke-width="3" fill="none" marker-end="url(#ah)"/><text x="680" y="50" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">edit() / notify savers</text><line x1="810" y1="170" x2="1078" y2="80" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="944" y="102" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">cancel() / notify</text><rect x="1080" y="40" width="250" height="80" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="1205.0" y="88.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Cancelled</text><line x1="810" y1="210" x2="1078" y2="300" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><text x="944" y="290" text-anchor="middle" font-size="21" font-weight="400" fill="#1E1B2E">[end time passed]</text><rect x="1080" y="270" width="250" height="80" rx="16" fill="#FFFFFF" stroke="#E0DFEA" stroke-width="2"/><text x="1205.0" y="318.0" text-anchor="middle" font-size="23" font-weight="600" fill="#1E1B2E">Ended</text><line x1="1330" y1="80" x2="1500" y2="180" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><line x1="1330" y1="310" x2="1500" y2="210" stroke="#6B6980" stroke-width="3" marker-end="url(#ah)"/><circle cx="1524" cy="195" r="22" fill="none" stroke="#231E3D" stroke-width="3"/><circle cx="1524" cy="195" r="13" fill="#231E3D"/></svg>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">States</h3><p style="font-size:24px; line-height:1.4">Conditions an object can be in: Draft, Published, Cancelled, Ended.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Transitions</h3><p style="font-size:24px; line-height:1.4">event [guard] / action. <i>cancel() / notify</i> means cancelling also notifies.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Why it helps</h3><p style="font-size:24px; line-height:1.4">Shows which actions are allowed when: you cannot edit an Ended event.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a quick reference for the milestone and the individual exercise. For most student projects, a class or domain model, an ER diagram, one activity or sequence diagram, and a component sketch are plenty." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Behavioural models</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Which diagram should you draw?</h2>
+  </div>
+  <table style="font-size:26px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:62%; color:#F4F4F8">If you need to show…</th><th style="width:38%; color:#F4F4F8">Draw a…</th></tr>
+    <tr><td>The things in the domain and how they relate</td><td><b>Domain model / class diagram</b></td></tr>
+    <tr style="background:#F6F5FB"><td>How data is stored</td><td><b>ER diagram or table list</b></td></tr>
+    <tr><td>A workflow with decisions and branches</td><td><b>Activity diagram</b></td></tr>
+    <tr style="background:#F6F5FB"><td>How parts of the system cooperate on one request</td><td><b>Sequence diagram</b></td></tr>
+    <tr><td>How one object's status changes</td><td><b>State machine</b></td></tr>
+    <tr style="background:#F6F5FB"><td>The main parts of the system and their connections</td><td><b>Component diagram</b></td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Draw the diagram that answers <b>your team's current question</b>. A diagram nobody reads is waste.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="ISO 9241-210 defines user experience as perceptions and responses resulting from the use or anticipated use of a system. UX work starts with the stakeholder and persona work from Week 3; UI design is where it becomes visible. Marites is the persona from the Week 3 deck." aria-label="Slide 15">
+<section id="s15" data-section="UI/UX design" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">UI/UX design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">UX and UI are not the same</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">User experience (UX)</h3><p style="font-size:28px; line-height:1.4">The <b>whole experience</b> of using a product: whether it is useful, easy, and pleasant, before, during, and after use.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>Can Marites find the parade route in the crowd, on prepaid data?</i></p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">User interface (UI)</h3><p style="font-size:28px; line-height:1.4">The <b>screens and controls</b> people interact with: layout, type, colour, buttons.</p><p style="font-size:25px; line-height:1.4; color:#4C4A5E"><i>Is the "Near me now" button big, high-contrast, and reachable with a thumb?</i></p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Good UI cannot rescue a bad UX decision. A beautiful screen for a feature nobody needs is still a failure.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">ISO 9241-210:2019, Human-centred design for interactive systems</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="Jakob Nielsen&#x27;s ten heuristics (1994, updated 2020) are the most widely used checklist for usability reviews. A heuristic evaluation is when three to five reviewers inspect an interface against the list independently; it is a cheap first test of wireframes before showing them to users." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">UI/UX design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Nielsen’s 10 usability heuristics</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:14px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Visibility of status</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Show what is happening: "Saving…", "Updated 5 min ago"</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Match the real world</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Use visitors' words, not database terms</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">User control</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Easy undo and back</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">4</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Consistency</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Same thing, same look, same place</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">5</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Error prevention</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Disable "Save" until the time is valid</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">6</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Recognition over recall</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Show options; do not make people remember</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">7</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Flexibility</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Shortcuts for frequent users</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">8</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Minimalist design</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Every element earns its place</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">9</p><h3 style="font-size:24px; font-weight:600; color:#231E3D">Help with errors</h3><p style="font-size:21px; line-height:1.38; color:#4C4A5E">Say what went wrong and how to fix it</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">10</p><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Help and docs</h3><p style="font-size:21px; line-height:1.38; color:#C9C5E0">Easy to find, short, task-focused</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">J. Nielsen, "10 Usability Heuristics for User Interface Design," Nielsen Norman Group (1994, updated 2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="Touch target guidance: Apple&#x27;s Human Interface Guidelines recommend at least 44×44 points, Google&#x27;s Material Design 48×48 dp, and WCAG 2.2 sets a 24×24 CSS pixel minimum (2.5.8, Level AA). Thumb-zone guidance is from Steven Hoober&#x27;s research on how people hold phones." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">UI/UX design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Design for the real context of use</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Thumb reach</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Main actions low on the screen, where one thumb can reach</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Big touch targets</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">At least about 44–48 px; space between them</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Light pages</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Prepaid data: small images, no autoplay video</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Readable outdoors</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">High contrast, large text; never grey on grey</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Plain language</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Short labels; consider Filipino or Cebuano where users need it</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Forgiving forms</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Few fields, sensible defaults, keep input on errors</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Your Week 5 non-functional requirements belong here: each guideline should trace to an NFR or a persona detail.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="A user flow sits between the story map (Week 4) and the wireframes. It decides which screens are needed. The QR-code trigger is a design decision that came from observation: visitors see posters around the plaza." aria-label="Slide 18">
+<section id="s18" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">UI/UX design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Map the user flow before drawing screens</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#0E7C66">1</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Open guide</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">From a QR code on a poster</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#0E7C66">2</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Near me now</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">List of events in the next hour</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#0E7C66">3</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Event details</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Time, venue, last updated</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#0E7C66">4</p><h3 style="font-size:25px; font-weight:600; color:#1E1B2E">Directions</h3><p style="font-size:21px; line-height:1.3; color:#4C4A5E">Opens the phone's map app</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#0E7C66"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:25px; font-weight:600; color:#F4F4F8">Save</h3><p style="font-size:21px; line-height:1.3; color:#C9C5E0">Get notified of changes</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">One flow per key story</h3><p style="font-size:24px; line-height:1.4">Start from the trigger (a poster, a friend's link) and end when the goal is met.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Count the steps</h3><p style="font-size:24px; line-height:1.4">Every extra screen is a chance to give up. Can you remove one?</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Note the branches</h3><p style="font-size:24px; line-height:1.4">Location denied? No events? These need screens too.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Low-fidelity prototypes find most of the same usability problems as high-fidelity ones at a fraction of the cost (a recurring finding in HCI research, for example Walker, Takayama and Landay, 2002). Recall throwaway prototyping from Week 2: wireframes are throwaway prototypes." aria-label="Slide 19">
+<section id="s19" data-section="Wireframes" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Wireframes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Choose the right level of fidelity</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#1E1B2E">Sketch</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Paper or whiteboard, minutes. Explore many ideas.</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#1E1B2E">Wireframe</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Grey boxes, real labels. Layout and flow.</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#1E1B2E">Mockup</h3><p style="font-size:22px; line-height:1.3; color:#4C4A5E">Colour, type, images. Visual design.</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">4</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Prototype</h3><p style="font-size:22px; line-height:1.3; color:#C9C5E0">Clickable. Test the flow with users.</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Start low</h3><p style="font-size:24px; line-height:1.4">People criticize a sketch freely; they hesitate to criticize something that looks finished.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Tools</h3><p style="font-size:24px; line-height:1.4">Paper, Excalidraw, draw.io, Figma (free for education). Pick one the team can share.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">For your milestone</h3><p style="font-size:24px; line-height:1.4">Wireframes of every MVP screen, plus a clickable prototype of one key flow if you can.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="Grey boxes stand for images; short bars stand for body text. Labels are real words, not lorem ipsum, because wording is part of the design. Each screen is annotated with the story it serves. The third screen deliberately shows the error state from UC-04 extension 3a." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Wireframes · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Wireframes for three MVP screens</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="width:320px; flex:none; height:600px; border:4px solid #6B6980; border-radius:34px; padding:22px 18px; gap:12px; background:#FFFFFF"><div style="height:6px; width:70px; background:#E0DFEA; border-radius:3px; align-self:center"></div><div style="flex-direction:row; justify-content:space-between; align-items:center"><p style="font-size:20px; font-weight:600; color:#1E1B2E; line-height:1.25">Near me now</p><div style="width:28px; height:28px; border:2px solid #6B6980; border-radius:6px"></div></div><p style="font-size:15px; font-weight:400; color:#6B6980; line-height:1.25">Next hour · within 1 km</p><div style="border:2px solid #E0DFEA; border-radius:10px; padding:10px 12px; gap:4px"><p style="font-size:17px; font-weight:600; color:#1E1B2E; line-height:1.25">Street dance finals</p><p style="font-size:15px; font-weight:400; color:#4C4A5E; line-height:1.25">7:15 PM · Plaza · 200 m</p></div><div style="border:2px solid #E0DFEA; border-radius:10px; padding:10px 12px; gap:4px"><p style="font-size:17px; font-weight:600; color:#1E1B2E; line-height:1.25">Food fair opens</p><p style="font-size:15px; font-weight:400; color:#4C4A5E; line-height:1.25">7:30 PM · Gym grounds · 450 m</p></div><div style="border:2px solid #E0DFEA; border-radius:10px; padding:10px 12px; gap:4px"><p style="font-size:17px; font-weight:600; color:#1E1B2E; line-height:1.25">Choir concert</p><p style="font-size:15px; font-weight:400; color:#4C4A5E; line-height:1.25">7:45 PM · Cathedral · 800 m</p></div><div style="flex:1"></div><div style="height:54px; border-radius:12px; background:#231E3D; justify-content:center; align-items:center"><p style="font-size:18px; font-weight:600; color:#F5C451; line-height:1.25">Change area</p></div></div>
+    <div style="width:320px; flex:none; height:600px; border:4px solid #6B6980; border-radius:34px; padding:22px 18px; gap:12px; background:#FFFFFF"><div style="height:6px; width:70px; background:#E0DFEA; border-radius:3px; align-self:center"></div><div style="flex-direction:row; justify-content:space-between; align-items:center"><p style="font-size:20px; font-weight:600; color:#1E1B2E; line-height:1.25">Event</p><div style="width:28px; height:28px; border:2px solid #6B6980; border-radius:6px"></div></div><div style="height:140px; width:100%; background:#DCDBE8; border-radius:6px"></div><p style="font-size:22px; font-weight:600; color:#1E1B2E; line-height:1.25">Street dance finals</p><p style="font-size:16px; font-weight:400; color:#4C4A5E; line-height:1.25">7:15–9:00 PM · Plaza stage</p><p style="font-size:15px; color:#0E7C66; font-weight:600">Updated 5 min ago: moved from 7:00 PM</p><div style="height:12px; width:100%; background:#DCDBE8; border-radius:6px"></div><div style="height:12px; width:80%; background:#DCDBE8; border-radius:6px"></div><div style="height:12px; width:60%; background:#DCDBE8; border-radius:6px"></div><div style="flex:1"></div><div style="flex-direction:row; gap:10px"><div style="flex:1; height:54px; border-radius:12px; background:#231E3D; justify-content:center; align-items:center"><p style="font-size:18px; font-weight:600; color:#F5C451; line-height:1.25">Directions</p></div><div style="flex:1; height:54px; border-radius:12px; border:2px solid #231E3D; justify-content:center; align-items:center"><p style="font-size:18px; font-weight:600; color:#231E3D; line-height:1.25">Save</p></div></div></div>
+    <div style="width:320px; flex:none; height:600px; border:4px solid #6B6980; border-radius:34px; padding:22px 18px; gap:12px; background:#FFFFFF"><div style="height:6px; width:70px; background:#E0DFEA; border-radius:3px; align-self:center"></div><div style="flex-direction:row; justify-content:space-between; align-items:center"><p style="font-size:20px; font-weight:600; color:#1E1B2E; line-height:1.25">Edit event</p><div style="width:28px; height:28px; border:2px solid #6B6980; border-radius:6px"></div></div><p style="font-size:15px; font-weight:400; color:#4C4A5E; line-height:1.25">Title</p><div style="height:44px; border:2px solid #E0DFEA; border-radius:8px"></div><p style="font-size:15px; font-weight:400; color:#4C4A5E; line-height:1.25">Start time</p><div style="height:44px; border:2px solid #5B4BC4; border-radius:8px"></div><p style="font-size:15px; color:#5B4BC4; font-weight:600">Start time cannot be in the past</p><p style="font-size:15px; font-weight:400; color:#4C4A5E; line-height:1.25">Venue</p><div style="height:44px; border:2px solid #E0DFEA; border-radius:8px"></div><div style="flex:1"></div><div style="height:54px; border-radius:12px; background:#E0DFEA; justify-content:center; align-items:center"><p style="font-size:18px; font-weight:600; color:#6B6980; line-height:1.25">Save changes</p></div></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Story #12</h3><p style="font-size:22px; line-height:1.4">Near me now: next hour, within 1 km, sorted by time.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Story #15 · status</h3><p style="font-size:22px; line-height:1.4">The "updated" line answers heuristic 1 and the trust goal from Week 3.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Error state</h3><p style="font-size:22px; line-height:1.4">Inline message under the field; Save stays disabled (heuristic 5).</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Thumb zone</h3><p style="font-size:22px; line-height:1.4">Main actions sit at the bottom of each screen.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="The five-state &quot;UI stack&quot; is from Scott Hurff (2015). Empty and error states are where student apps most often look broken in demos. Designing them now is much cheaper than discovering them during testing in Week 9." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Wireframes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Design every state, not just the happy one</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:14px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Ideal</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">The screen with real, typical content</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Empty</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">"No events in the next hour near you. Here are the next three."</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Loading</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Show cached data or a skeleton, not a blank screen</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Partial</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One event has no venue yet: what does its card show?</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">5</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Error</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Offline, server down, location denied: say what to do next</p></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Your Week 4 unhappy-path acceptance criteria tell you which states each screen needs.</p>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px"><b>Annotate</b> each wireframe with: the story ID, the states shown, and any accessibility notes (labels, contrast, focus order).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">S. Hurff, "How to fix a bad user interface" (2015)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="Think-aloud testing on paper or clickable wireframes is fast: ten minutes per person. Five users per round is Nielsen&#x27;s classic guidance. The syllabus asks teams to defend their solution using user or peer feedback; these sessions are a direct source of it. Get consent and do not record faces or names without permission." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Wireframes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Test wireframes with real users</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Pick tasks from stories</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">"Find an event starting soon near the plaza." Do not explain the screens first.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Recruit 3 to 5 people</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">From your stakeholder list, not your teammates.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Ask them to think aloud</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">They say what they look for and expect while they try.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Watch, do not help</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Note where they hesitate, misread, or give up.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:320px; font-size:26px; font-weight:600; color:#231E3D">Fix and repeat</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Change the wireframe; test the next person on the new version.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Record what you changed and why. It is evidence for the "user or peer feedback" part of your final defense.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="This is a preliminary component design, as the milestone asks. Three layers keep responsibilities separate: screens do not talk to the database directly. External services sit outside the boundary, matching the context diagram from Week 3. Week 7 refines this into an architecture, chooses technologies, and sets up the repository structure to match." aria-label="Slide 23">
+<section id="s23" data-section="Component design" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Component design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">A first sketch of the components</h2>
+  </div>
+  <div style="flex-direction:row; gap:24px"><div style="flex:3; gap:8px"><div style="flex-direction:row; gap:14px; align-items:stretch; background:#ECE9FB; border-radius:16px; padding:16px"><div style="width:200px; flex:none; justify-content:center"><p style="font-size:21px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Presentation</p></div><div style="flex:1; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Visitor web app</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Near me, event details, save</p></div><div style="flex:1; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Organizer pages</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Login, edit events</p></div></div><div style="flex-direction:row; justify-content:center"><x-shape kind="arrow-down" style="width:30px; height:30px; background:#6B6980"></x-shape></div><div style="flex-direction:row; gap:14px; align-items:stretch; background:#E1F3EE; border-radius:16px; padding:16px"><div style="width:200px; flex:none; justify-content:center"><p style="font-size:21px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Application</p></div><div style="flex:1; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Events API</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Read, create, update events</p></div><div style="flex:1; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Auth</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Organizer login, permissions</p></div><div style="flex:1; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Notifier</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Tells savers about changes</p></div></div><div style="flex-direction:row; justify-content:center"><x-shape kind="arrow-down" style="width:30px; height:30px; background:#6B6980"></x-shape></div><div style="flex-direction:row; gap:14px; align-items:stretch; background:#ECECF2; border-radius:16px; padding:16px"><div style="width:200px; flex:none; justify-content:center"><p style="font-size:21px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#6B6980">Data</p></div><div style="flex:1; gap:6px; background:#231E3D; border:0px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#F5C451">Database</h3><p style="font-size:21px; line-height:1.35; color:#C9C5E0">organizers, venues, events, saved_events</p></div></div></div><div style="flex:1; gap:14px; justify-content:center"><div style="flex:none; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Map app (external)</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Directions via a link</p></div><div style="flex:none; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:18px 22px"><h3 style="font-size:26px; font-weight:600; color:#231E3D">Push service (external)</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Delivers notifications</p></div></div></div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">23</p>
+</section>
+</div>
+<div class="frame" data-notes="The &quot;Stories&quot; column is traceability again: every story should land in at least one component, and every component should serve at least one story. Cohesion and coupling are previewed here and covered properly next week." aria-label="Slide 24">
+<section id="s24" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Component design</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Give each component one clear job</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:20%; color:#F4F4F8">Component</th><th style="width:36%; color:#F4F4F8">Responsible for</th><th style="width:24%; color:#F4F4F8">Talks to</th><th style="width:20%; color:#F4F4F8">Stories</th></tr>
+    <tr><td><b>Visitor web app</b></td><td>Showing events; caching the schedule offline</td><td>Events API</td><td>#12, #13, #18</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Organizer pages</b></td><td>Forms to create and edit events</td><td>Events API, Auth</td><td>#15, #16</td></tr>
+    <tr><td><b>Events API</b></td><td>Validating and storing event changes</td><td>Database, Notifier</td><td>#12–#18</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Auth</b></td><td>Who is logged in; who may edit what</td><td>Database</td><td>#15, #16</td></tr>
+    <tr><td><b>Notifier</b></td><td>Sending change notices to saved devices</td><td>Push service</td><td>#17</td></tr>
+  </table>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">High cohesion</h3><p style="font-size:24px; line-height:1.4">Everything in a component belongs to the same job.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Low coupling</h3><p style="font-size:24px; line-height:1.4">Components know as little about each other as possible.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">More in Week 7</h3><p style="font-size:24px; line-height:1.4">Modularity, design principles, and architecture styles.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">24</p>
+</section>
+</div>
+<div class="frame" data-notes="Diagrams as code (Mermaid, PlantUML) have the advantage that changes show up in pull-request diffs and reviews. GitHub renders Mermaid code blocks in Markdown files directly. The syllabus lists draw.io and Figma as example tools; any equivalent approved tool is fine." aria-label="Slide 25">
+<section id="s25" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Design tools</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Tools for diagrams and wireframes</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">draw.io (diagrams.net)</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Free UML, ER, and flow diagrams; saves to GitHub</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Figma</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Wireframes, mockups, and clickable prototypes; free education plan</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #5B4BC4"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Excalidraw</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Hand-drawn style sketches; quick to share</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Mermaid / PlantUML</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Diagrams as text, versioned in the repository; GitHub renders Mermaid</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">Paper and a phone camera</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Still the fastest way to sketch ten ideas</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><h3 style="font-size:28px; font-weight:600; color:#231E3D">dbdiagram.io</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Quick ER diagrams from a short text description</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Whatever you use: <b>commit the source file and an exported image</b> to your repository, and link them from your design document.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">25</p>
+</section>
+</div>
+<div class="frame" data-notes="Use this as a self-review checklist before submitting the design package." aria-label="Slide 26">
+<section id="s26" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Design tools</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Common design mistakes</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:30%; color:#F4F4F8">Mistake</th><th style="width:34%; color:#F4F4F8">Why it hurts</th><th style="width:36%; color:#F4F4F8">Fix</th></tr>
+    <tr><td>Diagrams drawn after the code</td><td>They document guesses, not decisions</td><td>Draw before building; update when it changes</td></tr>
+    <tr style="background:#F6F5FB"><td>A class for every noun</td><td>Cluttered model; confusion over what matters</td><td>Keep only things with data or behaviour</td></tr>
+    <tr><td>Only the happy-path screen</td><td>Empty and error screens break in the demo</td><td>Wireframe all five states for key screens</td></tr>
+    <tr style="background:#F6F5FB"><td>Pixel-perfect mockups in Week 6</td><td>Time spent on colour, not flow</td><td>Grey wireframes first; style later</td></tr>
+    <tr><td>Wireframes tested only by the team</td><td>You already know how it works</td><td>Test with 3 to 5 stakeholders</td></tr>
+    <tr style="background:#F6F5FB"><td>No link to stories</td><td>Cannot show why a screen exists</td><td>Annotate each screen with story IDs</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">26</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: an activity diagram (readable for non-technical stakeholders); a sequence diagram if the audience is the team. Q2: a state machine, with transitions such as approve(), reject() and release(). Q3: many-to-many (0..* on both ends), which in the data design needs a join table such as route_stops with a stop order. Q4: visibility of system status (1), and arguably help users recognize and recover (9); design an empty state." aria-label="Slide 27">
+<section id="s27" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Class discussion</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Which model fits?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">You need to explain to an organizer what happens after they press <b>Save</b>. Which diagram?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">A <b>barangay request</b> goes from submitted to approved, rejected, or released. Which diagram?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">A jeepney <b>Route</b> has many <b>Stops</b>; a Stop can be on many Routes. What multiplicity?</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">Your list screen shows nothing when there are no results. Which heuristic fails?</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">27</p>
+</section>
+</div>
+<div class="frame" data-notes="The design package should trace back to the requirements: stories to screens, stories to components, NFRs to design guidelines. Week 7 extends it into the architecture and design document and adds the Sprint 1 plan." aria-label="Slide 28">
+<section id="s28" data-section="Activity, discussion and recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Team milestone · this week</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Your design package</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:20px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">System model</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Domain model or class diagram</li><li style="margin:5px 0">One activity, sequence, or state diagram for your key flow</li><li style="margin:5px 0">Preliminary data design: tables and keys</li><li style="margin:5px 0">Source files and images in the repository</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Wireframes</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">Every MVP screen, annotated with story IDs</li><li style="margin:5px 0">Empty, loading, and error states for key screens</li><li style="margin:5px 0">User flow for your most important story</li><li style="margin:5px 0">Notes from testing with 3 to 5 people</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Components</h3><ul style="font-size:26px; line-height:1.4"><li style="margin:5px 0">A component sketch with layers</li><li style="margin:5px 0">Responsibilities and who talks to whom</li><li style="margin:5px 0">External services shown outside the boundary</li><li style="margin:5px 0">Open design questions for Week 7</li></ul></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">28</p>
+</section>
+</div>
+<div class="frame" data-notes="Paper and pens are enough. What to look for. A: classes Student, MenuItem, Order, OrderItem, PickupSlot; empty state when an item sells out. B: Resident, Request, DocumentType, StatusChange; a status screen that shows where the request is. C: Route, Stop, RouteStop, Landmark; empty state when no direct route exists, suggesting a transfer. For the review, check heuristics 1 (status), 5 (error prevention) and 9 (error recovery)." aria-label="Slide 29">
+<section id="s29" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">In-class activity · 25 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Sketch it</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">2 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Choose</b> your scenario (the same as before).</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">7 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Domain model:</b> four or five classes with attributes and multiplicities.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">8 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Wireframe two screens</b> on paper for one key story, including one error or empty state.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">4 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Swap and review</b> a neighbour's screens against three of Nielsen's heuristics.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">4 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Share:</b> two students show their wireframes; the class finds one improvement each.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Key story: a student orders and picks up lunch.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario B</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Barangay document requests</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Key story: a resident requests a clearance and checks its status.</p></div>
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario C</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Jeepney route finder</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Key story: a commuter finds which jeepney goes from A to B.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Week 6 · Analysis and design, UML models, UI/UX, and wireframes</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">29</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up while students work. Encourage rough sketches; the conversation in the review step matters more than neat drawings." aria-label="Slide 30">
+<section id="s30" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">In-class activity · worksheet</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Draw these on paper or in a document</h2>
+  </div>
+  <div style="flex-direction:row; gap:20px; height:600px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Domain model: 4–5 classes, attributes, multiplicities</p></div><div style="flex:1.2; gap:20px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Screen 1: key story</p></div><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Screen 2: error or empty state</p></div></div><div style="flex:0.8; gap:20px"><div style="flex:1; gap:10px; background:#FFFFFF; border:2px dashed #E0DFEA; border-radius:14px; padding:18px 22px"><p style="font-size:24px; font-weight:600; color:#231E3D">Heuristics checked: 1 · 5 · 9</p></div></div></div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">Scenario A: canteen pre-ordering · B: barangay document requests · C: jeepney route finder</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">30</p>
+</section>
+</div>
+<div class="frame" data-notes="Analysis models the problem domain; design models the solution. Draw diagrams to communicate, explore and document, and only as much as helps. Structural models (domain and class diagrams, data design) capture things and relationships; behavioural models (activity, sequence, state) capture flows and changes. UX is the whole experience and UI the screens; Nielsen&#x27;s heuristics and the real context of use guide them. Map user flows, choose fidelity deliberately, wireframe every state, and test with real users. A first component sketch with clear responsibilities sets up next week: architecture, modularity, design principles, Git workflows and code review." aria-label="Slide 31">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">From requirements to a buildable design</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Analysis: the problem; design: the solution</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Model only what helps decide</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Classes and data: one fact, one place</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Activity, sequence, state for behaviour</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Heuristics and real context for UI</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Wireframe all states; test with users</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">Sketch before you build, and let users break your sketches.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>
