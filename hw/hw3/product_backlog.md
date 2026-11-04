@@ -1,6 +1,4 @@
-# CSC181 Team Activity
-
-## From Interviews to a Product Backlog
+# From Interviews to a Product Backlog
 
 ## Overview
 
