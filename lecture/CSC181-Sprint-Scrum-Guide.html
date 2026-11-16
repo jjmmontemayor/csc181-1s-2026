@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running Your Sprints with Scrum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#14112A;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+.frame{position:absolute;inset:0;display:none}
+.frame.active{display:block}
+.frame>section{position:relative;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;
+  font-size:32px;line-height:1.4;color:#1E1B2E;font-family:'IBM Plex Sans',Arial,sans-serif}
+section div{display:flex;flex-direction:column;min-width:0}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section ul,section ol{padding-left:1.2em}
+section table{width:100%;border-collapse:collapse;table-layout:fixed}
+section th,section td{padding:.35em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(30,27,46,.14)}
+section th{font-weight:600}
+section svg{display:block;flex:none}
+x-shape{display:block;flex:none}
+x-shape[kind="arrow-right"]{clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%)}
+x-shape[kind="arrow-left"]{clip-path:polygon(100% 30%,40% 30%,40% 0,0 50%,40% 100%,40% 70%,100% 70%)}
+x-shape[kind="arrow-down"]{clip-path:polygon(30% 0,70% 0,70% 60%,100% 60%,50% 100%,0 60%,30% 60%)}
+x-shape[kind="arrow-up"]{clip-path:polygon(30% 100%,70% 100%,70% 40%,100% 40%,50% 0,0 40%,30% 40%)}
+x-shape[kind="ellipse"]{border-radius:50%}
+x-shape[kind="diamond"]{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.xi{flex:none}
+#bar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.08);z-index:5}
+#bar i{display:block;height:100%;width:0;background:#F5C451;transition:width .2s}
+#hud{position:fixed;right:16px;bottom:14px;display:flex;gap:8px;align-items:center;z-index:6;
+  font:500 14px 'IBM Plex Sans',Arial,sans-serif;color:#C9C5E0;opacity:.25;transition:opacity .2s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button{background:#2F2952;color:#F4F4F8;border:1px solid #4A4375;border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer}
+#hud button:focus-visible{outline:2px solid #F5C451;outline-offset:2px}
+#notes{position:fixed;left:16px;right:16px;bottom:56px;max-height:34vh;overflow:auto;display:none;z-index:6;
+  background:rgba(35,30,61,.96);color:#F4F4F8;border:1px solid #4A4375;border-radius:12px;padding:16px 20px;
+  font:400 17px/1.55 'IBM Plex Sans',Arial,sans-serif}
+#notes.show{display:block}
+#notes b{color:#F5C451;font-weight:600}
+#help{position:fixed;top:14px;right:16px;z-index:6;font:400 13px 'IBM Plex Sans',Arial,sans-serif;color:#9592B0;opacity:0;transition:opacity .4s}
+body.fresh #help{opacity:1}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:none;height:auto}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important;width:auto;height:auto}
+  .frame{position:relative;display:block;page-break-after:always;break-after:page;width:1920px;height:1080px}
+  #bar,#hud,#notes,#help{display:none!important}
+}
+</style>
+</head>
+<body class="fresh">
+<div id="viewport"><div id="stage">
+<div class="frame" data-notes="Use this deck once the backlogs are reviewed, before Sprint 1 starts on November 18. It turns the Scrum ideas from Week 2 and the sprint material from Weeks 7 and 8 into a concrete routine for the remaining weeks, and ends with three practice exercises teams can do together." aria-label="Slide 1">
+<section id="cover" data-transition="fade" style="display:flex; flex-direction:column; justify-content:space-between; padding:128px; background:#231E3D">
+  <div style="position:absolute; top:0; left:0; width:24px; height:1080px; display:flex; flex-direction:column; background:#F5C451">
+  </div>
+  <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">CSC181 · Software Engineering</p>
+  <div style="display:flex; flex-direction:column; gap:40px">
+    <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:700; line-height:1.02; letter-spacing:-2px; color:#F4F4F8">Running your<br>sprints with Scrum</h1>
+    <p style="width:1400px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:36px; line-height:1.4; color:#C9C5E0">A practice guide for Sprint 1 and Sprint 2: roles, sprint planning, stand-ups, the project board, the sprint review, and the retrospective</p>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:end; justify-content:space-between">
+    <p style="font-family:'IBM Plex Sans', Arial, sans-serif; font-size:28px; color:#C9C5E0">Sprint and Scrum guide</p>
+  </div>
+</section>
+</div>
+<div class="frame" data-notes="Dates reflect the revised schedule after the backlog extension. Each sprint is two weeks of school days. Sprint 2 ends with a feature freeze two days before its review, so the last days go to testing, documentation, and rehearsal rather than new features." aria-label="Slide 2">
+<section id="s2" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Where we are</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Two sprints to demo day</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:22%; color:#F4F4F8">Dates</th><th style="width:52%; color:#F4F4F8">What happens</th><th style="width:26%; color:#F4F4F8">Scrum event</th></tr>
+    <tr><td><b>Mon Nov 16 – Tue Nov 17</b></td><td>Review your own backlog; quick wireframes; accept the repository invite; load stories as issues</td><td>Backlog refinement</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Wed Nov 18</b></td><td>Choose the Sprint 1 goal and stories; break them into tasks</td><td>Sprint 1 planning</td></tr>
+    <tr><td><b>Nov 18–27</b></td><td><b>Sprint 1:</b> build the core flow of the MVP, end to end</td><td>Stand-ups Mon, Wed, Fri</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Fri Nov 27</b></td><td>Demo what works; decide what changes; improve how you work</td><td>Review and retrospective</td></tr>
+    <tr><td><b>Nov 30–Dec 11</b></td><td><b>Sprint 2:</b> finish the MVP, test it, write the docs; feature freeze Wed Dec 9</td><td>Planning Nov 30; review Dec 11</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Mon Dec 14</b></td><td>Final demonstration and defense</td><td>Demo day</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Your ordered product backlog is the input to everything on this slide. The top of it becomes Sprint 1.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">02</p>
+</section>
+</div>
+<div class="frame" data-notes="A recap of the Week 2 Scrum picture. Empiricism: transparency (the board shows the truth), inspection (stand-ups, review, retro), and adaptation (change the plan or the process). Students should see that every event exists to inspect something and adapt something." aria-label="Slide 3">
+<section id="s3" data-section="Scrum roles and rhythm" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scrum in one slide</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The loop you will run twice</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Product backlog</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Ordered stories, owned by the product owner</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Sprint planning</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Pick a goal and the stories that reach it</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Sprint backlog</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Those stories, split into tasks</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">The sprint</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Build, review, merge; stand-ups three times a week</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">5</p><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Increment</h3><p style="font-size:20px; line-height:1.3; color:#C9C5E0">Working software on main</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Sprint review</h3><p style="font-size:25px; line-height:1.4">Show the increment. Collect feedback as new backlog items.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Retrospective</h3><p style="font-size:25px; line-height:1.4">Look at how you worked. Pick one or two changes.</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:16px; background:#ECECF2; border-radius:12px; padding:16px 26px">
+    <x-shape kind="arrow-left" style="width:88px; height:36px; background:#6B6980"></x-shape>
+    <p style="font-size:26px; line-height:1.4">Both feed the next sprint planning. Scrum is inspect and adapt, on a fixed rhythm.</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">K. Schwaber &amp; J. Sutherland, The Scrum Guide (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">03</p>
+</section>
+</div>
+<div class="frame" data-notes="The 2020 Scrum Guide calls these accountabilities within one team. Recommend one product owner for the whole project (continuity with the stakeholders) and a rotating scrum master (so the facilitation load and the learning are shared). Write the names into the working agreement before Sprint 1 planning." aria-label="Slide 4">
+<section id="s4" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scrum roles</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Who does what on your team</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Product owner</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Orders the backlog and keeps it current</li><li style="margin:5px 0">Speaks for the stakeholders you interviewed</li><li style="margin:5px 0">Accepts or rejects a story at the review</li><li style="margin:5px 0">Says "not this sprint" to new requests</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Scrum master</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Runs planning, stand-ups, review, and retro</li><li style="margin:5px 0">Chases blockers; keeps the board honest</li><li style="margin:5px 0">Posts the stand-up summary</li><li style="margin:5px 0">Rotates each sprint, so two people do it</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">Developers</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Everyone on the team, including the PO and SM</li><li style="margin:5px 0">Pick tasks, branch, commit, open pull requests</li><li style="margin:5px 0">Review each other's code within 24 hours</li><li style="margin:5px 0">Move their own cards on the board</li></ul></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">In a team of four, the product owner and scrum master also write code. They are accountabilities, not job titles.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">04</p>
+</section>
+</div>
+<div class="frame" data-notes="The Scrum Guide timeboxes assume a full-time team; these are scaled for students who meet around classes, as in Week 8, slide 7. Teams may move a day to fit their schedules, but they should keep every event and agree the times before Sprint 1 starts." aria-label="Slide 5">
+<section id="s5" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Scrum rhythm</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Your sprint calendar</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:24%; color:#F4F4F8"></th><th style="width:27%; color:#F4F4F8">Sprint 1</th><th style="width:27%; color:#F4F4F8">Sprint 2</th><th style="width:22%; color:#F4F4F8">Length</th></tr>
+    <tr><td><b>Sprint planning</b></td><td>Wed Nov 18</td><td>Mon Nov 30</td><td>60 minutes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Stand-ups</b></td><td>Mon, Wed, Fri</td><td>Mon, Wed, Fri</td><td>10 minutes, or written by 9 PM</td></tr>
+    <tr><td><b>Backlog refinement</b></td><td>Fri Nov 20</td><td>Fri Dec 4</td><td>30 minutes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Feature freeze</b></td><td>—</td><td>Wed Dec 9</td><td>Only fixes, tests, docs after this</td></tr>
+    <tr><td><b>Sprint review</b></td><td>Fri Nov 27</td><td>Fri Dec 11</td><td>15–20 minutes</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Retrospective</b></td><td>Fri Nov 27</td><td>Fri Dec 11</td><td>20 minutes, right after the review</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Put these dates in a shared calendar today. A meeting with no date does not happen.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">05</p>
+</section>
+</div>
+<div class="frame" data-notes="Steps 3 and 4 depend on the instructor creating the team repositories and boards; teams wait for the invite. Everything else can start now. The working agreement from Week 7, slide 29 is the model: branching, reviews, Definition of Done, stand-ups, when stuck, board hygiene." aria-label="Slide 6">
+<section id="s6" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Before Sprint 1</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Get ready by Tuesday</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">1</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Review the backlog</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Real roles and "so that"; criteria with unhappy paths; Must-haves that fit two sprints.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">2</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Sketch wireframes</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Quick, low-fidelity screens for the MVP stories only.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#5B4BC4">3</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Join the repository</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Accept the invite. Do not create your own repository or board.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">4</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Load the backlog</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">One issue per story, labelled, in order in the Backlog column.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:24px; border-top:6px solid #0E7C66"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#0E7C66">5</p><h3 style="font-size:28px; font-weight:600; color:#231E3D">Name the roles</h3><p style="font-size:24px; line-height:1.38; color:#4C4A5E">Product owner for the project; scrum master for Sprint 1.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#231E3D; border-radius:14px; padding:24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:36px; font-weight:700; line-height:1; color:#F5C451">6</p><h3 style="font-size:28px; font-weight:600; color:#F4F4F8">Write the agreement</h3><p style="font-size:24px; line-height:1.38; color:#C9C5E0">Stand-up days, review turnaround, Definition of Done, in the repo.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">06</p>
+</section>
+</div>
+<div class="frame" data-notes="This follows the Scrum Guide&#x27;s three planning questions: why is this sprint valuable (the goal), what can be done (selection), how will it be done (tasks). Week 7, slides 27 and 28 have the worked example. Record the result in docs/sprints/sprint-1.md so the review can compare plan with outcome." aria-label="Slide 7">
+<section id="s7" data-section="Sprint planning" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Sprint planning</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">A 60-minute sprint planning meeting</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35">The product owner shows the top of the backlog and proposes a goal.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">10 min</p><p style="flex:1; font-size:25px; line-height:1.35">Agree the <b>sprint goal</b> in one sentence.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">10 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Pull</b> stories from the top until the goal is covered.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">20 min</p><p style="flex:1; font-size:25px; line-height:1.35">Split each story into <b>tasks</b> of a day or less.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">10 min</p><p style="flex:1; font-size:25px; line-height:1.35">Check the tasks against <b>capacity</b>. Drop or split if over.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35">Give each story an <b>owner</b> and a <b>reviewer</b>; set the Iteration field.</p></div>
+  </div>
+    <div style="flex:0.85; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#2F2952; border-left:6px solid #F5C451; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#F5C451">Pull, do not push</h3><p style="font-size:24px; line-height:1.4; color:#F4F4F8">The developers decide how much fits. The product owner decides the order.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#2F2952; border-left:6px solid #F5C451; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#F5C451">Output</h3><p style="font-size:24px; line-height:1.4; color:#F4F4F8">A sprint goal, a set of stories on the board marked Sprint 1, and tasks with owners.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">K. Schwaber &amp; J. Sutherland, The Scrum Guide (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">07</p>
+</section>
+</div>
+<div class="frame" data-notes="A goal gives the team room to negotiate scope during the sprint: if a story turns out bigger, they can cut part of it as long as the goal still holds. Sprint 1&#x27;s goal should describe a walking skeleton, the thin end-to-end slice from the story map." aria-label="Slide 8">
+<section id="s8" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint planning</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Write a sprint goal you can check</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:28%; color:#F4F4F8">Weak goal</th><th style="width:26%; color:#F4F4F8">Why it fails</th><th style="width:46%; color:#F4F4F8">Better goal</th></tr>
+    <tr><td>"Work on the app."</td><td>Nothing to check at the review</td><td>"A student can see today's menu and place a pre-order for a pickup time, on the deployed site."</td></tr>
+    <tr style="background:#F6F5FB"><td>"Finish stories #3, #4, #7."</td><td>A list, not a purpose</td><td>"A cashier can see the next pickup slot's orders in the order they were placed."</td></tr>
+    <tr><td>"Set up the database and login."</td><td>No user value</td><td>"An organizer can sign in and edit one event, and visitors see the change."</td></tr>
+    <tr style="background:#F6F5FB"><td>"Do everything in the MVP."</td><td>Too big for one sprint</td><td>"The core flow works end to end for one user, with sample data."</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Test: at the review, can someone outside the team say "yes, that is true now" by watching the demo?</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">08</p>
+</section>
+</div>
+<div class="frame" data-notes="Names are fictional. 70% follows Week 7, slide 27. The sum of task hours, not the story sizes, is compared with capacity. Story #4 is listed as a stretch: it is started only if the planned stories are done. In Sprint 2, replace the guess with velocity: what the team actually finished in Sprint 1." aria-label="Slide 9">
+<section id="s9" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint planning · example</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Check capacity before you commit</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+      <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:44%; color:#F4F4F8">Member</th><th style="width:30%; color:#F4F4F8">Hours per week</th><th style="width:26%; color:#F4F4F8">Two weeks</th></tr>
+    <tr><td>Ana</td><td>8</td><td>16</td></tr>
+    <tr style="background:#F6F5FB"><td>Ben</td><td>6</td><td>12</td></tr>
+    <tr><td>Cara</td><td>8</td><td>16</td></tr>
+    <tr style="background:#F6F5FB"><td>Dan</td><td>4 (exam week)</td><td>8</td></tr>
+    <tr><td><b>Total</b></td><td></td><td><b>52 h</b></td></tr>
+    <tr style="background:#F6F5FB"><td><b>Plan for 70%</b></td><td></td><td><b>about 36 h</b></td></tr>
+  </table>
+  </div>
+    <div style="flex:1.1; display:flex; flex-direction:column; gap:12px">
+      <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:58%; color:#F4F4F8">Story</th><th style="width:16%; color:#F4F4F8">Size</th><th style="width:26%; color:#F4F4F8">Task hours</th></tr>
+    <tr><td>#1 See today's menu</td><td>M</td><td>12 h</td></tr>
+    <tr style="background:#F6F5FB"><td>#2 Pre-order for a pickup slot</td><td>M</td><td>12 h</td></tr>
+    <tr><td>#3 Cashier sees the slot's orders</td><td>S</td><td>6 h</td></tr>
+    <tr style="background:#F6F5FB"><td><b>Planned</b></td><td></td><td><b>30 h</b></td></tr>
+    <tr><td>#4 Mark an item sold out</td><td>S</td><td>6 h (stretch)</td></tr>
+  </table>
+  </div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Ask each person for <b>real</b> hours: classes, exams, work, and travel included. Then keep 30% for surprises.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">09</p>
+</section>
+</div>
+<div class="frame" data-notes="These are the columns on the team boards the instructor sets up. The rules make the board honest: a card in In progress means someone touched it today; Done means merged and meeting the Definition of Done, not &quot;works on my laptop&quot;. Week 8, slides 11 to 13 cover issues, work-in-progress limits, and the burndown." aria-label="Slide 10">
+<section id="s10" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">The project board</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Every column has a rule</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:14px"><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">Backlog</p><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Ordered by the product owner. Top is next.</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#4 · unassigned</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Mark an item sold out</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#5 · unassigned</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Order-ready notice</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">Ready</p><p style="font-size:19px; line-height:1.3; color:#4C4A5E">In this sprint, with criteria and an owner.</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#3 · Dan</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Cashier sees the slot's orders</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">In progress</p><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Someone is working on it today. Two cards each, at most.</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#2 · Ben</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Pre-order for a pickup slot</p></div><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #B4423A; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#8 · Cara</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Fix price rounding</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">In review</p><p style="font-size:19px; line-height:1.3; color:#4C4A5E">A pull request is open and waiting.</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #5B4BC4; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#1 · Ana</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">See today's menu</p></div></div><div style="flex:1; gap:10px; background:#ECECF2; border-radius:14px; padding:16px"><p style="font-size:23px; font-weight:600; color:#231E3D">Done</p><p style="font-size:19px; line-height:1.3; color:#4C4A5E">Merged and meets the Definition of Done.</p><div style="gap:4px; background:#FFFFFF; border:1px solid #E0DFEA; border-left:5px solid #0E7C66; border-radius:8px; padding:10px 14px"><p style="font-size:18px; color:#6B6980">#9 · Cara</p><p style="font-size:21px; line-height:1.3; color:#1E1B2E">Deploy to a public URL</p></div></div></div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">Move your own card the moment your work changes. The board is the agenda for every stand-up.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">10</p>
+</section>
+</div>
+<div class="frame" data-notes="The Daily Scrum inspects progress toward the sprint goal. For a blended course, a written stand-up works if everyone posts the three answers by an agreed time (Week 2). The posts are also contribution evidence. A good post makes a blocker visible to a specific person; the weak one hides everything." aria-label="Slide 11">
+<section id="s11" data-section="During the sprint" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">During the sprint</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Stand-ups: three questions, three times a week</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:22px 26px"><p style="font-size:22px; font-weight:600; color:#0E7C66">Useful</p><p style="font-size:20px; color:#6B6980">Ben · Wed 8:40 PM</p><p style="font-size:22px; line-height:1.35"><b>Done:</b> Pickup slot picker (#2), PR #14 open.</p><p style="font-size:22px; line-height:1.35"><b>Next:</b> Save the order to the database.</p><p style="font-size:22px; line-height:1.35"><b>Blocked:</b> Need Ana to review #14 before I can merge.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #B4423A; border-radius:14px; padding:22px 26px"><p style="font-size:22px; font-weight:600; color:#B4423A">Not useful</p><p style="font-size:20px; color:#6B6980">Dan · Wed 11:58 PM</p><p style="font-size:22px; line-height:1.35"><b>Done:</b> Worked on the app.</p><p style="font-size:22px; line-height:1.35"><b>Next:</b> Continue.</p><p style="font-size:22px; line-height:1.35"><b>Blocked:</b> None.</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">When</h3><p style="font-size:24px; line-height:1.4">Mon, Wed, Fri: 10 minutes on a call, or posted in the team chat by 9 PM.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Rule</h3><p style="font-size:24px; line-height:1.4">Name the issue number. Say what you will finish next, not what you will "work on".</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Scrum master</h3><p style="font-size:24px; line-height:1.4">Reads every post, then follows up on each blocker the same day.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">K. Schwaber &amp; J. Sutherland, The Scrum Guide (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">11</p>
+</section>
+</div>
+<div class="frame" data-notes="This is GitHub flow from Week 7, slide 20, connected to the board. &quot;Closes #12&quot; in the pull request description closes the issue when it merges, which keeps the board accurate. Reviewing first is a work-in-progress limit in practice: finishing work beats starting more." aria-label="Slide 12">
+<section id="s12" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">During the sprint</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">One task, from card to Done</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; align-items:center; gap:10px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">1</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Pick</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Top card in Ready; assign yourself</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">2</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Start</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Move to In progress; branch 12-pickup-slot</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">3</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Commit</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">Small commits, clear messages</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">4</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Pull request</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">"Closes #12"; move to In review</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#5B4BC4">5</p><h3 style="font-size:24px; font-weight:600; color:#1E1B2E">Review</h3><p style="font-size:20px; line-height:1.3; color:#4C4A5E">A teammate within 24 hours</p></div>
+    <x-shape kind="arrow-right" style="width:40px; height:20px; background:#5B4BC4"></x-shape>
+    <div style="flex:1; display:flex; flex-direction:column; gap:6px; background:#231E3D; border-radius:14px; padding:20px"><p style="font-size:22px; font-weight:700; color:#F5C451">6</p><h3 style="font-size:24px; font-weight:600; color:#F4F4F8">Merge</h3><p style="font-size:20px; line-height:1.3; color:#C9C5E0">CI green; card goes to Done</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Small pull requests</h3><p style="font-size:24px; line-height:1.4">Under about 300 lines. Big ones wait longer and hide bugs.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #5B4BC4; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#5B4BC4">Review before you start</h3><p style="font-size:24px; line-height:1.4">If In review is full, review a teammate's work first.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FFFFFF; border-left:6px solid #0E7C66; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#0E7C66">Check the criteria</h3><p style="font-size:24px; line-height:1.4">The reviewer ticks the story's acceptance criteria, not just the code.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">12</p>
+</section>
+</div>
+<div class="frame" data-notes="These are the problems that sink student sprints, and every one is cheaper to fix early. The new-feature row is scope creep from Week 3: the product owner protects the sprint. The member row matters for fairness; the contribution log and peer evaluation should reflect what actually happened." aria-label="Slide 13">
+<section id="s13" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">During the sprint</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Warning signs, and what to do</h2>
+  </div>
+  <table style="font-size:24px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:32%; color:#F4F4F8">You notice</th><th style="width:30%; color:#F4F4F8">What it usually means</th><th style="width:38%; color:#F4F4F8">What to do</th></tr>
+    <tr><td>A card in In progress for three days</td><td>The task is too big or blocked</td><td>Split it, or pair on it today</td></tr>
+    <tr style="background:#F6F5FB"><td>Pull requests waiting two days</td><td>Everyone is building; no one is reviewing</td><td>Stop starting; everyone reviews first</td></tr>
+    <tr><td>A stakeholder asks for a new feature</td><td>Normal; ideas keep coming</td><td>Add it to the backlog. The PO orders it; the sprint stays.</td></tr>
+    <tr style="background:#F6F5FB"><td>A member misses two stand-ups</td><td>Overloaded, stuck, or checked out</td><td>Scrum master asks privately; share the work; tell the instructor if it continues</td></tr>
+    <tr><td>Half the sprint gone, little in Done</td><td>Behind plan</td><td>Cut scope now. Keep the goal; drop the stretch.</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">13</p>
+</section>
+</div>
+<div class="frame" data-notes="Refinement is ongoing in Scrum; scheduling one 30-minute slot mid-sprint makes sure it happens. Fri Nov 20 for Sprint 1 and Fri Dec 4 for Sprint 2. In Sprint 2 the look-ahead is short: anything not started by the feature freeze moves to Won&#x27;t have this time." aria-label="Slide 14">
+<section id="s14" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">During the sprint</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Mid-sprint backlog refinement: 30 minutes</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Check the board</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Is the goal still reachable? Cut or split now if not.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Look ahead</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Read the next five stories in the backlog together.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Clarify</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Rewrite unclear acceptance criteria; ask a stakeholder if needed.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Split and size</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Split anything L; size anything new.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:280px; font-size:26px; font-weight:600; color:#231E3D">Re-order</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">The product owner adds feedback and new requests in the right place.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Refinement makes the next sprint planning fast. It is not a second planning meeting.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">14</p>
+</section>
+</div>
+<div class="frame" data-notes="The review inspects the increment and adapts the backlog; it is a working session, not a slide show. A story that is 90% done is not done: it goes back to the backlog, re-ordered. Week 8, slides 19 and 20 cover the Sprint 1 review and what counts as a working prototype." aria-label="Slide 15">
+<section id="s15" data-section="End of the sprint" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">End of the sprint</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The sprint review: show, then adapt</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:10px">
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">1</p><p style="width:260px; font-size:26px; font-weight:600; color:#231E3D">Goal</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Read the sprint goal. Met, partly met, or not met?</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">2</p><p style="width:260px; font-size:26px; font-weight:600; color:#231E3D">Live demo</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Show working software from main. Every member drives part of it.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">3</p><p style="width:260px; font-size:26px; font-weight:600; color:#231E3D">Done and not done</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Which stories meet the Definition of Done; the rest go back to the backlog.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">4</p><p style="width:260px; font-size:26px; font-weight:600; color:#231E3D">Board</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Show the board as it is. Explain flat stretches honestly.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">5</p><p style="width:260px; font-size:26px; font-weight:600; color:#231E3D">Feedback</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Write every comment down as a new issue.</p></div>
+    <div style="display:flex; flex-direction:row; gap:24px; align-items:center; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:12px; padding:14px 26px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:700; color:#5B4BC4; width:40px">6</p><p style="width:260px; font-size:26px; font-weight:600; color:#231E3D">Next</p><p style="flex:1; font-size:24px; line-height:1.35; color:#4C4A5E">Re-order the backlog for the next sprint.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">K. Schwaber &amp; J. Sutherland, The Scrum Guide (2020)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">15</p>
+</section>
+</div>
+<div class="frame" data-notes="Start, Stop, Continue is from Derby and Larsen; the Prime Directive is Norm Kerth&#x27;s. Talk about the process, not people. Example actions: &quot;review within 24 hours&quot;, &quot;post stand-ups by 9 PM&quot;, &quot;no pull request over 300 lines&quot;. The Sprint 2 retro feeds the project reflection for the defense." aria-label="Slide 16">
+<section id="s16" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">End of the sprint</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">The retrospective: 20 minutes, one or two changes</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:28px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">2 min</p><p style="flex:1; font-size:25px; line-height:1.35">Read the Prime Directive aloud.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35">Each person writes sticky notes: <b>Start</b>, <b>Stop</b>, <b>Continue</b>.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35">Group similar notes; vote with three dots each.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35">Turn the top one or two into actions with an owner.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="display:flex; flex-direction:column; gap:10px; background:#2F2952; border-radius:14px; padding:26px 30px"><p style="font-size:22px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#F5C451">Prime Directive</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:27px; line-height:1.4; color:#F4F4F8">Regardless of what we discover, we understand and truly believe that everyone did the best job they could, given what they knew at the time, their skills and abilities, the resources available, and the situation at hand.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#2F2952; border-left:6px solid #F5C451; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#F5C451">Output</h3><p style="font-size:24px; line-height:1.4; color:#F4F4F8">Write the actions into the working agreement. Check them at the next retro.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">N. Kerth, Project Retrospectives (2001) · E. Derby &amp; D. Larsen, Agile Retrospectives (2006)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">16</p>
+</section>
+</div>
+<div class="frame" data-notes="Velocity is the honest input for Sprint 2: if the team finished 24 hours of tasks in Sprint 1, plan about that much. Week 11 covers estimation, feature freeze, and demo preparation in depth." aria-label="Slide 17">
+<section id="s17" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Sprint 2</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">Sprint 2 is a finishing sprint</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #5B4BC4; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#5B4BC4">Plan with evidence</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Use what you finished in Sprint 1 (velocity), not hopes</li><li style="margin:5px 0">Unfinished Sprint 1 stories come first if still Must</li><li style="margin:5px 0">Add the review feedback, ordered by the PO</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #0E7C66; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#0E7C66">Protect the finish</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Feature freeze on Wed Dec 9</li><li style="margin:5px 0">Dec 9–11: fix bugs, test, write docs</li><li style="margin:5px 0">Every Must-have story meets the Definition of Done</li></ul></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FFFFFF; border:1px solid #E0DFEA; border-top:6px solid #6B6980; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#6B6980">Prepare the demo</h3><ul style="font-size:25px; line-height:1.4"><li style="margin:5px 0">Sprint 2 review on Fri Dec 11 is the dress rehearsal</li><li style="margin:5px 0">Dec 12–13: fix only what the rehearsal broke</li><li style="margin:5px 0">Mon Dec 14: demo day</li></ul></div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">A small MVP that works in the demo beats a large one that crashes. Cut scope before the freeze, not after.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">17</p>
+</section>
+</div>
+<div class="frame" data-notes="Practise on a small, neutral backlog first so the team learns the steps without arguing about their own project. Expected answer: a goal like &quot;a student can see today&#x27;s menu and pre-order for a pickup slot, and the cashier sees the slot&#x27;s orders&quot;; stories 1 to 3 (30 h) fit the 36 h capacity; story 4 is a stretch; 5 and 6 stay in the backlog. Check that tasks include tests and reviews." aria-label="Slide 18">
+<section id="s18" data-section="Practice" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Practice 1 · 30 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Mock sprint planning</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35">Name a product owner and a scrum master for this exercise.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">5 min</p><p style="flex:1; font-size:25px; line-height:1.35">Write a <b>sprint goal</b> for the canteen backlog on the next slide.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">8 min</p><p style="flex:1; font-size:25px; line-height:1.35"><b>Pull</b> stories that reach the goal and fit the team's capacity.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">8 min</p><p style="flex:1; font-size:25px; line-height:1.35">Split one story into <b>tasks</b> of a day or less, with hours.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">4 min</p><p style="flex:1; font-size:25px; line-height:1.35">Give each story an <b>owner</b> and a <b>reviewer</b>.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="display:flex; flex-direction:column; gap:6px; background:#F4F4F8; color:#1E1B2E; border-radius:12px; padding:18px 22px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:24px; font-weight:700; color:#5B4BC4">Scenario A</p><h3 style="font-size:26px; font-weight:600; color:#231E3D">Canteen pre-ordering</h3><p style="font-size:21px; line-height:1.35; color:#4C4A5E">Students order lunch ahead and pick it up at a time slot. Roles: student, cashier, cook, concessionaire. The same scenario as the Week 4 practice.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#2F2952; border-left:6px solid #F5C451; border-radius:0px 12px 12px 0px; padding:20px 26px"><h3 style="font-size:28px; font-weight:600; color:#F5C451">Then do it for real</h3><p style="font-size:24px; line-height:1.4; color:#F4F4F8">Run the same 60-minute meeting for your own project on Wed Nov 18.</p></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">18</p>
+</section>
+</div>
+<div class="frame" data-notes="Leave this slide up during Practice 1. Capacity: 26 h per week times two is 52 h, about 36 h at 70%. Stories 1 to 3 add up to 30 h. Adding story 4 reaches 36 h, which leaves no slack, so it should be a stretch at most. A team that pulls story 5 or 6 has ignored capacity." aria-label="Slide 19">
+<section id="s19" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:26px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Practice 1 · materials</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">The canteen backlog and team</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:24px">
+    <div style="flex:1.6; display:flex; flex-direction:column; gap:12px">
+      <table style="font-size:22px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:7%; color:#F4F4F8">#</th><th style="width:63%; color:#F4F4F8">Story</th><th style="width:15%; color:#F4F4F8">Priority</th><th style="width:15%; color:#F4F4F8">Size</th></tr>
+    <tr><td>1</td><td>As a student, I want to see today's menu with prices, so that I can decide before I go down.</td><td>Must</td><td>M</td></tr>
+    <tr style="background:#F6F5FB"><td>2</td><td>As a student, I want to pre-order for a pickup time slot, so that I skip the line.</td><td>Must</td><td>M</td></tr>
+    <tr><td>3</td><td>As a cashier, I want to see the orders for the next pickup slot, so that I can prepare them in order.</td><td>Must</td><td>S</td></tr>
+    <tr style="background:#F6F5FB"><td>4</td><td>As a cook, I want to mark an item sold out, so that students cannot order it.</td><td>Should</td><td>S</td></tr>
+    <tr><td>5</td><td>As a student, I want a notice when my order is ready, so that I do not wait at the counter.</td><td>Should</td><td>M</td></tr>
+    <tr style="background:#F6F5FB"><td>6</td><td>As a concessionaire, I want a weekly sales report, so that I can plan stock.</td><td>Could</td><td>L</td></tr>
+  </table>
+  </div>
+    <div style="flex:0.8; display:flex; flex-direction:column; gap:14px">
+      <table style="font-size:23px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:60%; color:#F4F4F8">Member</th><th style="width:40%; color:#F4F4F8">Hours / week</th></tr>
+    <tr><td>Ana</td><td>8</td></tr>
+    <tr style="background:#F6F5FB"><td>Ben</td><td>6</td></tr>
+    <tr><td>Cara</td><td>8</td></tr>
+    <tr style="background:#F6F5FB"><td>Dan</td><td>4</td></tr>
+  </table>
+      <p style="font-size:23px; line-height:1.4; color:#1E1B2E; background:#ECECF2; padding:22px 30px; border-radius:12px">Assume S ≈ 6 h, M ≈ 12 h, L ≈ 24 h of tasks. Sprint length: two weeks.</p>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">19</p>
+</section>
+</div>
+<div class="frame" data-notes="Expected answers. Q1: ask what exactly is left; split the task or pair on it today; the card should reflect reality. Q2: thank the stakeholder, add it to the backlog, and let the product owner order it; the sprint goal does not change for it. Q3: stop starting new work; everyone reviews today; consider a limit on In review. Q4: reach out privately and kindly first; redistribute his tasks if needed so the goal survives; record it honestly in the contribution log; tell the instructor if it continues." aria-label="Slide 20">
+<section id="s20" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Practice 2 · 15 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">You are the scrum master. What do you do?</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q1</p><p style="font-size:30px; line-height:1.35">Ben's card has been In progress for four days. His stand-up says "still working on it".</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q2</p><p style="font-size:30px; line-height:1.35">In week 1, a stakeholder asks for a dark mode. The developer who heard it wants to start tonight.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q3</p><p style="font-size:30px; line-height:1.35">It is Wednesday of week 2. Three pull requests have waited two days for review.</p></div>
+    <div style="display:flex; flex-direction:column; gap:14px; background:#FFFFFF; border:1px solid #E0DFEA; border-radius:16px; padding:30px 34px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:700; color:#5B4BC4">Q4</p><p style="font-size:30px; line-height:1.35">Dan has not posted for the last two stand-ups or answered the team chat.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">20</p>
+</section>
+</div>
+<div class="frame" data-notes="The backlog activity was the team&#x27;s first sizeable joint deliverable and, for many teams, needed an extension. That makes it good material for a first retrospective: real, recent, and directly useful for Sprint 1. Keep the focus on the process, not on individuals." aria-label="Slide 21">
+<section id="s21" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Practice 3 · 20 minutes</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Your first real retrospective</h2>
+  </div>
+  <div style="display:flex; flex-direction:row; gap:32px">
+    <div style="flex:1.15; display:flex; flex-direction:column; gap:12px">
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">2 min</p><p style="flex:1; font-size:25px; line-height:1.35">Read the Prime Directive aloud.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35">Think about how your team made the <b>product backlog</b>. Write Start, Stop, Continue notes.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35">Group and vote: three dots each.</p></div>
+    <div style="display:flex; flex-direction:row; gap:20px; align-items:center; background:#2F2952; border-radius:12px; padding:16px 24px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:26px; font-weight:700; color:#F5C451; width:96px">6 min</p><p style="flex:1; font-size:25px; line-height:1.35">Pick one or two actions for Sprint 1 and write them into your working agreement.</p></div>
+  </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:14px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#2F2952; border-radius:14px; padding:28px 32px"><h3 style="font-size:32px; font-weight:600; color:#F5C451">Prompts if you are stuck</h3><ul style="font-size:24px; line-height:1.4"><li style="margin:5px 0">How did we split the work on the interviews and stories?</li><li style="margin:5px 0">Did everyone know what was due, and when?</li><li style="margin:5px 0">Where did we lose time?</li><li style="margin:5px 0">What would we do differently for Sprint 1?</li></ul></div>
+  </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#C9C5E0">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#C9C5E0; text-align:right">21</p>
+</section>
+</div>
+<div class="frame" data-notes="This is how the team shows that it followed the process, and it is also individual contribution evidence (Week 7, slide 30). One Markdown file per sprint is enough: the plan at the top, the review and retro notes added at the end." aria-label="Slide 22">
+<section id="s22" data-transition="fade" style="background:#F4F4F8; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5B4BC4">Your evidence</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#231E3D">What each sprint leaves behind</h2>
+  </div>
+  <table style="font-size:25px; color:#1E1B2E; font-family:'IBM Plex Sans', Arial, sans-serif; background:#FFFFFF; border:1px solid #E0DFEA">
+    <tr style="background:#231E3D"><th style="width:36%; color:#F4F4F8">Evidence</th><th style="width:40%; color:#F4F4F8">Where it lives</th><th style="width:24%; color:#F4F4F8">Who keeps it</th></tr>
+    <tr><td>Sprint goal, stories, tasks, owners</td><td><code>docs/sprints/sprint-1.md</code> and the board</td><td>Scrum master</td></tr>
+    <tr style="background:#F6F5FB"><td>Stand-up posts</td><td>Team chat or a pinned issue thread</td><td>Everyone</td></tr>
+    <tr><td>Issues, branches, pull requests, reviews</td><td>The team repository</td><td>Everyone</td></tr>
+    <tr style="background:#F6F5FB"><td>Review notes and new feedback issues</td><td><code>docs/sprints/sprint-1.md</code> and new issues</td><td>Product owner</td></tr>
+    <tr><td>Retro actions</td><td>The working agreement in the repository</td><td>Scrum master</td></tr>
+  </table>
+  <p style="font-size:28px; line-height:1.4; color:#1E1B2E; background:#ECE9FB; padding:22px 30px; border-radius:12px">If it is not on the board or in the repository, nobody can see that it happened, including your instructor.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1300px; font-size:24px; color:#6B6980">CSC181 · Running your sprints with Scrum</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:120px; font-size:24px; color:#6B6980; text-align:right">22</p>
+</section>
+</div>
+<div class="frame" data-notes="Scrum is a fixed rhythm of inspection and adaptation. Before Sprint 1: fix the backlog, join the repository, load the issues, name a product owner and scrum master, and agree the working agreement. Sprint planning sets a checkable goal, pulls stories within real capacity, and splits them into small tasks with owners and reviewers. During the sprint, stand-ups three times a week and an honest board expose blockers early. Each sprint ends with a review that inspects the product and a retrospective that improves the process. Sprint 2 is a finishing sprint with a feature freeze on December 9 and demo day on December 14." aria-label="Slide 23">
+<section id="recap" data-transition="fade" style="background:#231E3D; color:#F4F4F8; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:12px">
+    <p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#F5C451">Recap</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:700; line-height:1.1; color:#F4F4F8">Two sprints, one rhythm</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">1</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Order the backlog; name the roles</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">2</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Plan: goal, stories, tasks, capacity</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">3</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Stand up three times a week</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">4</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Move cards; review within a day</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#2F2952; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#F5C451">5</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#F4F4F8">Review the increment, then improve</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#5B4BC4; border-radius:12px; padding:22px 26px"><p style="font-size:24px; font-weight:600; color:#FFFFFF">6</p><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:30px; font-weight:600; color:#FFFFFF">Freeze features, then finish well</p></div>
+  </div>
+  <div style="display:flex; flex-direction:row; justify-content:space-between; align-items:end">
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:600; line-height:1.25; color:#F4F4F8; width:1200px">A sprint goal you can check, a board that tells the truth.</p>
+    <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:44px; font-weight:700; color:#F5C451">Questions?</p>
+  </div>
+</section>
+</div>
+</div></div>
+<div id="bar"><i></i></div>
+<div id="notes" aria-live="polite"></div>
+<div id="help">← → to navigate · N notes · F full screen · Ctrl+P to save as PDF</div>
+<div id="hud">
+<button id="prev" aria-label="Previous slide">←</button>
+<span id="count"></span>
+<button id="next" aria-label="Next slide">→</button>
+<button id="nbtn" aria-label="Toggle speaker notes">Notes</button>
+<button id="fbtn" aria-label="Toggle full screen">Full screen</button>
+</div>
+<script>
+(function(){
+  var frames=[].slice.call(document.querySelectorAll('.frame'));
+  var notes=document.getElementById('notes'), cnt=document.getElementById('count'), bar=document.querySelector('#bar i');
+  var stage=document.getElementById('stage'), cur=0;
+  function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);stage.style.transform='scale('+s+')';}
+  function show(i){
+    i=Math.max(0,Math.min(frames.length-1,i));
+    frames[cur].classList.remove('active');frames[i].classList.add('active');cur=i;
+    cnt.textContent=(i+1)+' / '+frames.length;
+    bar.style.width=((i+1)/frames.length*100)+'%';
+    var n=frames[i].getAttribute('data-notes')||'';
+    notes.innerHTML='<b>Speaker notes · slide '+(i+1)+'</b><br>'+(n?n.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}):'(none)');
+    if(history.replaceState)history.replaceState(null,'','#'+(i+1));
+  }
+  function toggleNotes(){notes.classList.toggle('show');}
+  function full(){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();}else{document.exitFullscreen&&document.exitFullscreen();}}
+  document.addEventListener('keydown',function(e){
+    if(e.target.closest&&e.target.closest('button')&&(e.key===' '||e.key==='Enter'))return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='ArrowDown'){show(cur+1);e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'){show(cur-1);e.preventDefault();}
+    else if(k==='Home'){show(0);}else if(k==='End'){show(frames.length-1);}
+    else if(k==='n'||k==='N'){toggleNotes();}else if(k==='f'||k==='F'){full();}
+  });
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('nbtn').onclick=toggleNotes;
+  document.getElementById('fbtn').onclick=full;
+  var sx=null;
+  document.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)show(cur+(dx<0?1:-1));sx=null;});
+  window.addEventListener('hashchange',function(){var h=parseInt((location.hash||'').slice(1),10);if(!isNaN(h)&&h-1!==cur)show(h-1);});
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',function(){stage.style.transform='none'});
+  window.addEventListener('afterprint',fit);
+  fit();
+  var h=parseInt((location.hash||'').slice(1),10);frames[0].classList.add('active');show(isNaN(h)?0:h-1);
+  setTimeout(function(){document.body.classList.remove('fresh')},4000);
+})();
+</script>
+</body>
+</html>
