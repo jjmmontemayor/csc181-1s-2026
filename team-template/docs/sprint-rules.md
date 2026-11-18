@@ -2,13 +2,14 @@
 
 CSC181 uses two sprints, followed by the final demonstration and defense.
 
-| | Dates | Weeks | Ends with |
-|---|---|---|---|
-| Sprint 1 | Mon Nov 9 – Sun Nov 22 | 8–9 | Sprint 1 review and retrospective |
-| Sprint 2 | Mon Nov 23 – Fri Dec 4 | 10–11 | Sprint 2 review and retrospective; code freeze |
-| Final defense | Mon Dec 7 – Fri Dec 11 | 12 | Team presentation, demonstration, and defense |
+| | Dates | Ends with |
+|---|---|---|
+| Sprint 1 | Fri Nov 20 – Tue Dec 1 | Sprint 1 review and retrospective |
+| Sprint 2 | Wed Dec 2 – Fri Dec 11 | Feature freeze on Wed Dec 9; Sprint 2 review and retrospective |
+| Demo day | Mon Dec 14 | Team presentation, demonstration, and defense |
 
-Sprint 2 is shorter (12 days). Plan it from what the team actually finished in Sprint 1.
+Sprint 1 is 12 days and Sprint 2 is 10 days. Plan Sprint 2 from what the team actually
+finished in Sprint 1.
 
 ## Rules for every sprint
 
@@ -51,7 +52,8 @@ Sprint 2 is shorter (12 days). Plan it from what the team actually finished in S
 | Documentation | Draft user guide and technical documentation; README setup steps that work. |
 | Readiness | Deployment or release plan; security and privacy checklist done. |
 
-## Code freeze
+## Feature freeze
 
-After the Sprint 2 review, only bug fixes and documentation are merged to `main`. The version
-on `main` at the start of defense week is the one you present.
+From Wed Dec 9, no new features are merged to `main`. Only bug fixes, tests, and
+documentation are merged. The version on `main` at the end of Sprint 2 is the one you
+present on demo day.
